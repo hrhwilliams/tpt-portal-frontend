@@ -20,16 +20,21 @@ Separate index, `taxa`, aliased like the main one. Small — hundreds of thousan
 
 ```json
 {
-  "rank":         { "type": "keyword" },
-  "name":         { "type": "keyword",
-                    "fields": {
-                      "prefix": { "type": "text", "analyzer": "name_prefix",
-                                  "search_analyzer": "lowercase_keyword" },
-                      "lower":  { "type": "keyword", "normalizer": "lowercase" }
-                    } },
-  "record_count": { "type": "long" },
-  "parent_rank":  { "type": "keyword" },
-  "parent_name":  { "type": "keyword" }
+	"rank": { "type": "keyword" },
+	"name": {
+		"type": "keyword",
+		"fields": {
+			"prefix": {
+				"type": "text",
+				"analyzer": "name_prefix",
+				"search_analyzer": "lowercase_keyword"
+			},
+			"lower": { "type": "keyword", "normalizer": "lowercase" }
+		}
+	},
+	"record_count": { "type": "long" },
+	"parent_rank": { "type": "keyword" },
+	"parent_name": { "type": "keyword" }
 }
 ```
 
@@ -66,12 +71,22 @@ Homonyms across ranks are separate documents. `(family, Cricetidae)` and `(subfa
 
 ```json
 {
-  "matches": [
-    { "rank": "genus", "name": "Sorex", "record_count": 12481,
-      "parent_rank": "family", "parent_name": "Soricidae" },
-    { "rank": "genus", "name": "Sorella", "record_count": 3,
-      "parent_rank": "family", "parent_name": "Formicidae" }
-  ]
+	"matches": [
+		{
+			"rank": "genus",
+			"name": "Sorex",
+			"record_count": 12481,
+			"parent_rank": "family",
+			"parent_name": "Soricidae"
+		},
+		{
+			"rank": "genus",
+			"name": "Sorella",
+			"record_count": 3,
+			"parent_rank": "family",
+			"parent_name": "Formicidae"
+		}
+	]
 }
 ```
 
@@ -83,25 +98,26 @@ Homonyms across ranks are separate documents. `(family, Cricetidae)` and `(subfa
 Query:
 
 ```json
-{ "size": 10,
-  "query": { "bool": { "filter": [
-    { "term":  { "rank": "genus" } },
-    { "match": { "name.prefix": "sor" } }
-  ] } },
-  "sort": [ { "record_count": "desc" }, { "name": "asc" } ] }
+{
+	"size": 10,
+	"query": {
+		"bool": { "filter": [{ "term": { "rank": "genus" } }, { "match": { "name.prefix": "sor" } }] }
+	},
+	"sort": [{ "record_count": "desc" }, { "name": "asc" }]
+}
 ```
 
 ## Guardrails
 
 D38 makes this a public unauthenticated endpoint like the others, and it is the one users will hit hardest — one request per keystroke.
 
-| Guard | Value |
-|---|---|
-| Debounce | 200 ms client-side, and requests are cancelled on new input |
-| Min query length | 2 characters, enforced server-side too |
-| Max `limit` | 20 |
-| Per-IP rate limit | 120 req/min — higher than search, because typing is bursty |
-| Cache | `Cache-Control: public, max-age=3600`; the data only changes on snapshot swap |
+| Guard             | Value                                                                         |
+| ----------------- | ----------------------------------------------------------------------------- |
+| Debounce          | 200 ms client-side, and requests are cancelled on new input                   |
+| Min query length  | 2 characters, enforced server-side too                                        |
+| Max `limit`       | 20                                                                            |
+| Per-IP rate limit | 120 req/min — higher than search, because typing is bursty                    |
+| Cache             | `Cache-Control: public, max-age=3600`; the data only changes on snapshot swap |
 
 The response is small and highly cacheable, so a CDN in front of this endpoint removes most of the load. Worth doing before launch rather than after.
 

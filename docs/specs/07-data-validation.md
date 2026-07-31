@@ -4,33 +4,33 @@
 
 Sample: 199 rows × 154 columns, 2.0 MB. Institutions MSB (194), NMMNHS (3), DGR (1), UWBM (1). Collections MSB:Mamm 101, MSB:Herp 36, MSB:Fish 25, MSB:Para 16, MSB:Bird 12, MSB:Host 4.
 
-Small sample — vocabulary lists here are indicative, not complete. Everything about *structure* is reliable.
+Small sample — vocabulary lists here are indicative, not complete. Everything about _structure_ is reliable.
 
 ## Verdicts on interview decisions
 
-| Decision | Verdict | What the data says |
-|---|---|---|
-| D8 positives only | **revise, but not to a binary** | `not detected` and `not examined for` are real types, but outcome recording is unreliable in both directions. See below |
-| D9 date = collection date | **right, for a different reason** | `attribute_date` is clean ISO but is often the *load* date. One record's own remark: *"Legacy samples screened between 2000-2022… Attribute date reflects loaded date only."* Unusable as a test date |
-| D10 locality = free-text `spec_locality` | **overturned** | `locality_search_terms` contains the interview place names verbatim. `spec_locality` does not |
-| D11 method in remark | **corrected** | `attribute_method` is a first-class field (120/731 non-null), separate from `attribute_remark` |
-| D12 ranks phylum→species | **incomplete** | Arvicolidae is not a family here — it is `subfamily = Arvicolinae` inside `family = Cricetidae`. Subfamily is mandatory |
-| D18 correlated nested | **confirmed** | Method/date/determiner vary per attribute row on the same specimen. Correlation is required |
-| D7 relationships are v2 | **confirmed, and harder than assumed** | See "Relationship direction" below |
+| Decision                                 | Verdict                                | What the data says                                                                                                                                                                                    |
+| ---------------------------------------- | -------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| D8 positives only                        | **revise, but not to a binary**        | `not detected` and `not examined for` are real types, but outcome recording is unreliable in both directions. See below                                                                               |
+| D9 date = collection date                | **right, for a different reason**      | `attribute_date` is clean ISO but is often the _load_ date. One record's own remark: _"Legacy samples screened between 2000-2022… Attribute date reflects loaded date only."_ Unusable as a test date |
+| D10 locality = free-text `spec_locality` | **overturned**                         | `locality_search_terms` contains the interview place names verbatim. `spec_locality` does not                                                                                                         |
+| D11 method in remark                     | **corrected**                          | `attribute_method` is a first-class field (120/731 non-null), separate from `attribute_remark`                                                                                                        |
+| D12 ranks phylum→species                 | **incomplete**                         | Arvicolidae is not a family here — it is `subfamily = Arvicolinae` inside `family = Cricetidae`. Subfamily is mandatory                                                                               |
+| D18 correlated nested                    | **confirmed**                          | Method/date/determiner vary per attribute row on the same specimen. Correlation is required                                                                                                           |
+| D7 relationships are v2                  | **confirmed, and harder than assumed** | See "Relationship direction" below                                                                                                                                                                    |
 
 ## `attributedetail` — actual structure
 
 Seven fields per row, not two. 731 rows across 170 specimens:
 
-| Field | Non-null | Notes |
-|---|---|---|
-| `attribute_type` | 731/731 | 35 distinct types in sample |
-| `attribute_value` | 731/731 | |
-| `attribute_determiner` | 725/731 | agent name string |
-| `attribute_date` | 700/731 | **100% clean ISO `YYYY-MM-DD`** — no partial dates in this sample |
-| `attribute_units` | 281/731 | mm, g, individuals, years, kg |
-| `attribute_method` | 120/731 | |
-| `attribute_remark` | 120/731 | |
+| Field                  | Non-null | Notes                                                             |
+| ---------------------- | -------- | ----------------------------------------------------------------- |
+| `attribute_type`       | 731/731  | 35 distinct types in sample                                       |
+| `attribute_value`      | 731/731  |                                                                   |
+| `attribute_determiner` | 725/731  | agent name string                                                 |
+| `attribute_date`       | 700/731  | **100% clean ISO `YYYY-MM-DD`** — no partial dates in this sample |
+| `attribute_units`      | 281/731  | mm, g, individuals, years, kg                                     |
+| `attribute_method`     | 120/731  |                                                                   |
+| `attribute_remark`     | 120/731  |                                                                   |
 
 Types are dominated by measurements (`sex` 134, `reproductive data` 61, `weight` 58, `life stage` 53, `hind foot with claw` 49…). The four detection types total 96 rows: `examined for` 40, `not detected` 30, `detected` 14, `not examined for` 12.
 
@@ -63,24 +63,24 @@ Conversely, 2 of 14 `detected` rows in the sample have **no** `examined for` row
 
 ### Distribution over (specimen, value) pairs
 
-| Combination | Count |
-|---|---|
-| `examined for` + `not detected` | 27 |
-| `examined for` + `detected` | 12 |
-| `not examined for` only | 12 |
-| `detected` only, no `examined for` | 2 |
-| `examined for` only, no outcome at that value | 1 |
+| Combination                                   | Count |
+| --------------------------------------------- | ----- |
+| `examined for` + `not detected`               | 27    |
+| `examined for` + `detected`                   | 12    |
+| `not examined for` only                       | 12    |
+| `detected` only, no `examined for`            | 2     |
+| `examined for` only, no outcome at that value | 1     |
 
 The single "no outcome" case is the `348964` record above, which does have outcomes at child values — so after hierarchy-aware matching this sample has zero true orphans. **You have confirmed true orphans do occur in the full corpus**, so the state must be modelled regardless. Neither `detected` + `not detected` nor `examined for` alone is a complete partition.
 
 ### The four states the UI must distinguish
 
-| State | Derivation | Honest label |
-|---|---|---|
-| Positive | `detected` at the value or any child of it | Detected |
-| Negative | `not detected`, and no `detected` at the value or below | Not detected |
+| State                     | Derivation                                                              | Honest label                 |
+| ------------------------- | ----------------------------------------------------------------------- | ---------------------------- |
+| Positive                  | `detected` at the value or any child of it                              | Detected                     |
+| Negative                  | `not detected`, and no `detected` at the value or below                 | Not detected                 |
 | Tested, result unrecorded | `examined for`, with no `detected`/`not detected` at the value or below | Examined, no result recorded |
-| Not tested | `not examined for`, or nothing at all | Not examined / no record |
+| Not tested                | `not examined for`, or nothing at all                                   | Not examined / no record     |
 
 Two rules follow, and both are correctness rules, not polish:
 
@@ -171,12 +171,16 @@ One catch: it is joined on `", "` but individual terms themselves contain commas
 It parses cleanly, but **don't parse it** — `related_record_cache` is the same data as JSON, aligned 1:1 in all 33 records that have relations:
 
 ```json
-{"relationship": "parasite of", "family": "Cricetidae",
- "identification": "Microtus oeconomus cf.",
- "record": "https://arctos.database.museum/guid/MSB:Host:13914",
- "identifier_type": "Arctos record GUID",
- "geography": "United States, Alaska", "locality": "…",
- "issued_by": {"agentID": "…", "agent_name": "…"}}
+{
+	"relationship": "parasite of",
+	"family": "Cricetidae",
+	"identification": "Microtus oeconomus cf.",
+	"record": "https://arctos.database.museum/guid/MSB:Host:13914",
+	"identifier_type": "Arctos record GUID",
+	"geography": "United States, Alaska",
+	"locality": "…",
+	"issued_by": { "agentID": "…", "agent_name": "…" }
+}
 ```
 
 Relationship vocabulary (37 rows): `same individual as` 17, `parasite of` 14, `offspring of` 3, `collected with` 2, `parent of` 1.
@@ -191,9 +195,9 @@ MSB:Para:16839  Echinococcus multilocularis (Taeniidae) --parasite of--> MSB:Hos
 MSB:Para:26528  Catallagia dacenkoi (Ctenophthalmidae)  --parasite of--> UAM:Mamm:80418  Myodes rufocanus (Cricetidae)
 ```
 
-The interview wants *hosts* as the result rows. The data only supports querying from the *parasite*. Either the ETL synthesizes inverse `host of` edges onto host records, or the query runs parasite-side and the UI inverts the presentation.
+The interview wants _hosts_ as the result rows. The data only supports querying from the _parasite_. Either the ETL synthesizes inverse `host of` edges onto host records, or the query runs parasite-side and the UI inverts the presentation.
 
-Good news: this sample contains the interview query almost exactly — *Echinococcus multilocularis*, Taeniidae, parasitizing Arvicolinae hosts in Alaska. It is answerable.
+Good news: this sample contains the interview query almost exactly — _Echinococcus multilocularis_, Taeniidae, parasitizing Arvicolinae hosts in Alaska. It is answerable.
 
 **2. The cache carries only `family`.** No genus, order, class, or subfamily of the related record — and `identification` is an unreliable substitute: `"Microtus oeconomus cf."` (qualifier), `"Stagnicola"` (genus only), `"Cestoda"` (class), `"Acari"` (subclass), `"Ixodida"` (order). "All taxonomic levels below family" needs a real two-pass ETL join on the related GUID, exactly as spec 06 assumed. Confirmed necessary, not optional.
 
@@ -213,8 +217,12 @@ So "Arvicolid rodents from Saint Lawrence Island **collected by Robert L. Rausch
 `collectors` is a display string (`"Amber L. Hobbes, Keith B. Gido"` — comma-joined, and personal names can contain commas). `collector_agents` is the structured form:
 
 ```json
-{"agentid": "https://arctos.database.museum/agent/21302424",
- "agent_name": "Amber L. Hobbes", "agent_role": "collector", "agent_order": 1}
+{
+	"agentid": "https://arctos.database.museum/agent/21302424",
+	"agent_name": "Amber L. Hobbes",
+	"agent_role": "collector",
+	"agent_order": 1
+}
 ```
 
 333 entries: 270 `collector`, 63 `preparator`. **Role filtering is required** — one sampled record's `collector_agents` holds only a preparator. Index `agentid` as keyword and match on it, not the name: that is what makes "Robert L. Rausch" robust against spelling variants. Note collectors are often institutions or projects, not people: `"Chile Hantavirus Project"`, `"Kobuk River Small Mammal Crew"`, `"Panama Hantavirus Project 2004"`.

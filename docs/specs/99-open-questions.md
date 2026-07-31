@@ -4,23 +4,23 @@ Interview 2 (2026-07-30) closed OQ1, OQ2, OQ7, OQ8 and OQ9. What remains is eith
 
 ## Closed in interview 2
 
-| OQ | Resolution |
-|---|---|
-| OQ1 — topology | **Closed as D38.** Netlify static, browser calls Rust directly. The Rust API is public, unauthenticated, and CORS-allowlisted. `svelte-adapter-bun` must be replaced with `@sveltejs/adapter-static` + `fallback: '200.html'`. Every guardrail in spec 02 became load-bearing |
-| OQ2 — pagination | **Closed.** `from`/`size` capped at `from + size <= 10000` for browsing, `search_after` + PIT for export, `track_total_hits: 10000` |
-| OQ7 — export granularity | **Closed as D39.** One row per specimen, matched attribute detail in aligned parallel `; `-joined columns. Only matching attributes |
-| OQ8 — snapshot metadata | **Closed as D41.** ETL-written metadata document carrying extraction date, row counts, and the D29/D35 assertion results |
-| OQ9 — repo layout | **Closed as D45.** Sibling repos. Specs and tools stay in the frontend repo until the backend repo exists |
+| OQ                       | Resolution                                                                                                                                                                                                                                                                    |
+| ------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| OQ1 — topology           | **Closed as D38.** Netlify static, browser calls Rust directly. The Rust API is public, unauthenticated, and CORS-allowlisted. `svelte-adapter-bun` must be replaced with `@sveltejs/adapter-static` + `fallback: '200.html'`. Every guardrail in spec 02 became load-bearing |
+| OQ2 — pagination         | **Closed.** `from`/`size` capped at `from + size <= 10000` for browsing, `search_after` + PIT for export, `track_total_hits: 10000`                                                                                                                                           |
+| OQ7 — export granularity | **Closed as D39.** One row per specimen, matched attribute detail in aligned parallel `; `-joined columns. Only matching attributes                                                                                                                                           |
+| OQ8 — snapshot metadata  | **Closed as D41.** ETL-written metadata document carrying extraction date, row counts, and the D29/D35 assertion results                                                                                                                                                      |
+| OQ9 — repo layout        | **Closed as D45.** Sibling repos. Specs and tools stay in the frontend repo until the backend repo exists                                                                                                                                                                     |
 
 ## Closed by the `test.csv` profiling
 
-| OQ | Resolution |
-|---|---|
+| OQ                     | Resolution                                                                                                                                                                                                                                           |
+| ---------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | OQ3 — negative results | **Closed.** Explicit `not detected` and `not examined for` types exist, but recording is unreliable in both directions and outcome pairing is not string-equality. Resolved as the three-state filter in D21, with absence never treated as negative |
-| OQ4 — method field | **Closed.** `attribute_method` is a first-class field, but its values are prose (`comb`, `combed`, `comb w/chloroform`, plus a 140-character serology description). Free-text match, no dropdown, and the form says so (D11) |
-| OQ5 — field name | **Closed.** `relatedcatalogeditems` is real; `relatedcatalogdata` does not exist. Query `related_record_cache` (JSON) instead of parsing either |
-| OQ6 — Arctos URL | **Closed.** `https://arctos.database.museum/guid/{guid}`, where `guid` already includes the prefix (`MSB:Mamm:151352`). Confirmed from `related_record_cache.record` |
-| OQ11 — encumbrances | **Closed.** No encumbered data in scope (D29). ETL still asserts it, so an upstream change fails loudly instead of leaking |
+| OQ4 — method field     | **Closed.** `attribute_method` is a first-class field, but its values are prose (`comb`, `combed`, `comb w/chloroform`, plus a 140-character serology description). Free-text match, no dropdown, and the form says so (D11)                         |
+| OQ5 — field name       | **Closed.** `relatedcatalogeditems` is real; `relatedcatalogdata` does not exist. Query `related_record_cache` (JSON) instead of parsing either                                                                                                      |
+| OQ6 — Arctos URL       | **Closed.** `https://arctos.database.museum/guid/{guid}`, where `guid` already includes the prefix (`MSB:Mamm:151352`). Confirmed from `related_record_cache.record`                                                                                 |
+| OQ11 — encumbrances    | **Closed.** No encumbered data in scope (D29). ETL still asserts it, so an upstream change fails loudly instead of leaking                                                                                                                           |
 
 ## OQ10 — Case sensitivity — resolved as an analyzer
 
@@ -36,11 +36,11 @@ OQ12 (array form), OQ14 (`event_count`), and OQ16 (dump scope) are now written u
 
 Fallbacks are specified, so none of them blocks building:
 
-| OQ | If refused |
-|---|---|
+| OQ   | If refused                                                                                     |
+| ---- | ---------------------------------------------------------------------------------------------- |
 | OQ12 | `text` + `match_phrase` on locality. Loses exact matching and place suggestions (D43 degrades) |
-| OQ14 | D26's coverage claim keeps a documented ~0.5% ceiling |
-| OQ16 | v2 relationship coverage is lower than measured; publish the resolved rate in the UI |
+| OQ14 | D26's coverage claim keeps a documented ~0.5% ceiling                                          |
+| OQ16 | v2 relationship coverage is lower than measured; publish the resolved rate in the UI           |
 
 ## OQ12 — `locality_search_terms` as an array
 
@@ -60,7 +60,7 @@ Recommendation: build both. Per-event terms for correlated queries, record-level
 
 3,772 of 741,801 records (0.51%) disagree, and in **both** directions — `event_count` too high on 3,664, too low on 108. So it is not a simple over-count.
 
-Nothing in the build depends on it (spec 01 builds events from the array and ignores the count), but the question of what the missing events *are* stands: is `json_locality` filtered by event type, deduplicated, or truncated? Until answered, D26's coverage claim has a known 0.5% ceiling.
+Nothing in the build depends on it (spec 01 builds events from the array and ignores the count), but the question of what the missing events _are_ stands: is `json_locality` filtered by event type, deduplicated, or truncated? Until answered, D26's coverage claim has a known 0.5% ceiling.
 
 ## OQ15 — Sparse columns — closed for this slice
 

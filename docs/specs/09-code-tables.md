@@ -10,11 +10,11 @@ This changes where `/api/schema` gets its vocabularies, and it adds one mandator
 
 `ctattribute_type` documents all 145 attribute types with three fields that decide how the portal treats each one:
 
-| Field | Meaning |
-|---|---|
-| `value_code_table` | name of the table constraining the value, or empty |
-| `unit_code_table` | name of the units table — i.e. this is a measurement |
-| `public` | `0` means **do not show outside Arctos** |
+| Field              | Meaning                                              |
+| ------------------ | ---------------------------------------------------- |
+| `value_code_table` | name of the table constraining the value, or empty   |
+| `unit_code_table`  | name of the units table — i.e. this is a measurement |
+| `public`           | `0` means **do not show outside Arctos**             |
 
 So "which fields have a restricted vocabulary" is a lookup, not a judgment call. Against the 84 attribute types observed in `msb.csv`:
 
@@ -28,11 +28,11 @@ Every attribute type present in the data is documented. Nothing observed is undo
 
 Three types carry `public: 0`:
 
-| Type | Arctos' own description |
-|---|---|
-| `NAGPRA category` | *"Insufficient documentation DO NOT USE"* |
-| `restricted data` | *"Internal information of any sort. Do not change privacy setting!"* |
-| `value` | Monetary value |
+| Type              | Arctos' own description                                              |
+| ----------------- | -------------------------------------------------------------------- |
+| `NAGPRA category` | _"Insufficient documentation DO NOT USE"_                            |
+| `restricted data` | _"Internal information of any sort. Do not change privacy setting!"_ |
+| `value`           | Monetary value                                                       |
 
 None appear in `msb.csv` — all three are zero across 2,488,094 attribute rows, and all three are recommended for Cultural collections, which are out of scope. **That is exactly why this needs to be enforced rather than observed**, and it is the same hazard as D29's encumbrance assertion: a public, unauthenticated portal (D15) must not start leaking because an upstream collection changed.
 
@@ -71,9 +71,9 @@ virus: Rabies            virus: SARS-CoV-2 *
 
 Three things follow:
 
-**Maximum colon depth is 2, by design.** D22's `path_hierarchy` tokenizer is now backed by the authority definition rather than by observation — no value in this table can over-expand. The parent terms (`bacteria`, `virus`, `fungi`, `ectoparasite`, `endoparasite`, `pathology`) are deliberate: the table's own guidance is *"Use a more specific term if known."* The hierarchy is intentional, which is what makes ancestor expansion the correct reading of the data rather than a convenience.
+**Maximum colon depth is 2, by design.** D22's `path_hierarchy` tokenizer is now backed by the authority definition rather than by observation — no value in this table can over-expand. The parent terms (`bacteria`, `virus`, `fungi`, `ectoparasite`, `endoparasite`, `pathology`) are deliberate: the table's own guidance is _"Use a more specific term if known."_ The hierarchy is intentional, which is what makes ancestor expansion the correct reading of the data rather than a convenience.
 
-**`endoparasite: cestode` is a controlled value**, which matters for flagship query 1 (*Taeniid cestodes*). That query is now answerable two ways — via the attribute path (`examined for`/`detected` = `endoparasite: cestode`) and via the relations path (`related_family: Taeniidae`). They are different assertions and will not return the same set: the attribute records *that a cestode was found*, the relation records *which catalogued parasite it was*. Both are legitimate; the form should not blur them.
+**`endoparasite: cestode` is a controlled value**, which matters for flagship query 1 (_Taeniid cestodes_). That query is now answerable two ways — via the attribute path (`examined for`/`detected` = `endoparasite: cestode`) and via the relations path (`related_family: Taeniidae`). They are different assertions and will not return the same set: the attribute records _that a cestode was found_, the relation records _which catalogued parasite it was_. Both are legitimate; the form should not blur them.
 
 **Descriptions are worth surfacing.** Each value carries a definition (`"Ticks are parasitic arachnids in the order Ixodida"`), plus `issue_url` and `documentation_url`. Put the description in the option's `title`, and the ambiguity in terms like `parasite` versus `endoparasite` stops being the user's problem.
 
@@ -87,23 +87,23 @@ D21 and spec 04's honesty note were reasoned from the data. This is the same con
 
 ## Other tables the specs can use
 
-| Table | Values | Use |
-|---|---|---|
-| `ctlicense` | 8 | Maps the CC URL in `use_license_url` to a short label — `CC BY-NC`, `CC0`, `Copyright Restricted`. Spec 05 renders the label and exports the URL |
-| `ctlocation_in_host` | 77 | `location in host` (33,226 rows) and `parts examined` (1,491). A real parasitology filter, cheap, post-v1 |
-| `ctcollector_role` | 6 | `collector`, `preparator`, `creator`, `isolator`, `subject`, `copyright holder`. Confirms D01's role filter needs an explicit allowlist — there are six roles, not two |
-| `ctsex_cde` | 7 | Includes `male ?`, `female ?`, `gynandromorph`. A boolean sex filter would be wrong |
-| `ctlife_stage` | 13 | |
-| `cttaxa_formula` | 10 | Matches the 9 observed exactly |
-| `ctspecimen_event_type` | 7 | `collection`, `encounter`, `observation`, `creation`, `depiction`, `use` |
-| `ctcollecting_source` | 3 | `wild`, `captive`, `unknown`. **Worth surfacing** — a captive-bred specimen's locality does not mean what a wild one's does |
-| `ctverificationstatus` | 3 | `accepted`, `unaccepted`, `verified and locked` — per event, added to the mapping in spec 01 |
-| `ctspecimen_part_name` | 405 | For the v2 part filters (spec 06) |
-| `ctpart_preservation` / `ctpart_modifier` | 91 each | |
+| Table                                     | Values  | Use                                                                                                                                                                    |
+| ----------------------------------------- | ------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `ctlicense`                               | 8       | Maps the CC URL in `use_license_url` to a short label — `CC BY-NC`, `CC0`, `Copyright Restricted`. Spec 05 renders the label and exports the URL                       |
+| `ctlocation_in_host`                      | 77      | `location in host` (33,226 rows) and `parts examined` (1,491). A real parasitology filter, cheap, post-v1                                                              |
+| `ctcollector_role`                        | 6       | `collector`, `preparator`, `creator`, `isolator`, `subject`, `copyright holder`. Confirms D01's role filter needs an explicit allowlist — there are six roles, not two |
+| `ctsex_cde`                               | 7       | Includes `male ?`, `female ?`, `gynandromorph`. A boolean sex filter would be wrong                                                                                    |
+| `ctlife_stage`                            | 13      |                                                                                                                                                                        |
+| `cttaxa_formula`                          | 10      | Matches the 9 observed exactly                                                                                                                                         |
+| `ctspecimen_event_type`                   | 7       | `collection`, `encounter`, `observation`, `creation`, `depiction`, `use`                                                                                               |
+| `ctcollecting_source`                     | 3       | `wild`, `captive`, `unknown`. **Worth surfacing** — a captive-bred specimen's locality does not mean what a wild one's does                                            |
+| `ctverificationstatus`                    | 3       | `accepted`, `unaccepted`, `verified and locked` — per event, added to the mapping in spec 01                                                                           |
+| `ctspecimen_part_name`                    | 405     | For the v2 part filters (spec 06)                                                                                                                                      |
+| `ctpart_preservation` / `ctpart_modifier` | 91 each |                                                                                                                                                                        |
 
-## What the code tables do *not* cover
+## What the code tables do _not_ cover
 
-**Specimen relationships.** `cttaxon_relation` sounds relevant but is not — it holds `synonym of`, `misspelling`, `potential alternate spelling`, which are *taxon name* relationships. No table in the API describes `parasite of` / `host of parasite` / `same individual as`. The 16 relationship types in spec 08 remain empirically derived, and a new type could appear in any snapshot without warning. Log unknown relationship values; do not reject them.
+**Specimen relationships.** `cttaxon_relation` sounds relevant but is not — it holds `synonym of`, `misspelling`, `potential alternate spelling`, which are _taxon name_ relationships. No table in the API describes `parasite of` / `host of parasite` / `same individual as`. The 16 relationship types in spec 08 remain empirically derived, and a new type could appear in any snapshot without warning. Log unknown relationship values; do not reject them.
 
 **`attribute_method`.** Confirmed prose. No code table, consistent with D11 — free text, no dropdown.
 

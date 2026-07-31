@@ -35,7 +35,7 @@ Four groups, in the order a specimen scientist thinks.
 
 **Taxon.** A rank and a name. Ranks offered: phylum, class, order, family, subfamily, genus, species. Subfamily is not optional — the taxonomy in this source places the vole group at `subfamily = Arvicolinae` under `family = Cricetidae`, and a form without subfamily cannot express it. The name field is a combobox backed by a separate taxon-name index carrying record counts and each name's parent, so a user sees `Arvicolinae (subfamily, in Cricetidae) — 4,112 records` before they commit to a search. Suggestions fill the field; they never constrain it. A valid name absent from the current snapshot must still be searchable.
 
-**Place and date.** Locality matches whole place names against the record's search-term rollup. Country and state are separate record-level filters. Dates bound the *collection* event, not the determination or the test.
+**Place and date.** Locality matches whole place names against the record's search-term rollup. Country and state are separate record-level filters. Dates bound the _collection_ event, not the determination or the test.
 
 **Attributes.** Repeatable rows. Each row is a type, a value, and an optional NOT. Rows combine with AND. This is the portal's substantive capability and is described in full below.
 
@@ -68,7 +68,7 @@ No preset, no inference, no arbitrary decision baked into the product. The same 
 
 **Taxonomy fields are multi-valued (D23).** A single record may carry `Echinostomata; Digenea` in one rank column. Splitting is an index-time concern, not an ETL one. Exact matching against the raw field misses these silently.
 
-**Method is one input, replicated into every row.** It reads as "every attribute I asked about was recorded by this method," which is unambiguous and preserves correlation. **Method is disabled whenever any row is negated** — "no detected-X row *by this method*" still matches a specimen with a positive found another way, which is a false negative in the worst possible direction. The combination is refused in the form and rejected by the API.
+**Method is one input, replicated into every row.** It reads as "every attribute I asked about was recorded by this method," which is unambiguous and preserves correlation. **Method is disabled whenever any row is negated** — "no detected-X row _by this method_" still matches a specimen with a positive found another way, which is a false negative in the worst possible direction. The combination is refused in the form and rejected by the API.
 
 ---
 
@@ -76,7 +76,7 @@ No preset, no inference, no arbitrary decision baked into the product. The same 
 
 These are not caveats appended to a finished design. Each one changed the design.
 
-**Absence of a result is not a negative result.** The four detection types — examined for, not examined for, detected, not detected — form a matrix that the corpus occupies in *every* combination. Three combinations carry the large majority of records and represent normal practice. The remainder include examinations whose outcome was never written down, positives recorded with no examination row, and a small number of records asserting both poles of a contradiction. Treating a missing `detected` row as a negative would silently convert a substantial population of unknowns into negatives and inflate the negative count materially. It is not done anywhere in this system, and the UI says so where a user could otherwise assume it.
+**Absence of a result is not a negative result.** The four detection types — examined for, not examined for, detected, not detected — form a matrix that the corpus occupies in _every_ combination. Three combinations carry the large majority of records and represent normal practice. The remainder include examinations whose outcome was never written down, positives recorded with no examination row, and a small number of records asserting both poles of a contradiction. Treating a missing `detected` row as a negative would silently convert a substantial population of unknowns into negatives and inflate the negative count materially. It is not done anywhere in this system, and the UI says so where a user could otherwise assume it.
 
 **The portal does not grade the data it searches.** The matrix above is evidence about how to build the query, not a quality score to expose. There is no "incomplete record" filter and no data-quality badge. Rating records is a different product; this one finds what is there, including the parts that are untidy. The same line applies to controlled vocabularies: a value absent from its code table is indexed and logged, never rejected (D37).
 
@@ -126,7 +126,7 @@ The corpus records host–parasite links directly: a parasite specimen is `paras
 
 Two limits, both honest:
 
-**The same question has two different answers, and they are not interchangeable.** An attribute assertion — *a cestode was detected in this host* — and a relationship — *this catalogued parasite specimen is linked to this host* — are different claims. The second is strictly stronger and returns fewer records. A v2 UI must not blur them.
+**The same question has two different answers, and they are not interchangeable.** An attribute assertion — _a cestode was detected in this host_ — and a relationship — _this catalogued parasite specimen is linked to this host_ — are different claims. The second is strictly stronger and returns fewer records. A v2 UI must not blur them.
 
 **A share of relationship targets are not resolvable identifiers** — barcodes, field numbers, foreign catalogue numbers. The rate measured against the sample slice is not generalisable: that slice was assembled by following relationships, so it resolves cross-institution targets by construction. The true rate depends on how the production dump is scoped, which is an open question with the dump's author. Whatever it turns out to be, it gets published in the UI. A feature that silently answers for part of the graph is worse than one that states its coverage.
 
@@ -136,12 +136,12 @@ Two limits, both honest:
 
 Decisions taken while writing this document, against the specs as they stand:
 
-| Change | Effect |
-|---|---|
-| Attribute pair rows replace the four-state outcome control | The outcome enum is gone from the form, the schema response, and the API contract. Its states remain expressible, composed by the user |
-| Pair rows cover all attribute types, not the four detection types | Value input is a dropdown when the type is vocabulary-backed, free text otherwise |
-| Per-row NOT | Negation compiles to an exclusion clause; the previously specified refusal of "examined with no outcome, by method" generalises to *any* negated row plus a method |
-| One method input, replicated into each row | Preserves correlation with a single control |
-| No data-quality filter or badge | The detection matrix informs the design; it is not exposed as a rating |
+| Change                                                            | Effect                                                                                                                                                             |
+| ----------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Attribute pair rows replace the four-state outcome control        | The outcome enum is gone from the form, the schema response, and the API contract. Its states remain expressible, composed by the user                             |
+| Pair rows cover all attribute types, not the four detection types | Value input is a dropdown when the type is vocabulary-backed, free text otherwise                                                                                  |
+| Per-row NOT                                                       | Negation compiles to an exclusion clause; the previously specified refusal of "examined with no outcome, by method" generalises to _any_ negated row plus a method |
+| One method input, replicated into each row                        | Preserves correlation with a single control                                                                                                                        |
+| No data-quality filter or badge                                   | The detection matrix informs the design; it is not exposed as a rating                                                                                             |
 
 The specs have not yet been revised to match. Specs 02, 03 and 04 describe the outcome enum, and spec 01's flat detection arrays are retained as a fast path for simple unnegated rows but are no longer the primary query path.

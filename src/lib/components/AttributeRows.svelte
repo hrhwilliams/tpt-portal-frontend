@@ -24,10 +24,6 @@
 	function remove(i: number) {
 		rows = rows.filter((_, n) => n !== i);
 	}
-
-	function indent(value: string) {
-		return value.includes(':') ? '    ' : '';
-	}
 </script>
 
 <div class="rows">
@@ -69,7 +65,11 @@
 					<select bind:value={row.value}>
 						<option value="">— choose —</option>
 						{#each vocab as v (v.value)}
-							<option value={v.value} title={v.description}>{indent(v.value)}{v.value}</option>
+							<!-- children indent under their parent; depth never exceeds 2 (D22). Keep on one
+							     line: a wrapped <option> collapses the leading spaces away. -->
+							<option value={v.value} title={v.description}
+								>{v.value.includes(':') ? '    ' : ''}{v.value}</option
+							>
 						{/each}
 					</select>
 				{:else}
@@ -106,11 +106,7 @@
 </div>
 
 <style>
-	.rows {
-		display: flex;
-		flex-direction: column;
-		gap: 0.4rem;
-	}
+	/* shared row/label/op styles are global — see +layout.svelte */
 	.opsel {
 		display: flex;
 		gap: 1rem;
@@ -130,31 +126,9 @@
 		gap: 0.3rem;
 		font-size: 0.82rem;
 	}
-	.row {
-		display: flex;
-		gap: 0.6rem;
-		align-items: flex-end;
-		padding: 0.5rem;
-		border: 1px solid var(--line);
-		border-radius: 6px;
-		background: var(--panel);
-	}
 	.row.negated {
 		border-color: #b4544a;
 		background: color-mix(in srgb, #b4544a 8%, var(--panel));
-	}
-	.grow {
-		flex: 1;
-		min-width: 0;
-	}
-	label {
-		display: flex;
-		flex-direction: column;
-		gap: 0.2rem;
-	}
-	.lbl {
-		font-size: 0.75rem;
-		color: var(--muted);
 	}
 	.hint {
 		font-style: normal;
@@ -169,30 +143,13 @@
 		padding-bottom: 0.4rem;
 		white-space: nowrap;
 	}
-	.op {
-		font-size: 0.72rem;
-		font-weight: 700;
-		color: var(--muted);
-		letter-spacing: 0.06em;
-		padding-left: 0.5rem;
-	}
 	.desc {
 		margin: -0.1rem 0 0.3rem 0.5rem;
 		font-size: 0.78rem;
 		color: var(--muted);
 		max-width: 70ch;
 	}
-	.rm {
-		padding: 0.3rem 0.6rem;
-		line-height: 1;
-		font-size: 1.1rem;
-	}
-	.add {
-		align-self: flex-start;
-	}
 	.note {
 		margin: 0;
-		font-size: 0.8rem;
-		color: var(--muted);
 	}
 </style>

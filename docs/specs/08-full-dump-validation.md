@@ -6,7 +6,7 @@ Spec 07 stays as written; it is the record of what the small sample supported. T
 
 Reproduce with `tools/profile_msb.py` (broad pass) and `tools/profile_msb2.py` (targeted pass).
 
-Not a random draw: 97% MSB, and the non-MSB records are present only because they are related to an MSB record. Institution-level generalisations are still unsafe. Everything about *structure* is now reliable.
+Not a random draw: 97% MSB, and the non-MSB records are present only because they are related to an MSB record. Institution-level generalisations are still unsafe. Everything about _structure_ is now reliable.
 
 ## Corrections — things the specs got wrong
 
@@ -16,16 +16,16 @@ The single biggest correction. Spec 06, spec 07, and D30 all assert there is no 
 
 At 170,984 relation rows the vocabulary is **16 relationship types**, and inverses are stored natively:
 
-| Relationship | Rows | Inverse | Rows |
-|---|---:|---|---:|
-| `parasite of` | 57,485 | `host of parasite` | 54,059 |
-| `parent of` | 3,450 | `offspring of` | 3,284 |
-| `same individual as` | 40,442 | *(symmetric)* | — |
-| `collected with` | 7,865 | *(symmetric)* | — |
-| `same lot as` | 3,602 | *(symmetric)* | — |
-| `sibling of` | 686 | *(symmetric)* | — |
-| `eaten by` | 18 | `ate` | 15 |
-| `associated with` 48, `in amplexus with` 14, `littermate or nestmate of` 10, `same series as` 2, `mate of` 2, `same edition as` 2 | | | |
+| Relationship                                                                                                                      |   Rows | Inverse            |   Rows |
+| --------------------------------------------------------------------------------------------------------------------------------- | -----: | ------------------ | -----: |
+| `parasite of`                                                                                                                     | 57,485 | `host of parasite` | 54,059 |
+| `parent of`                                                                                                                       |  3,450 | `offspring of`     |  3,284 |
+| `same individual as`                                                                                                              | 40,442 | _(symmetric)_      |      — |
+| `collected with`                                                                                                                  |  7,865 | _(symmetric)_      |      — |
+| `same lot as`                                                                                                                     |  3,602 | _(symmetric)_      |      — |
+| `sibling of`                                                                                                                      |    686 | _(symmetric)_      |      — |
+| `eaten by`                                                                                                                        |     18 | `ate`              |     15 |
+| `associated with` 48, `in amplexus with` 14, `littermate or nestmate of` 10, `same series as` 2, `mate of` 2, `same edition as` 2 |        |                    |        |
 
 The name is `host of parasite`, not `host of` — which is why a grep of the sample found nothing.
 
@@ -45,17 +45,17 @@ The 3,426-row gap between `parasite of` and `host of parasite` is worth measurin
 
 Spec 06 calls them "thin stubs (`parts = media`)" that must be followed through `same individual as` to reach the real specimen. Across all **25,708** `MSB:Host` records:
 
-| Field | Populated |
-|---|---|
-| `scientific_name` | 25,708 (100%) |
-| `began_date` | 25,702 (99.98%) |
-| `locality_search_terms` | 25,702 (99.98%) |
-| `collector_agents` | 25,689 (99.9%) |
-| `family` | 25,403 (98.8%) |
-| `genus` | 25,079 (97.6%) |
-| `subfamily` | 15,455 (60.1%) |
-| `host of parasite` edge | 18,831 (73.3%) |
-| **`same individual as` edge** | **863 (3.4%)** |
+| Field                         | Populated       |
+| ----------------------------- | --------------- |
+| `scientific_name`             | 25,708 (100%)   |
+| `began_date`                  | 25,702 (99.98%) |
+| `locality_search_terms`       | 25,702 (99.98%) |
+| `collector_agents`            | 25,689 (99.9%)  |
+| `family`                      | 25,403 (98.8%)  |
+| `genus`                       | 25,079 (97.6%)  |
+| `subfamily`                   | 15,455 (60.1%)  |
+| `host of parasite` edge       | 18,831 (73.3%)  |
+| **`same individual as` edge** | **863 (3.4%)**  |
 
 `parts = media` on 22,863 of them is a statement about preparation, not about record completeness. They carry the collector, the locality, and the taxonomy the flagship query needs, **directly**.
 
@@ -65,9 +65,9 @@ Only 3.4% have a `same individual as` edge at all, so the two-hop path is not th
 
 ### 3. The two-pass taxonomy join is probably not needed either
 
-Spec 06 requires a two-pass ETL join because `related_record_cache` carries only `family`. That is still true. But the flagship query — *"hosts of Taeniid cestodes (including Echinococcus)"* — filters the related record at **family** level, which the cache already has. The host side (`Arvicolinae`) is the record's own taxonomy, native.
+Spec 06 requires a two-pass ETL join because `related_record_cache` carries only `family`. That is still true. But the flagship query — _"hosts of Taeniid cestodes (including Echinococcus)"_ — filters the related record at **family** level, which the cache already has. The host side (`Arvicolinae`) is the record's own taxonomy, native.
 
-So the join buys related-record filtering at ranks *other than* family. Nothing in either interview query needs that.
+So the join buys related-record filtering at ranks _other than_ family. Nothing in either interview query needs that.
 
 **Recommendation:** ship v2 relations from the cache alone. Add the join if and when a user asks for a non-family related rank. This is the third and last of the "ETL invents data" items, and dropping it removes the entire two-pass architecture from v1.
 
@@ -75,13 +75,13 @@ So the join buys related-record filtering at ranks *other than* family. Nothing 
 
 Spec 07 says "100% clean ISO". At scale:
 
-| Field | Clean `YYYY-MM-DD` | `YYYY-MM` | `YYYY` | Datetime `…T HH:mm` | Empty |
-|---|---:|---:|---:|---:|---:|
-| `attribute_date` | 2,308,842 | 7,099 | 4,659 | 0 | 167,494 |
-| `began_date` | 737,075 | \| | — 656 combined — | \| | 4,070 |
-| `ended_date` | — | \| | — 646 combined — | \| | — |
+| Field            | Clean `YYYY-MM-DD` | `YYYY-MM` |           `YYYY` | Datetime `…T HH:mm` |   Empty |
+| ---------------- | -----------------: | --------: | ---------------: | ------------------: | ------: |
+| `attribute_date` |          2,308,842 |     7,099 |            4,659 |                   0 | 167,494 |
+| `began_date`     |            737,075 |        \| | — 656 combined — |                  \| |   4,070 |
+| `ended_date`     |                  — |        \| | — 646 combined — |                  \| |       — |
 
-No garbage values at all — every non-ISO value is a *shorter* or *longer* ISO prefix. So this is a `format` list on the existing `date` field, not an ETL step and not a fallback to `keyword`:
+No garbage values at all — every non-ISO value is a _shorter_ or _longer_ ISO prefix. So this is a `format` list on the existing `date` field, not an ETL step and not a fallback to `keyword`:
 
 ```json
 "format": "strict_date_optional_time||yyyy-MM-dd||yyyy-MM||yyyy"
@@ -126,11 +126,11 @@ Spec 01 maps it as a scalar `keyword`. Give it the same `.split` subfield as tax
 
 Of 170,984 relation rows:
 
-| Form | Rows | Example |
-|---|---:|---|
-| Full URL | 142,242 (83.2%) | `https://arctos.database.museum/guid/MSB:Mamm:293371` |
-| Bare GUID | 5,886 (3.4%) | `MSB:Mamm:293371` |
-| Not a GUID | 22,856 (13.4%) | `A4HEG`, `NK 200451`, `AMNH M 263798`, `M-263798`, `318688`, `MIG12-28536513` |
+| Form       |            Rows | Example                                                                       |
+| ---------- | --------------: | ----------------------------------------------------------------------------- |
+| Full URL   | 142,242 (83.2%) | `https://arctos.database.museum/guid/MSB:Mamm:293371`                         |
+| Bare GUID  |    5,886 (3.4%) | `MSB:Mamm:293371`                                                             |
+| Not a GUID |  22,856 (13.4%) | `A4HEG`, `NK 200451`, `AMNH M 263798`, `M-263798`, `318688`, `MIG12-28536513` |
 
 191 of the URLs are `http://`, not `https://`. One value is itself `; `-joined (`M-261738; MSB:…`).
 
@@ -153,25 +153,25 @@ infraspecific_rank   lastpartlocation   member
 
 ## Confirmations — decisions the full slice upholds
 
-| Decision | Evidence at 741,801 rows |
-|---|---|
-| **D22** value hierarchy | *(Since confirmed authoritatively — `ctexamined_detected` defines 32 values, max depth 2. See [09-code-tables.md](09-code-tables.md).)* Detection values observed here are **16 distinct values, max colon depth 2**. `ectoparasite: flea/mite/tick/louse/fly/mite or tick`, `virus: Orthohantavirus/SARS-CoV-2/Borealpox`, `fungi: Batrachochytrium dendrobatidis/Ophidiomyces`, plus bare `ectoparasite`, `endoparasite`, `parasite`, `pathology`, `PFAS`. The `path_hierarchy` tokenizer is exactly right and cannot over-expand |
-| **D23** multi-valued taxonomy | Real at every rank. `suborder` 2,063 · `genus` 1,938 · `phylclass` 1,951 · `species` 1,912 · `family` 1,641 · `subfamily` 1,207 rows. ~0.26% per rank, not the 1.5% spec 07 estimated — but the failure is still silent |
-| **D26** nested events | 14,734 records (1.99%) have more than one event; the largest has 19. Top-level date misses events on all of them |
-| **D27** keep duplicates | Confirmed — `2` is by far the commonest multi-event count (11,832 records) |
-| **D28** no-event records | 3,265 records (0.44%) have empty `json_locality`; 4,070 have no `began_date`. The synthesized-event case in spec 01 is real |
-| **D29** encumbrances | Empty across all 741,801 rows |
-| **D25** flat arrays from `attributedetail` | Vindicated: the top-level `detected` column is `; `-joined on 4,309 rows, `examined_for` on 18,048. Building from the JSON avoids all of that splitting |
-| `attributedetail` shape | 2,488,094 attribute rows, **0 JSON parse errors**, all seven keys present on every row. 84 distinct `attribute_type` values; detection types total 236,544 rows |
-| `related_record_cache` shape | 170,984 rows across 124,291 records (16.8%), 0 parse errors |
-| Coordinates | 644,287 both · 97,514 neither · **0 partial**. Spec 01's "omit if either is blank" guard never fires, but costs nothing |
-| `formatted_scientific_name` | Only `<i>` tags, no others. Differs from `scientific_name` on 211,194 records (28.5%) — it is not redundant, confirming the decision to keep it `"index": false` with an `<i>`-only allowlist |
+| Decision                                   | Evidence at 741,801 rows                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            |
+| ------------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **D22** value hierarchy                    | _(Since confirmed authoritatively — `ctexamined_detected` defines 32 values, max depth 2. See [09-code-tables.md](09-code-tables.md).)_ Detection values observed here are **16 distinct values, max colon depth 2**. `ectoparasite: flea/mite/tick/louse/fly/mite or tick`, `virus: Orthohantavirus/SARS-CoV-2/Borealpox`, `fungi: Batrachochytrium dendrobatidis/Ophidiomyces`, plus bare `ectoparasite`, `endoparasite`, `parasite`, `pathology`, `PFAS`. The `path_hierarchy` tokenizer is exactly right and cannot over-expand |
+| **D23** multi-valued taxonomy              | Real at every rank. `suborder` 2,063 · `genus` 1,938 · `phylclass` 1,951 · `species` 1,912 · `family` 1,641 · `subfamily` 1,207 rows. ~0.26% per rank, not the 1.5% spec 07 estimated — but the failure is still silent                                                                                                                                                                                                                                                                                                             |
+| **D26** nested events                      | 14,734 records (1.99%) have more than one event; the largest has 19. Top-level date misses events on all of them                                                                                                                                                                                                                                                                                                                                                                                                                    |
+| **D27** keep duplicates                    | Confirmed — `2` is by far the commonest multi-event count (11,832 records)                                                                                                                                                                                                                                                                                                                                                                                                                                                          |
+| **D28** no-event records                   | 3,265 records (0.44%) have empty `json_locality`; 4,070 have no `began_date`. The synthesized-event case in spec 01 is real                                                                                                                                                                                                                                                                                                                                                                                                         |
+| **D29** encumbrances                       | Empty across all 741,801 rows                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
+| **D25** flat arrays from `attributedetail` | Vindicated: the top-level `detected` column is `; `-joined on 4,309 rows, `examined_for` on 18,048. Building from the JSON avoids all of that splitting                                                                                                                                                                                                                                                                                                                                                                             |
+| `attributedetail` shape                    | 2,488,094 attribute rows, **0 JSON parse errors**, all seven keys present on every row. 84 distinct `attribute_type` values; detection types total 236,544 rows                                                                                                                                                                                                                                                                                                                                                                     |
+| `related_record_cache` shape               | 170,984 rows across 124,291 records (16.8%), 0 parse errors                                                                                                                                                                                                                                                                                                                                                                                                                                                                         |
+| Coordinates                                | 644,287 both · 97,514 neither · **0 partial**. Spec 01's "omit if either is blank" guard never fires, but costs nothing                                                                                                                                                                                                                                                                                                                                                                                                             |
+| `formatted_scientific_name`                | Only `<i>` tags, no others. Differs from `scientific_name` on 211,194 records (28.5%) — it is not redundant, confirming the decision to keep it `"index": false` with an `<i>`-only allowlist                                                                                                                                                                                                                                                                                                                                       |
 
 ## New issues found
 
 ### `attribute_value.hierarchy` will index junk for non-detection types
 
-The `path_hierarchy` tokenizer is applied to `attributedetail.attribute_value` for *all* 84 attribute types, not just the four detection ones. Detection values top out at depth 2. Others do not:
+The `path_hierarchy` tokenizer is applied to `attributedetail.attribute_value` for _all_ 84 attribute types, not just the four detection ones. Detection values top out at depth 2. Others do not:
 
 ```
 reproductive data | "testes position: abdominal | testes length: 1 mm | testes width: 1 mm"
@@ -185,7 +185,7 @@ Not a correctness bug — nothing queries those, and the flat `detected`/`examin
 
 ### `event_count` is unreliable in both directions
 
-3,772 records (0.51%) disagree with `len(json_locality)`. Mostly `event_count` too high (`2|1` on 3,392 records), but `1|2` occurs 41 times and `2|3` 67 times — so it is not simply an over-count. OQ14's answer is "do not use it for validation", which spec 01 already says. The open question of *why* is still worth asking upstream, but nothing in the build depends on it.
+3,772 records (0.51%) disagree with `len(json_locality)`. Mostly `event_count` too high (`2|1` on 3,392 records), but `1|2` occurs 41 times and `2|3` 67 times — so it is not simply an over-count. OQ14's answer is "do not use it for validation", which spec 01 already says. The open question of _why_ is still worth asking upstream, but nothing in the build depends on it.
 
 ### `taxon_rank` is empty on 23.5% of records
 

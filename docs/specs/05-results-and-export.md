@@ -7,11 +7,12 @@ Depends on specs 02 and 04.
 Columns: catalog GUID (links to the Arctos record), scientific name, family, country, state/province, locality, collection date.
 
 - GUID links out to `https://arctos.database.museum/guid/{guid}` — confirmed from `related_record_cache.record` in the dump. `guid` already carries the full `MSB:Mamm:151352` form, so `guid_prefix` is not needed to build the URL. OQ6 closed.
-- **A specimen can have several events (D26/D27), and the row expands to show them (D44).** Collapsed, one row per specimen showing the *matched* event. Expanded, every event with its date, locality, and coordinates.
+- **A specimen can have several events (D26/D27), and the row expands to show them (D44).** Collapsed, one row per specimen showing the _matched_ event. Expanded, every event with its date, locality, and coordinates.
 
   This is the only presentation that makes duplicate georeferences legible. ~2% of specimens have several events, and "3 events" usually means one visit recorded three ways — same date and place, coordinates differing in the fourth decimal — not three collections. A count badge alone implies the opposite; the expanded view shows the near-identical coordinates and the reader draws the right conclusion without being told.
 
   The expand control states the count and stays keyboard-reachable (`<button aria-expanded>`, not a click handler on a row). Rows with one event have no control at all rather than a disabled one.
+
 - Records with no event at all show "no locality recorded" rather than an empty cell (D28), so missing is distinguishable from not-matching.
 - Scientific names are italicised. If `formatted_scientific_name` is used for this, it is untrusted HTML from the dump — escape or strip, never `{@html}`.
 - Long locality strings truncate with the full value in `title`.
@@ -26,7 +27,7 @@ D19/D20 (>10M docs, large result sets) and D17 (URL-addressable queries) conflic
 Resolution, **pending your confirmation (OQ2)**:
 
 - **UI paging uses `from`/`size`, capped at `from + size <= 10000`.** Page numbers work, deep links work, cost is bounded.
-- Hitting the cap shows: *"Only the first 10,000 results can be browsed. Narrow your search, or export the full result set."*
+- Hitting the cap shows: _"Only the first 10,000 results can be browsed. Narrow your search, or export the full result set."_
 - **Export uses PIT + `search_after`** and is not subject to the 10k cap.
 
 This is the standard resolution and matches how users actually behave — nobody browses to page 400, they export.
@@ -41,13 +42,13 @@ This is the standard resolution and matches how users actually behave — nobody
 - Hard cap `max_export_rows` (100k default, published in `/api/schema`). On truncation, the final CSV line is a comment row stating the export was truncated — a silently short file is a data-integrity problem in a research context.
 - PIT is released in all paths, including client disconnect. Leaked PITs pin segments and grow disk use.
 - Rate limit: 2 concurrent exports per IP, 5/hour. Public + unauthenticated + >10M docs makes this the most abusable endpoint in the system (D15), and D38 puts it directly on the internet with no proxy in front — the limit is the whole defence.
-- CORS applies here too (spec 02). A streaming response still needs the allowlisted origin header, and it must be set on the *first* byte, before the stream opens.
+- CORS applies here too (spec 02). A streaming response still needs the allowlisted origin header, and it must be set on the _first_ byte, before the stream opens.
 
 ### CSV contents
 
 **One row per specimen (D39).** Row count equals result count, which is what people expect from a search export and what makes the file safe to join against anything else.
 
-The problem that shape creates: a specimen can match on several attribute rows, and D18 exists precisely because method, date, and determiner vary *between* those rows. Collapsing them into one cell would destroy the correlation the whole query is built to preserve.
+The problem that shape creates: a specimen can match on several attribute rows, and D18 exists precisely because method, date, and determiner vary _between_ those rows. Collapsing them into one cell would destroy the correlation the whole query is built to preserve.
 
 Solution: **aligned parallel columns.** Matched attribute detail goes into `; `-joined lists where the *N*th element of every list refers to the same attribute row.
 

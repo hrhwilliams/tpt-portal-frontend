@@ -15,8 +15,11 @@
 		const q = value.trim().toLowerCase();
 		if (q.length < 2) return [];
 		return all
-			.filter((t) => (!rank || t.rank === rank) && t.name.toLowerCase().startsWith(q))
-			.filter((t) => t.name.toLowerCase() !== q)
+			.filter((t) => {
+				const n = t.name.toLowerCase();
+				// an exact hit is already in the box; suggesting it back is noise
+				return (!rank || t.rank === rank) && n.startsWith(q) && n !== q;
+			})
 			.slice(0, 10);
 	});
 

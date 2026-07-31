@@ -191,24 +191,9 @@
 		grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
 		gap: 0.7rem;
 	}
-	label {
-		display: flex;
-		flex-direction: column;
-		gap: 0.2rem;
-	}
-	.lbl {
-		font-size: 0.75rem;
-		color: var(--muted);
-	}
 	.method {
 		margin-top: 0.9rem;
 		max-width: 24rem;
-	}
-	.note {
-		font-size: 0.8rem;
-		color: var(--muted);
-		max-width: 78ch;
-		margin: 0.5rem 0 0;
 	}
 	.note.warn {
 		color: #b4544a;

@@ -1,4 +1,4 @@
-import adapter from "svelte-adapter-bun";
+import adapter from 'svelte-adapter-bun';
 import { sveltekit } from '@sveltejs/kit/vite';
 import { defineConfig } from 'vite';
 

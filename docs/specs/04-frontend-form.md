@@ -21,10 +21,10 @@ Rules:
 
 ## Routes
 
-| Route | Responsibility |
-|---|---|
-| `/` | Landing: what the portal is, one worked example query, link to `/search` |
-| `/search` | Form + results. `load` parses the URL, validates, calls the search API |
+| Route     | Responsibility                                                           |
+| --------- | ------------------------------------------------------------------------ |
+| `/`       | Landing: what the portal is, one worked example query, link to `/search` |
+| `/search` | Form + results. `load` parses the URL, validates, calls the search API   |
 
 `/search` with no params renders the empty form and does not call the API (spec 02 rejects empty queries anyway).
 
@@ -46,7 +46,7 @@ Outcome is a radio group of exactly four (D40):
 - **Examined, no result recorded** — examined for it, and no outcome was ever written down
 - **Any record of examination** — the denominator: any of the above
 
-The third is the state spec 07 identified and D21 originally folded into the denominator. Making it selectable turns a caveat into a query: a user can now *find* the records the caveat is about, which is the difference between telling someone the data is incomplete and showing them where.
+The third is the state spec 07 identified and D21 originally folded into the denominator. Making it selectable turns a caveat into a query: a user can now _find_ the records the caveat is about, which is the difference between telling someone the data is incomplete and showing them where.
 
 Selecting it **disables the method input**, driven by `allows_method: false` from `/api/schema`. "Examined by this method with no result recorded" is unanswerable — the method lives on the attribute row, and this state is defined by the absence of the rows that would carry one. Spec 02 rejects the combination server-side; the form should never send it. Show a short reason next to the disabled input rather than greying it out silently.
 
@@ -56,12 +56,12 @@ Alongside it, a persistent note, not a dismissible tooltip:
 
 This is not polish. The four underlying states (spec 07) do not partition cleanly, and a user comparing "detected" against "not detected" counts will compute a prevalence figure that is wrong unless they know the denominator is incomplete.
 
-**Arctos says the same thing, and citing it beats paraphrasing it.** The `ctexamined_detected` documentation states these data *"cannot be Research Grade by themselves"* and should be accompanied by parts, relationships, or other direct evidence. Link `https://handbook.arctosdb.org/best_practices/examined.html` from the note (spec 09).
+**Arctos says the same thing, and citing it beats paraphrasing it.** The `ctexamined_detected` documentation states these data _"cannot be Research Grade by themselves"_ and should be accompanied by parts, relationships, or other direct evidence. Link `https://handbook.arctosdb.org/best_practices/examined.html` from the note (spec 09).
 
 The value `<select>` is populated from the code table, so it lists **all 32 controlled values**, not only those with records (D36). Consequences for the form:
 
 - Children indent under parents — selecting `ectoparasite` includes `ectoparasite: flea` and `ectoparasite: louse` (D22). Depth never exceeds 2, guaranteed by the code table.
-- Each option carries the authority's own description in its `title`: *"Ticks are parasitic arachnids in the order Ixodida."* This is what disambiguates `parasite` from `endoparasite` without the user guessing.
+- Each option carries the authority's own description in its `title`: _"Ticks are parasitic arachnids in the order Ixodida."_ This is what disambiguates `parasite` from `endoparasite` without the user guessing.
 - Values with **0 records in the current snapshot are shown with their count and disabled**, not omitted. A vanishing option is indistinguishable from a value that was never offered; "0 records" tells the user their search is well-formed and the corpus is empty for it.
 
 The method input is free text with placeholder guidance and a note that method is recorded as prose, so matching is approximate — `comb` will not find `combed` (D11).
@@ -79,7 +79,7 @@ Two notes the data forces, both small and both the kind of thing that otherwise 
 
 **Zero results trigger a suggestion query, and only then.** On an empty result set the page runs a prefix aggregation over `locality_search_terms` and offers up to 10 real place names:
 
-> No matches for **Isle Royale**. Did you mean: *Isle Royale National Park* (312) · *Isle Royale, Keweenaw County* (47)?
+> No matches for **Isle Royale**. Did you mean: _Isle Royale National Park_ (312) · _Isle Royale, Keweenaw County_ (47)?
 
 Suggestions are links that re-run the search, so they stay URL-addressable (D17). The expensive query runs only after the cheap one has already failed, so the common case pays nothing.
 

@@ -79,6 +79,57 @@
 	:global(a) {
 		color: var(--accent);
 	}
+
+	/* Form primitives. The search form and its row components render one visual
+	   language; these lived identically in three style blocks. */
+	:global(.rows) {
+		display: flex;
+		flex-direction: column;
+		gap: 0.4rem;
+	}
+	:global(form label) {
+		display: flex;
+		flex-direction: column;
+		gap: 0.2rem;
+	}
+	:global(.row) {
+		display: flex;
+		gap: 0.6rem;
+		align-items: flex-end;
+		padding: 0.5rem;
+		border: 1px solid var(--line);
+		border-radius: 6px;
+		background: var(--panel);
+	}
+	:global(.grow) {
+		flex: 1;
+		min-width: 0;
+	}
+	:global(.lbl) {
+		font-size: 0.75rem;
+		color: var(--muted);
+	}
+	:global(.op) {
+		font-size: 0.72rem;
+		font-weight: 700;
+		color: var(--muted);
+		letter-spacing: 0.06em;
+		padding-left: 0.5rem;
+	}
+	:global(.rm) {
+		padding: 0.3rem 0.6rem;
+		line-height: 1;
+		font-size: 1.1rem;
+	}
+	:global(.add) {
+		align-self: flex-start;
+	}
+	:global(.note) {
+		margin: 0.5rem 0 0;
+		font-size: 0.8rem;
+		color: var(--muted);
+		max-width: 78ch;
+	}
 	header {
 		display: flex;
 		gap: 1.5rem;

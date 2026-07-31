@@ -4,16 +4,16 @@ Owner: indexer/ETL. Blocks specs 02–05. Nothing else can be built first.
 
 ## Why the current mapping can't answer the v1 query
 
-Target query: *"What Sorex from Isle Royale NP were tested for hantavirus in 1994 by ELISA, and which were positive?"*
+Target query: _"What Sorex from Isle Royale NP were tested for hantavirus in 1994 by ELISA, and which were positive?"_
 
-| Clause | Current mapping | Verdict |
-|---|---|---|
-| `Sorex` | `genus` keyword | OK, but must become a keyword **array** (D23) |
-| `Isle Royale NP` | only `country`, `state_prov` | **missing** — lives in `locality_search_terms` (D24) |
-| `1994` | `began_date` date | **misses second events** — must move into nested events (D26) |
-| `detected: Hantavirus` | `attributedetail` nested type/value | OK, but needs ancestor expansion (D22) |
-| `by ELISA` | no method field on the attribute | **missing** — source has `attribute_method` (D11) |
-| ranks above family, and subfamily | only family/genus/species | **missing** (D12) |
+| Clause                            | Current mapping                     | Verdict                                                       |
+| --------------------------------- | ----------------------------------- | ------------------------------------------------------------- |
+| `Sorex`                           | `genus` keyword                     | OK, but must become a keyword **array** (D23)                 |
+| `Isle Royale NP`                  | only `country`, `state_prov`        | **missing** — lives in `locality_search_terms` (D24)          |
+| `1994`                            | `began_date` date                   | **misses second events** — must move into nested events (D26) |
+| `detected: Hantavirus`            | `attributedetail` nested type/value | OK, but needs ancestor expansion (D22)                        |
+| `by ELISA`                        | no method field on the attribute    | **missing** — source has `attribute_method` (D11)             |
+| ranks above family, and subfamily | only family/genus/species           | **missing** (D12)                                             |
 
 ## Mapping v2
 
@@ -109,7 +109,7 @@ Built from `json_locality`, one nested doc per array element. Notes:
 - Omit `coordinates` entirely when either `dec_lat` or `dec_long` is blank. A `geo_point` with a null component fails indexing; `0,0` is worse — it silently places specimens in the Gulf of Guinea.
 - `verbatim_date` is free text (`"30 Aug 2002"`, `"3 JUN 1949"`). Store unindexed for display; never parse it.
 - `events.locality_search_terms` is per-event and depends on OQ13. Until that is resolved, populate it from each event's own `higher_geog`, `spec_locality`, and `locality_name`, and rely on the record-level rollup below for full recall.
-- **`event_count` is not trustworthy.** It disagrees with `len(json_locality)` on 3,772 of 741,801 records (0.51%), and in *both* directions — mostly too high, but too low on 108. Build events from the array and log the discrepancy; do not use the count for validation.
+- **`event_count` is not trustworthy.** It disagrees with `len(json_locality)` on 3,772 of 741,801 records (0.51%), and in _both_ directions — mostly too high, but too low on 108. Build events from the array and log the discrepancy; do not use the count for validation.
 - **Synthesize an event when `json_locality` is empty but top-level date or place fields are not.** `MSB:Bird:6062` has `began_date = 1985-02-07`, `event_count = 1`, and an empty `json_locality`. Since D26 routes all date filtering through nested events, that record would otherwise be unfindable by date despite having one. Build a single event from the top-level `began_date`, `ended_date`, `higher_geog`, `spec_locality`, `country`, `state_prov`, `county`, and coordinates, and mark it `synthesized: true`.
 
   Records with neither (`MSB:Herp:57260`) get no events at all, which is correct — D28 covers them.
@@ -208,7 +208,7 @@ The bare keyword field stays for exact matching and display; `.hierarchy` is wha
 - **Drop rows whose `attribute_type` is marked `public: 0` in `ctattribute_type` (D35).** Currently `NAGPRA category`, `restricted data`, and `value`. None occur in `msb.csv` — which is the point: this is enforced, not observed, exactly like the D29 encumbrance assertion. Fail the build on an `attribute_type` the code table does not document at all. See spec 09.
 - `attribute_value` stays exact for display and CSV; `attribute_value.hierarchy` is what queries match against.
 - **`attribute_value.hierarchy` is only meaningful for the four detection types.** The tokenizer runs on all 84 attribute types, and prose values carry incidental colons — `reproductive data` reaches depth 12 (`"testes position: abdominal | testes length: 1 mm | …"`), producing ancestor tokens like `testes position` on ~94,000 rows. Harmless for search, since only detection values are ever queried, but it means this subfield must **never** be used as an aggregation source. Spec 03 aggregates the flat detection fields instead.
-- `attribute_date` stays a real `date` with the `DATEFMT` list (D33) — 2,308,842 values are `yyyy-MM-dd`, 7,099 are `yyyy-MM`, 4,659 are `yyyy`, and none are malformed. It is **not** exposed as a filter (D9): it is often the load date, and one record's own remark states *"Attribute date reflects loaded date only."* Index it for display and provenance in the export.
+- `attribute_date` stays a real `date` with the `DATEFMT` list (D33) — 2,308,842 values are `yyyy-MM-dd`, 7,099 are `yyyy-MM`, 4,659 are `yyyy`, and none are malformed. It is **not** exposed as a filter (D9): it is often the load date, and one record's own remark states _"Attribute date reflects loaded date only."_ Index it for display and provenance in the export.
 - `attribute_method` gets both `text` (for the free-text "method contains" input) and `.keyword` (so `/schema` can aggregate the top values for guidance, even though a dropdown is not viable).
 - `attribute_method` also carries non-method provenance notes (`"Migrated from SNV results."`). Do not present it as authoritative method metadata.
 
@@ -257,15 +257,15 @@ Built from `related_record_cache` (JSON — **do not parse the `relatedcataloged
 - `host of parasite` is stored natively — 54,059 rows, on the host records, pointing back at the parasite. No inverse synthesis, and no `inferred` flag, because nothing is inferred.
 - `MSB:Host` records are complete specimens (100% `scientific_name`, 99.9% `collector_agents`, 97.6% `genus`), not stubs. Only 3.4% carry the `same individual as` edge the traversal assumed. No `resolved_via`, because there is one path.
 
-The related taxonomy collapses to `related_family` plus the loose `identification` string, both straight from the cache. Filtering related records at ranks *below* family needs the two-pass join sketched in spec 06 — deferred under D32, since both flagship queries filter at family (`Taeniidae`).
+The related taxonomy collapses to `related_family` plus the loose `identification` string, both straight from the cache. Filtering related records at ranks _below_ family needs the two-pass join sketched in spec 06 — deferred under D32, since both flagship queries filter at family (`Taeniidae`).
 
 The one real ETL step: **`record` arrives in three forms** and must be normalised to a bare GUID.
 
-| Form | Rows | Example | `related_guid` |
-|---|---:|---|---|
-| Full URL | 142,242 | `https://arctos.database.museum/guid/MSB:Mamm:293371` | strip prefix |
-| Bare GUID | 5,886 | `MSB:Mamm:293371` | as-is |
-| Not a GUID | 22,856 | `A4HEG`, `NK 200451`, `AMNH M 263798`, `318688` | null; keep in `related_identifier` |
+| Form       |    Rows | Example                                               | `related_guid`                     |
+| ---------- | ------: | ----------------------------------------------------- | ---------------------------------- |
+| Full URL   | 142,242 | `https://arctos.database.museum/guid/MSB:Mamm:293371` | strip prefix                       |
+| Bare GUID  |   5,886 | `MSB:Mamm:293371`                                     | as-is                              |
+| Not a GUID |  22,856 | `A4HEG`, `NK 200451`, `AMNH M 263798`, `318688`       | null; keep in `related_identifier` |
 
 191 URLs are `http://`, not `https://`. Match on the path segment, not a fixed prefix string.
 
@@ -316,31 +316,31 @@ Two additions given the derived fields in this mapping:
 
 Everything the ETL derives rather than copies. Each one is a place where a silent regression returns fewer results instead of failing:
 
-| Output | From | Rule |
-|---|---|---|
-| `events[]` | `json_locality` | one nested doc per element; omit `coordinates` if either lat/long blank; keep duplicates (D27); synthesize one from top-level fields when the array is empty but a date or place exists |
-| `event_date_min` / `_max` | `events[].began_date`/`ended_date` | min/max; sort-only; optional (see above) |
-| `detected` and siblings | `attributedetail` JSON | filter to the four detection types, after dropping `public: 0` types (D35). **Not** from the joined top-level columns |
-| `collector_ids` / `collector_names` | `collector_agents` | filter `agent_role = collector` |
-| `relations[]` | `related_record_cache` | copy; normalise `record` to a bare GUID; flag the 13.4% that are not GUIDs (D31) |
-| `locality_search_terms` | upstream **array** | do not split the joined string (D24, OQ12) |
+| Output                              | From                               | Rule                                                                                                                                                                                    |
+| ----------------------------------- | ---------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `events[]`                          | `json_locality`                    | one nested doc per element; omit `coordinates` if either lat/long blank; keep duplicates (D27); synthesize one from top-level fields when the array is empty but a date or place exists |
+| `event_date_min` / `_max`           | `events[].began_date`/`ended_date` | min/max; sort-only; optional (see above)                                                                                                                                                |
+| `detected` and siblings             | `attributedetail` JSON             | filter to the four detection types, after dropping `public: 0` types (D35). **Not** from the joined top-level columns                                                                   |
+| `collector_ids` / `collector_names` | `collector_agents`                 | filter `agent_role = collector`                                                                                                                                                         |
+| `relations[]`                       | `related_record_cache`             | copy; normalise `record` to a bare GUID; flag the 13.4% that are not GUIDs (D31)                                                                                                        |
+| `locality_search_terms`             | upstream **array**                 | do not split the joined string (D24, OQ12)                                                                                                                                              |
 
 Removed by the full-slice profile, and worth recording as removed so they are not reintroduced:
 
-| Was | Why it is gone |
-|---|---|
-| Inverse relation edges | `host of parasite` is in the source (D31) |
-| `MSB:Host` stub traversal | `MSB:Host` records are complete (D31) |
-| Two-pass `guid → classification` join | `related_family` is in the cache and both queries filter at family (D32) |
-| Partial-date coercion | a `format` list parses them (D33) |
+| Was                                        | Why it is gone                                                           |
+| ------------------------------------------ | ------------------------------------------------------------------------ |
+| Inverse relation edges                     | `host of parasite` is in the source (D31)                                |
+| `MSB:Host` stub traversal                  | `MSB:Host` records are complete (D31)                                    |
+| Two-pass `guid → classification` join      | `related_family` is in the cache and both queries filter at family (D32) |
+| Partial-date coercion                      | a `format` list parses them (D33)                                        |
 | `events.country` / `state_prov` / `county` | not in `json_locality`; splitting `higher_geog` would be invention (D34) |
 
 Handled by analyzers, **not** the ETL — no derived state, nothing to drift:
 
-| Concern | Mechanism |
-|---|---|
-| `:` value hierarchy (D22) | `path_hierarchy` tokenizer → `.hierarchy` |
-| `; ` multi-valued taxonomy (D23) | `pattern` tokenizer → `.split` |
+| Concern                          | Mechanism                                 |
+| -------------------------------- | ----------------------------------------- |
+| `:` value hierarchy (D22)        | `path_hierarchy` tokenizer → `.hierarchy` |
+| `; ` multi-valued taxonomy (D23) | `pattern` tokenizer → `.split`            |
 | case-insensitive matching (OQ10) | `lowercase` filter in the search analyzer |
 
 ## Verified against `test.csv` — closed

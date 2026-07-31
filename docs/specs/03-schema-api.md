@@ -6,32 +6,37 @@
 
 ```json
 {
-  "snapshot_date": "2026-07-01",
-  "ranks": [
-    { "id": "phylum",    "label": "Phylum",    "field": "phylum" },
-    { "id": "class",     "label": "Class",     "field": "phylclass" },
-    { "id": "order",     "label": "Order",     "field": "phylorder" },
-    { "id": "family",    "label": "Family",    "field": "family" },
-    { "id": "subfamily", "label": "Subfamily", "field": "subfamily" },
-    { "id": "genus",     "label": "Genus",     "field": "genus" },
-    { "id": "species",   "label": "Species",   "field": "species" }
-  ],
-  "outcomes": [
-    { "id": "detected",           "label": "Detected" },
-    { "id": "not_detected",       "label": "Not detected" },
-    { "id": "examined_no_result", "label": "Examined, no result recorded",
-      "allows_method": false },
-    { "id": "examined",           "label": "Any record of examination" }
-  ],
-  "analysis_values": ["ectoparasite", "ectoparasite: flea", "endoparasite",
-                      "parasite", "virus: Orthohantavirus", "..."],
-  "countries":  ["United States", "..."],
-  "sorts": [
-    { "id": "guid_asc",  "label": "Catalog number" },
-    { "id": "date_desc", "label": "Newest collection date" },
-    { "id": "date_asc",  "label": "Oldest collection date" }
-  ],
-  "limits": { "max_per_page": 200, "max_result_window": 10000, "max_export_rows": 100000 }
+	"snapshot_date": "2026-07-01",
+	"ranks": [
+		{ "id": "phylum", "label": "Phylum", "field": "phylum" },
+		{ "id": "class", "label": "Class", "field": "phylclass" },
+		{ "id": "order", "label": "Order", "field": "phylorder" },
+		{ "id": "family", "label": "Family", "field": "family" },
+		{ "id": "subfamily", "label": "Subfamily", "field": "subfamily" },
+		{ "id": "genus", "label": "Genus", "field": "genus" },
+		{ "id": "species", "label": "Species", "field": "species" }
+	],
+	"outcomes": [
+		{ "id": "detected", "label": "Detected" },
+		{ "id": "not_detected", "label": "Not detected" },
+		{ "id": "examined_no_result", "label": "Examined, no result recorded", "allows_method": false },
+		{ "id": "examined", "label": "Any record of examination" }
+	],
+	"analysis_values": [
+		"ectoparasite",
+		"ectoparasite: flea",
+		"endoparasite",
+		"parasite",
+		"virus: Orthohantavirus",
+		"..."
+	],
+	"countries": ["United States", "..."],
+	"sorts": [
+		{ "id": "guid_asc", "label": "Catalog number" },
+		{ "id": "date_desc", "label": "Newest collection date" },
+		{ "id": "date_asc", "label": "Oldest collection date" }
+	],
+	"limits": { "max_per_page": 200, "max_result_window": 10000, "max_export_rows": 100000 }
 }
 ```
 
@@ -54,7 +59,7 @@ Values sort so parents precede children (`ectoparasite` before `ectoparasite: fl
 
 `countries` stays an aggregation on `country` — there is no code table for it.
 
-**There is no `methods` list.** `attribute_method` is prose, not vocabulary — `comb`, `combed`, `comb with chloroform`, and `comb w/chloroform` all occur in a 199-row sample, alongside a 140-character serology description. A dropdown would imply a precision the data does not have. The form takes free text (D11). If guidance is wanted, `/schema` may expose the top ~20 `attribute_method.keyword` values as *examples* — labelled as examples, never as the complete set.
+**There is no `methods` list.** `attribute_method` is prose, not vocabulary — `comb`, `combed`, `comb with chloroform`, and `comb w/chloroform` all occur in a 199-row sample, alongside a 140-character serology description. A dropdown would imply a precision the data does not have. The form takes free text (D11). If guidance is wanted, `/schema` may expose the top ~20 `attribute_method.keyword` values as _examples_ — labelled as examples, never as the complete set.
 
 `limits` is echoed so the frontend enforces the same bounds the backend does, without duplicating the numbers in TypeScript.
 
@@ -77,18 +82,23 @@ D2 means data is stale by design. The UI displays it ("Data current as of …") 
 **Source: an ETL-written metadata document (D41).** One doc per index:
 
 ```json
-{ "doc_type": "snapshot_metadata",
-  "snapshot_date": "2026-07-01",
-  "extracted_at": "2026-07-01T04:12:00Z",
-  "source_file": "arctos-export-20260701.csv",
-  "row_count": 10482913,
-  "indexed_count": 10482913,
-  "code_tables_fetched": "2026-07-01",
-  "assertions": { "encumbrances_empty": true, "nonpublic_attributes_dropped": 0,
-                  "undocumented_attribute_types": [] } }
+{
+	"doc_type": "snapshot_metadata",
+	"snapshot_date": "2026-07-01",
+	"extracted_at": "2026-07-01T04:12:00Z",
+	"source_file": "arctos-export-20260701.csv",
+	"row_count": 10482913,
+	"indexed_count": 10482913,
+	"code_tables_fetched": "2026-07-01",
+	"assertions": {
+		"encumbrances_empty": true,
+		"nonpublic_attributes_dropped": 0,
+		"undocumented_attribute_types": []
+	}
+}
 ```
 
-The alias target's creation date was the alternative and is rejected: it records when the index was *built*, not when the data was *extracted*, and those differ by however long the ETL queue was. `extracted_at` depends on the dump carrying a timestamp — request 4 in spec 11. Until that lands, it equals the ETL run time and the UI shows the date only, not the time.
+The alias target's creation date was the alternative and is rejected: it records when the index was _built_, not when the data was _extracted_, and those differ by however long the ETL queue was. `extracted_at` depends on the dump carrying a timestamp — request 4 in spec 11. Until that lands, it equals the ETL run time and the UI shows the date only, not the time.
 
 Carrying the D29 and D35 assertion results here means `/api/schema` can surface "this snapshot was verified" rather than the guarantee living only in a build log nobody reads.
 

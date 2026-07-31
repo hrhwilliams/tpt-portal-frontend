@@ -4,13 +4,13 @@ Query UI deferred to v2 (D7); **the mapping lands in v1** (D31) because reindexi
 
 Revised twice: against `test.csv` ([07](07-data-validation.md)), then against the full 741,801-row MSB slice ([08](08-full-dump-validation.md)). The second revision **deleted most of the ETL this spec originally specified** — the data already contains what it proposed to derive.
 
-Target query: *"What Arvicolid rodents from Saint Lawrence Island collected by Robert L. Rausch are hosts of Taeniid cestodes (including Echinococcus)?"*
+Target query: _"What Arvicolid rodents from Saint Lawrence Island collected by Robert L. Rausch are hosts of Taeniid cestodes (including Echinococcus)?"_
 
-The dump contains this query almost exactly: `MSB:Para:16970` and `MSB:Para:16839` are both *Echinococcus multilocularis* (family Taeniidae), each `parasite of` an Arvicolinae host in Alaska. And `Saint Lawrence Island` appears verbatim in `locality_search_terms` on 6 of 199 sampled records. It is answerable.
+The dump contains this query almost exactly: `MSB:Para:16970` and `MSB:Para:16839` are both _Echinococcus multilocularis_ (family Taeniidae), each `parasite of` an Arvicolinae host in Alaska. And `Saint Lawrence Island` appears verbatim in `locality_search_terms` on 6 of 199 sampled records. It is answerable.
 
 ## Corrections from the data
 
-**1. "Arvicolidae" is `subfamily = Arvicolinae`.** No such family exists in this taxonomy source; the hosts sit in `family = Cricetidae`. The rank is off by one in the original request — worth telling the interviewee. *(Holds at 741,801 rows.)*
+**1. "Arvicolidae" is `subfamily = Arvicolinae`.** No such family exists in this taxonomy source; the hosts sit in `family = Cricetidae`. The rank is off by one in the original request — worth telling the interviewee. _(Holds at 741,801 rows.)_
 
 **2. ~~Edges are one-directional.~~ Withdrawn.** The 199-row sample had no `host of` edge, so this spec required the ETL to synthesize one. The full slice has **54,059 `host of parasite` edges**, sitting on the host records (`MSB:Mamm` 27,100 · `MSB:Host` 18,831 · `UAM:Mamm` 6,798) and pointing back at `MSB:Para`. The relationship is named `host of parasite`, which is why a grep for `host of` on the sample found nothing. Query it directly.
 
@@ -24,7 +24,7 @@ Both withdrawals are evidenced in [08-full-dump-validation.md](08-full-dump-vali
 
 The remaining reason for a mapping change is narrower than this spec originally claimed: Elasticsearch cannot join at query time, so the relationship and the related record's family must sit together in one nested doc. The cache supplies both. That is now the whole job.
 
-**Related taxonomy below family is deferred (D32).** The cache carries `family` plus a loose `identification` string (`"Microtus oeconomus cf."`, `"Stagnicola"`, `"Cestoda"` — qualifiers, genus-only, and higher taxa). Resolving genus/order/subfamily of the *related* record needs the two-pass join below. Neither flagship query needs it — both filter the related record at family (`Taeniidae`). Build it when someone asks for a non-family related rank, not before.
+**Related taxonomy below family is deferred (D32).** The cache carries `family` plus a loose `identification` string (`"Microtus oeconomus cf."`, `"Stagnicola"`, `"Cestoda"` — qualifiers, genus-only, and higher taxa). Resolving genus/order/subfamily of the _related_ record needs the two-pass join below. Neither flagship query needs it — both filter the related record at family (`Taeniidae`). Build it when someone asks for a non-family related rank, not before.
 
 ## Mapping
 
@@ -33,19 +33,38 @@ The `relations` nested field is specified in [01-index-mapping.md](01-index-mapp
 ## The query then becomes one request
 
 ```json
-{ "bool": { "filter": [
-  { "term": { "subfamily": "Arvicolinae" } },
-  { "term": { "collector_ids": "https://arctos.database.museum/agent/…" } },
-  { "nested": { "path": "events", "query": {
-      "term": { "events.locality_search_terms": "Saint Lawrence Island" } } } },
-  { "nested": { "path": "relations", "query": { "bool": { "filter": [
-      { "term": { "relations.relationship": "host of parasite" } },
-      { "term": { "relations.related_family": "Taeniidae" } }
-  ] } } } }
-] } }
+{
+	"bool": {
+		"filter": [
+			{ "term": { "subfamily": "Arvicolinae" } },
+			{ "term": { "collector_ids": "https://arctos.database.museum/agent/…" } },
+			{
+				"nested": {
+					"path": "events",
+					"query": {
+						"term": { "events.locality_search_terms": "Saint Lawrence Island" }
+					}
+				}
+			},
+			{
+				"nested": {
+					"path": "relations",
+					"query": {
+						"bool": {
+							"filter": [
+								{ "term": { "relations.relationship": "host of parasite" } },
+								{ "term": { "relations.related_family": "Taeniidae" } }
+							]
+						}
+					}
+				}
+			}
+		]
+	}
+}
 ```
 
-**Denormalizing the full classification is what makes "all taxonomic levels below family" work.** `related_family: Taeniidae` matches every Taeniid genus and species — including *Echinococcus* — with no rank expansion, no recursive lookup, no taxonomy service at query time. The same trick handles pathogen taxonomies if viral, bacterial, or fungal sources are imported into Arctos.
+**Denormalizing the full classification is what makes "all taxonomic levels below family" work.** `related_family: Taeniidae` matches every Taeniid genus and species — including _Echinococcus_ — with no rank expansion, no recursive lookup, no taxonomy service at query time. The same trick handles pathogen taxonomies if viral, bacterial, or fungal sources are imported into Arctos.
 
 Same correlated-nested rule as spec 02: relationship type and related taxonomy in **one** `nested` clause, or you match a specimen that hosts something and is separately related to a Taeniid.
 
@@ -80,16 +99,16 @@ littermate or nestmate of 10   same series as 2   mate of 2   same edition as 2
 
 Inverses are stored natively in every case where one exists. `host of parasite` is the name the sample was missing — D31.
 
-**There is no code table for this.** The Arctos authority API exposes 121 tables and none of them describes specimen relationships; `cttaxon_relation` sounds right but holds `synonym of` / `misspelling` / `potential alternate spelling`, which are taxon *name* relationships (spec 09). So unlike the detection vocabulary, this list is empirical and a new type can appear in any snapshot without warning. Log unknown relationship values and index them; do not reject them (D37).
+**There is no code table for this.** The Arctos authority API exposes 121 tables and none of them describes specimen relationships; `cttaxon_relation` sounds right but holds `synonym of` / `misspelling` / `potential alternate spelling`, which are taxon _name_ relationships (spec 09). So unlike the detection vocabulary, this list is empirical and a new type can appear in any snapshot without warning. Log unknown relationship values and index them; do not reject them (D37).
 
 ### The cestode query has two distinct answers
 
 `endoparasite: cestode` is a controlled `ctexamined_detected` value, so flagship query 1 is expressible **without** the relations field at all — as an attribute search. That is not the same question:
 
-| Path | Asserts |
-|---|---|
-| `examined for`/`detected` = `endoparasite: cestode` | a cestode was found in this host |
-| `relations.related_family = Taeniidae` | a *catalogued* parasite specimen is linked to this host |
+| Path                                                | Asserts                                                 |
+| --------------------------------------------------- | ------------------------------------------------------- |
+| `examined for`/`detected` = `endoparasite: cestode` | a cestode was found in this host                        |
+| `relations.related_family = Taeniidae`              | a _catalogued_ parasite specimen is linked to this host |
 
 The second is a strictly stronger claim and will return fewer records. Both are legitimate; the v2 UI must not present them as interchangeable.
 

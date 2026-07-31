@@ -172,15 +172,18 @@
 		padding: 0;
 		overflow-y: auto;
 	}
-	li label {
+	/* `.ms` is load-bearing: Svelte 5 scopes with :where(), so a bare `li label`
+	   ties with the global `form label` and loses to it. */
+	.ms li label {
 		display: flex;
+		flex-direction: row;
 		align-items: center;
 		gap: 0.5rem;
 		padding: 0.22rem 0.3rem;
 		cursor: pointer;
 		border-radius: 4px;
 	}
-	li label:hover {
+	.ms li label:hover {
 		background: var(--accent-soft);
 	}
 	.txt {

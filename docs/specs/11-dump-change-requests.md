@@ -33,7 +33,7 @@ Splitting the joined string on `", "` turns the first into three fragments, none
 
 **Ask:** is the production dump restricted to one institution, or does it include the records that MSB specimens are related to?
 
-**Why it matters:** `msb.csv` was built by grepping for `MSB`, so it contains the records at both ends of most relations and therefore resolves them *by construction*. That tells us nothing about production.
+**Why it matters:** `msb.csv` was built by grepping for `MSB`, so it contains the records at both ends of most relations and therefore resolves them _by construction_. That tells us nothing about production.
 
 Relations point outward at 74 distinct `guid_prefix` values across 30 institutions:
 
@@ -56,12 +56,12 @@ same individual as -> NMMNH:Mamm 5,793    -> KSB:Mamm 1,307   -> ANWC:Birds 364
 
 **Evidence:** 3,772 of 741,801 records (0.51%) disagree, in **both** directions:
 
-| Shape | Records |
-|---|---|
-| `event_count = 2`, one entry supplied | 3,392 |
-| `event_count = 3`, two supplied | 257 |
-| `event_count = 2`, **three** supplied | 67 |
-| `event_count = 1`, two supplied | 41 |
+| Shape                                 | Records |
+| ------------------------------------- | ------- |
+| `event_count = 2`, one entry supplied | 3,392   |
+| `event_count = 3`, two supplied       | 257     |
+| `event_count = 2`, **three** supplied | 67      |
+| `event_count = 1`, two supplied       | 41      |
 
 Examples: `MSB:Bird:49658`, `MSB:Herp:75023`, `MSB:Bird:49663`, `MSB:Bird:49630`.
 
@@ -77,7 +77,7 @@ For `MSB:Bird:49658` the missing event looks real — `locality_search_terms` me
 
 **Ask:** does the export already carry the timestamp of when it was extracted? If so, name the column.
 
-**Why:** D2 makes staleness a design property, so the UI shows "Data current as of …". D41 has the ETL write that into an index metadata document. The ETL knows when it *ran*, which is not when the data was *extracted* — those differ by however long the file sat in a queue.
+**Why:** D2 makes staleness a design property, so the UI shows "Data current as of …". D41 has the ETL write that into an index metadata document. The ETL knows when it _ran_, which is not when the data was _extracted_ — those differ by however long the file sat in a queue.
 
 **What breaks without it:** nothing serious; we report the ETL run date and it is approximately right. Worth one line in a reply.
 

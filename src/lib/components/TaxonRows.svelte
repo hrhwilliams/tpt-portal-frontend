@@ -80,33 +80,7 @@
 </div>
 
 <style>
-	.rows {
-		display: flex;
-		flex-direction: column;
-		gap: 0.4rem;
-	}
-	.row {
-		display: flex;
-		gap: 0.6rem;
-		align-items: flex-end;
-		padding: 0.5rem;
-		border: 1px solid var(--line);
-		border-radius: 6px;
-		background: var(--panel);
-	}
-	.grow {
-		flex: 1;
-		min-width: 0;
-	}
-	label {
-		display: flex;
-		flex-direction: column;
-		gap: 0.2rem;
-	}
-	.lbl {
-		font-size: 0.75rem;
-		color: var(--muted);
-	}
+	/* shared row/label/op styles are global — see +layout.svelte */
 	.op.and {
 		color: var(--fg);
 	}
@@ -116,24 +90,7 @@
 		flex-direction: column;
 		gap: 0.2rem;
 	}
-	.op {
-		font-size: 0.72rem;
-		font-weight: 700;
-		color: var(--muted);
-		letter-spacing: 0.06em;
-		padding-left: 0.5rem;
-	}
-	.rm {
-		padding: 0.3rem 0.6rem;
-		line-height: 1;
-		font-size: 1.1rem;
-	}
-	.add {
-		align-self: flex-start;
-	}
 	.note {
 		margin: 0;
-		font-size: 0.8rem;
-		color: var(--muted);
 	}
 </style>

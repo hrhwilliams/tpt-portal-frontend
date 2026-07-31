@@ -2,21 +2,21 @@
 
 Small, independently buildable specs. Read `00-decisions.md` first; it records what was confirmed and why.
 
-| Spec | Scope | Depends on |
-|---|---|---|
-| [00-decisions.md](00-decisions.md) | Confirmed decisions D1–D34 | — |
-| [01-index-mapping.md](01-index-mapping.md) | Mapping v2, new fields, alias-swap reindex | — |
-| [02-search-api.md](02-search-api.md) | `POST /api/search`, ES query translation, guardrails | 01 |
-| [03-schema-api.md](03-schema-api.md) | `GET /api/schema`, vocab caching | 01 |
-| [04-frontend-form.md](04-frontend-form.md) | Search form, URL-as-state | 02, 03 |
-| [05-results-and-export.md](05-results-and-export.md) | Results table, pagination, streamed CSV | 02, 04 |
-| [06-v2-relationship-search-sketch.md](06-v2-relationship-search-sketch.md) | Host/parasite search — v2 query UI, v1 ETL | 01, 07 |
-| [07-data-validation.md](07-data-validation.md) | What `test.csv` (199 rows) contains. **Partly superseded by 08** | — |
-| [08-full-dump-validation.md](08-full-dump-validation.md) | The 741,801-row MSB slice. Corrections win over 07 | — |
-| [09-code-tables.md](09-code-tables.md) | Arctos authority API — vocabularies, descriptions, and the `public: 0` filter | — |
-| [10-taxon-autocomplete.md](10-taxon-autocomplete.md) | `taxa` index + `GET /api/taxa`. In v1 as of D42 | 01 |
-| [11-dump-change-requests.md](11-dump-change-requests.md) | Four asks for whoever generates the dump | 08 |
-| [99-open-questions.md](99-open-questions.md) | What's left. Nothing blocks code anymore | — |
+| Spec                                                                       | Scope                                                                         | Depends on |
+| -------------------------------------------------------------------------- | ----------------------------------------------------------------------------- | ---------- |
+| [00-decisions.md](00-decisions.md)                                         | Confirmed decisions D1–D34                                                    | —          |
+| [01-index-mapping.md](01-index-mapping.md)                                 | Mapping v2, new fields, alias-swap reindex                                    | —          |
+| [02-search-api.md](02-search-api.md)                                       | `POST /api/search`, ES query translation, guardrails                          | 01         |
+| [03-schema-api.md](03-schema-api.md)                                       | `GET /api/schema`, vocab caching                                              | 01         |
+| [04-frontend-form.md](04-frontend-form.md)                                 | Search form, URL-as-state                                                     | 02, 03     |
+| [05-results-and-export.md](05-results-and-export.md)                       | Results table, pagination, streamed CSV                                       | 02, 04     |
+| [06-v2-relationship-search-sketch.md](06-v2-relationship-search-sketch.md) | Host/parasite search — v2 query UI, v1 ETL                                    | 01, 07     |
+| [07-data-validation.md](07-data-validation.md)                             | What `test.csv` (199 rows) contains. **Partly superseded by 08**              | —          |
+| [08-full-dump-validation.md](08-full-dump-validation.md)                   | The 741,801-row MSB slice. Corrections win over 07                            | —          |
+| [09-code-tables.md](09-code-tables.md)                                     | Arctos authority API — vocabularies, descriptions, and the `public: 0` filter | —          |
+| [10-taxon-autocomplete.md](10-taxon-autocomplete.md)                       | `taxa` index + `GET /api/taxa`. In v1 as of D42                               | 01         |
+| [11-dump-change-requests.md](11-dump-change-requests.md)                   | Four asks for whoever generates the dump                                      | 08         |
+| [99-open-questions.md](99-open-questions.md)                               | What's left. Nothing blocks code anymore                                      | —          |
 
 ## v1 in one sentence
 
@@ -53,7 +53,7 @@ When backend work starts, build it against fixtures drawn from the shapes in spe
 Items 1–4 fail the same way: fewer results, no error, plausible-looking output. Spec 02 pins each with a test. Item 0 fails in the opposite and worse direction — more data than intended.
 
 0. **Indexing an attribute type Arctos marks non-public (D35).** Not a wrong-answer bug — a disclosure bug, on a portal with no auth. Zero occurrences today, which is exactly why it must be asserted rather than observed.
-1. **Uncorrelated nested clauses (D18).** Attribute value and method must sit inside a *single* `nested` clause. Three sibling clauses compile, run fast, and are scientifically wrong.
+1. **Uncorrelated nested clauses (D18).** Attribute value and method must sit inside a _single_ `nested` clause. Three sibling clauses compile, run fast, and are scientifically wrong.
 2. **Querying a bare keyword field instead of its analyzed subfield.** `.hierarchy` for values (D22), `.split` for taxonomy (D23). The bare field is for display and CSV only.
 3. **Filtering on the top-level date (D26).** Misses second events on multi-event records.
 4. **Deriving in the ETL what an analyzer already does.** See below.
