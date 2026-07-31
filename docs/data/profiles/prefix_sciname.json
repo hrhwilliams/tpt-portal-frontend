@@ -1,0 +1,6452 @@
+{
+ "rows": 741801,
+ "guid_prefix": [
+  {
+   "value": "MSB:Mamm",
+   "count": 355691,
+   "institution": "MSB",
+   "collection_cde": "Mammalogy"
+  },
+  {
+   "value": "MSB:Fish",
+   "count": 126206,
+   "institution": "MSB",
+   "collection_cde": "Ichthyology"
+  },
+  {
+   "value": "MSB:Herp",
+   "count": 106348,
+   "institution": "MSB",
+   "collection_cde": "Herpetology"
+  },
+  {
+   "value": "MSB:Para",
+   "count": 53046,
+   "institution": "MSB",
+   "collection_cde": "Parasitology"
+  },
+  {
+   "value": "MSB:Bird",
+   "count": 50631,
+   "institution": "MSB",
+   "collection_cde": "Ornithology"
+  },
+  {
+   "value": "MSB:Host",
+   "count": 25708,
+   "institution": "MSB",
+   "collection_cde": "Biological"
+  },
+  {
+   "value": "NMMNH:Mamm",
+   "count": 5795,
+   "institution": "NMMNHS",
+   "collection_cde": "Mammalogy"
+  },
+  {
+   "value": "KSB:Mamm",
+   "count": 4679,
+   "institution": "KSB",
+   "collection_cde": "Mammalogy"
+  },
+  {
+   "value": "MSB:DGR",
+   "count": 3551,
+   "institution": "MSB",
+   "collection_cde": "General"
+  },
+  {
+   "value": "UAM:Mamm",
+   "count": 3516,
+   "institution": "UAM",
+   "collection_cde": "Mammalogy"
+  },
+  {
+   "value": "DGR:Bird",
+   "count": 1550,
+   "institution": "DGR",
+   "collection_cde": "Ornithology"
+  },
+  {
+   "value": "NMU:Para",
+   "count": 938,
+   "institution": "NMU",
+   "collection_cde": "Parasitology"
+  },
+  {
+   "value": "HWML:Para",
+   "count": 861,
+   "institution": "HWML",
+   "collection_cde": "Parasitology"
+  },
+  {
+   "value": "UWBM:Mamm",
+   "count": 577,
+   "institution": "UWBM",
+   "collection_cde": "Mammalogy"
+  },
+  {
+   "value": "UTEP:Herp",
+   "count": 413,
+   "institution": "UTEP",
+   "collection_cde": "Herpetology"
+  },
+  {
+   "value": "DMNS:Mamm",
+   "count": 384,
+   "institution": "DMNS",
+   "collection_cde": "Mammalogy"
+  },
+  {
+   "value": "DGR:Mamm",
+   "count": 304,
+   "institution": "DGR",
+   "collection_cde": "Mammalogy"
+  },
+  {
+   "value": "MVZ:Bird",
+   "count": 275,
+   "institution": "MVZ",
+   "collection_cde": "Ornithology"
+  },
+  {
+   "value": "MSB:Arth",
+   "count": 241,
+   "institution": "MSB",
+   "collection_cde": "Entomology"
+  },
+  {
+   "value": "MVZ:Mamm",
+   "count": 227,
+   "institution": "MVZ",
+   "collection_cde": "Mammalogy"
+  },
+  {
+   "value": "NMMNH:Bird",
+   "count": 122,
+   "institution": "NMMNHS",
+   "collection_cde": "Ornithology"
+  },
+  {
+   "value": "OWU:Bird",
+   "count": 102,
+   "institution": "OWU",
+   "collection_cde": "Ornithology"
+  },
+  {
+   "value": "USNPC:Para",
+   "count": 93,
+   "institution": "USNPC",
+   "collection_cde": "Parasitology"
+  },
+  {
+   "value": "MVZ:Herp",
+   "count": 67,
+   "institution": "MVZ",
+   "collection_cde": "Herpetology"
+  },
+  {
+   "value": "FHSM:Mamm",
+   "count": 66,
+   "institution": "FHSM",
+   "collection_cde": "Mammalogy"
+  },
+  {
+   "value": "UTEP:HerpOS",
+   "count": 48,
+   "institution": "UTEP",
+   "collection_cde": "Herpetology"
+  },
+  {
+   "value": "UWYMV:Mamm",
+   "count": 42,
+   "institution": "UWYMV",
+   "collection_cde": "Mammalogy"
+  },
+  {
+   "value": "ASNHC:Mamm",
+   "count": 35,
+   "institution": "ASNHC",
+   "collection_cde": "Mammalogy"
+  },
+  {
+   "value": "DMNS:Bird",
+   "count": 34,
+   "institution": "DMNS",
+   "collection_cde": "Ornithology"
+  },
+  {
+   "value": "ASNHC:Bird",
+   "count": 29,
+   "institution": "ASNHC",
+   "collection_cde": "Ornithology"
+  },
+  {
+   "value": "UTEP:Bird",
+   "count": 21,
+   "institution": "UTEP",
+   "collection_cde": "Ornithology"
+  },
+  {
+   "value": "MMNH:Bird",
+   "count": 17,
+   "institution": "BELL",
+   "collection_cde": "Ornithology"
+  },
+  {
+   "value": "MSB:Inv",
+   "count": 13,
+   "institution": "MSB",
+   "collection_cde": "Invertebrates"
+  },
+  {
+   "value": "MSBObs:Herp",
+   "count": 13,
+   "institution": "MSB",
+   "collection_cde": "Herpetology"
+  },
+  {
+   "value": "ASNHC:Herp",
+   "count": 12,
+   "institution": "ASNHC",
+   "collection_cde": "Herpetology"
+  },
+  {
+   "value": "UAM:Bird",
+   "count": 11,
+   "institution": "UAM",
+   "collection_cde": "Ornithology"
+  },
+  {
+   "value": "MVZ:Egg",
+   "count": 10,
+   "institution": "MVZ",
+   "collection_cde": "Oology"
+  },
+  {
+   "value": "UMNH:Mamm",
+   "count": 9,
+   "institution": "UMNH",
+   "collection_cde": "Mammalogy"
+  },
+  {
+   "value": "NMMNH:Herp",
+   "count": 9,
+   "institution": "NMMNHS",
+   "collection_cde": "Herpetology"
+  },
+  {
+   "value": "UAM:Ento",
+   "count": 9,
+   "institution": "UAM",
+   "collection_cde": "Entomology"
+  },
+  {
+   "value": "HSUVM:Mamm",
+   "count": 8,
+   "institution": "HSU",
+   "collection_cde": "Mammalogy"
+  },
+  {
+   "value": "UMNH:Herp",
+   "count": 8,
+   "institution": "UMNH",
+   "collection_cde": "Herpetology"
+  },
+  {
+   "value": "NMU:Mamm",
+   "count": 7,
+   "institution": "NMU",
+   "collection_cde": "Mammalogy"
+  },
+  {
+   "value": "WNMU:Bird",
+   "count": 6,
+   "institution": "WNMU",
+   "collection_cde": "Ornithology"
+  },
+  {
+   "value": "ALMNH:Inv",
+   "count": 6,
+   "institution": "ALMNH",
+   "collection_cde": "Invertebrates"
+  },
+  {
+   "value": "WNMU:Mamm",
+   "count": 5,
+   "institution": "WNMU",
+   "collection_cde": "Mammalogy"
+  },
+  {
+   "value": "BYU:Fish",
+   "count": 4,
+   "institution": "BYU",
+   "collection_cde": "Ichthyology"
+  },
+  {
+   "value": "UAMObs:Ento",
+   "count": 4,
+   "institution": "UAM",
+   "collection_cde": "Entomology"
+  },
+  {
+   "value": "UAMb:Herb",
+   "count": 4,
+   "institution": "UAM",
+   "collection_cde": "Botany"
+  },
+  {
+   "value": "APSU:Herp",
+   "count": 3,
+   "institution": "APSU",
+   "collection_cde": "Herpetology"
+  },
+  {
+   "value": "BYU:Herp",
+   "count": 3,
+   "institution": "BYU",
+   "collection_cde": "Herpetology"
+  },
+  {
+   "value": "UAM:Herb",
+   "count": 3,
+   "institution": "UAM",
+   "collection_cde": "Botany"
+  },
+  {
+   "value": "CRCM:Bird",
+   "count": 3,
+   "institution": "CRCM",
+   "collection_cde": "Ornithology"
+  },
+  {
+   "value": "UCM:Herp",
+   "count": 3,
+   "institution": "UCM",
+   "collection_cde": "Herpetology"
+  },
+  {
+   "value": "MSBObs:Mamm",
+   "count": 3,
+   "institution": "MSB",
+   "collection_cde": "Mammalogy"
+  },
+  {
+   "value": "UAM:ES",
+   "count": 2,
+   "institution": "UAM",
+   "collection_cde": "Earth Science"
+  },
+  {
+   "value": "NMMNH:Herb",
+   "count": 2,
+   "institution": "NMMNHS",
+   "collection_cde": "Botany"
+  },
+  {
+   "value": "UTEP:Ento",
+   "count": 2,
+   "institution": "UTEP",
+   "collection_cde": "Entomology"
+  },
+  {
+   "value": "UAM:Arc",
+   "count": 2,
+   "institution": "UAM",
+   "collection_cde": "Cultural"
+  },
+  {
+   "value": "ASUMZ:Bivalve",
+   "count": 2,
+   "institution": "ACBC",
+   "collection_cde": "Malacology"
+  },
+  {
+   "value": "UAM:Fish",
+   "count": 2,
+   "institution": "UAM",
+   "collection_cde": "Ichthyology"
+  },
+  {
+   "value": "UCM:Mamm",
+   "count": 2,
+   "institution": "UCM",
+   "collection_cde": "Mammalogy"
+  },
+  {
+   "value": "OWU:Para",
+   "count": 2,
+   "institution": "OWU",
+   "collection_cde": "Parasitology"
+  },
+  {
+   "value": "UWZM:Bird",
+   "count": 2,
+   "institution": "UWZM",
+   "collection_cde": "Ornithology"
+  },
+  {
+   "value": "UTEP:Teach",
+   "count": 1,
+   "institution": "UTEP",
+   "collection_cde": "General"
+  },
+  {
+   "value": "UCSC:Bird",
+   "count": 1,
+   "institution": "UCSC",
+   "collection_cde": "Ornithology"
+  },
+  {
+   "value": "ASUMZ:Mamm",
+   "count": 1,
+   "institution": "ACBC",
+   "collection_cde": "Mammalogy"
+  },
+  {
+   "value": "UWYMV:Bird",
+   "count": 1,
+   "institution": "UWYMV",
+   "collection_cde": "Ornithology"
+  },
+  {
+   "value": "KWP:Ento",
+   "count": 1,
+   "institution": "KWP",
+   "collection_cde": "Entomology"
+  },
+  {
+   "value": "UCM:Bird",
+   "count": 1,
+   "institution": "UCM",
+   "collection_cde": "Ornithology"
+  },
+  {
+   "value": "NMMNH:Inv",
+   "count": 1,
+   "institution": "NMMNHS",
+   "collection_cde": "Invertebrates"
+  },
+  {
+   "value": "UMNH:Bird",
+   "count": 1,
+   "institution": "UMNH",
+   "collection_cde": "Ornithology"
+  },
+  {
+   "value": "Arctos:Entity",
+   "count": 1,
+   "institution": "Arctos",
+   "collection_cde": "General"
+  },
+  {
+   "value": "UCSC:Mamm",
+   "count": 1,
+   "institution": "UCSC",
+   "collection_cde": "Mammalogy"
+  }
+ ],
+ "scientific_name_distinct": 10703,
+ "scientific_name_top": [
+  {
+   "name": "Peromyscus maniculatus",
+   "count": 32634
+  },
+  {
+   "name": "Cyprinella lutrensis",
+   "count": 17180
+  },
+  {
+   "name": "Pimephales promelas",
+   "count": 12922
+  },
+  {
+   "name": "Peromyscus leucopus",
+   "count": 11122
+  },
+  {
+   "name": "Rhinichthys osculus",
+   "count": 10827
+  },
+  {
+   "name": "Catostomus latipinnis",
+   "count": 9757
+  },
+  {
+   "name": "Peromyscus truei",
+   "count": 7980
+  },
+  {
+   "name": "Microtus oeconomus",
+   "count": 7847
+  },
+  {
+   "name": "Gambusia affinis",
+   "count": 7789
+  },
+  {
+   "name": "Dipodomys merriami",
+   "count": 7652
+  },
+  {
+   "name": "Myodes rutilus",
+   "count": 7591
+  },
+  {
+   "name": "Uta stansburiana",
+   "count": 7516
+  },
+  {
+   "name": "Martes americana",
+   "count": 7277
+  },
+  {
+   "name": "Peromyscus boylii",
+   "count": 6961
+  },
+  {
+   "name": "Acari",
+   "count": 5927
+  },
+  {
+   "name": "Sorex cinereus",
+   "count": 5739
+  },
+  {
+   "name": "Ictalurus punctatus",
+   "count": 5355
+  },
+  {
+   "name": "Dipodomys ordii",
+   "count": 5312
+  },
+  {
+   "name": "Microlophus albemarlensis",
+   "count": 5209
+  },
+  {
+   "name": "Bos bison",
+   "count": 5089
+  },
+  {
+   "name": "Perognathus flavus",
+   "count": 4664
+  },
+  {
+   "name": "Catostomus (Pantosteus) discobolus",
+   "count": 4648
+  },
+  {
+   "name": "Siphonaptera",
+   "count": 4359
+  },
+  {
+   "name": "Neotoma albigula",
+   "count": 4326
+  },
+  {
+   "name": "Microtus pennsylvanicus",
+   "count": 4246
+  },
+  {
+   "name": "Elephas maximus",
+   "count": 4191
+  },
+  {
+   "name": "Lynx rufus baileyi",
+   "count": 4087
+  },
+  {
+   "name": "Sigmodon hispidus",
+   "count": 4019
+  },
+  {
+   "name": "Zygodontomys brevicauda",
+   "count": 3991
+  },
+  {
+   "name": "Mus musculus",
+   "count": 3961
+  },
+  {
+   "name": "Sorex monticolus",
+   "count": 3720
+  },
+  {
+   "name": "Reithrodontomys megalotis",
+   "count": 3536
+  },
+  {
+   "name": "Myodes gapperi",
+   "count": 3445
+  },
+  {
+   "name": "Microtus longicaudus",
+   "count": 3371
+  },
+  {
+   "name": "Aspidoscelis tigris",
+   "count": 3318
+  },
+  {
+   "name": "Peromyscus maniculatus rufinus",
+   "count": 3169
+  },
+  {
+   "name": "Cyprinus carpio",
+   "count": 3138
+  },
+  {
+   "name": "Pantosteus discobolus",
+   "count": 3099
+  },
+  {
+   "name": "Microtus mogollonensis",
+   "count": 2942
+  },
+  {
+   "name": "Peromyscus eremicus",
+   "count": 2918
+  },
+  {
+   "name": "Thomomys bottae",
+   "count": 2816
+  },
+  {
+   "name": "Fundulus zebrinus",
+   "count": 2724
+  },
+  {
+   "name": "Cestoda",
+   "count": 2701
+  },
+  {
+   "name": "Peromyscus maniculatus nebrascensis",
+   "count": 2609
+  },
+  {
+   "name": "Onychomys leucogaster",
+   "count": 2591
+  },
+  {
+   "name": "Carpiodes carpio",
+   "count": 2547
+  },
+  {
+   "name": "Pseudacris maculata",
+   "count": 2546
+  },
+  {
+   "name": "Catostomus commersonii",
+   "count": 2542
+  },
+  {
+   "name": "Peromyscus boylii rowleyi",
+   "count": 2533
+  },
+  {
+   "name": "Ochotona princeps",
+   "count": 2427
+  },
+  {
+   "name": "Peromyscus keeni",
+   "count": 2397
+  },
+  {
+   "name": "Sceloporus cowlesi",
+   "count": 2364
+  },
+  {
+   "name": "Calomys laucha",
+   "count": 2195
+  },
+  {
+   "name": "Peromyscus",
+   "count": 2180
+  },
+  {
+   "name": "Sceloporus undulatus",
+   "count": 2164
+  },
+  {
+   "name": "Anaxyrus woodhousii",
+   "count": 2142
+  },
+  {
+   "name": "Xyrauchen texanus",
+   "count": 2142
+  },
+  {
+   "name": "Spea multiplicata",
+   "count": 2114
+  },
+  {
+   "name": "Abrothrix olivacea",
+   "count": 2095
+  },
+  {
+   "name": "Aspidoscelis inornata",
+   "count": 2093
+  },
+  {
+   "name": "Rhinichthys cataractae",
+   "count": 2068
+  },
+  {
+   "name": "Canis lupus baileyi",
+   "count": 2065
+  },
+  {
+   "name": "Platygobio gracilis",
+   "count": 2046
+  },
+  {
+   "name": "Nematoda",
+   "count": 1990
+  },
+  {
+   "name": "Peromyscus truei truei",
+   "count": 1975
+  },
+  {
+   "name": "Notropis simus",
+   "count": 1938
+  },
+  {
+   "name": "Ambystoma tigrinum",
+   "count": 1917
+  },
+  {
+   "name": "Notropis jemezanus",
+   "count": 1888
+  },
+  {
+   "name": "Taenia",
+   "count": 1859
+  },
+  {
+   "name": "Macrhybopsis aestivalis",
+   "count": 1853
+  },
+  {
+   "name": "Hybognathus placitus",
+   "count": 1842
+  },
+  {
+   "name": "Alopex lagopus",
+   "count": 1830
+  },
+  {
+   "name": "Chaetodipus intermedius",
+   "count": 1820
+  },
+  {
+   "name": "Myodes",
+   "count": 1766
+  },
+  {
+   "name": "Lithobates catesbeianus",
+   "count": 1762
+  },
+  {
+   "name": "Toxascaris",
+   "count": 1746
+  },
+  {
+   "name": "Urosaurus ornatus",
+   "count": 1743
+  },
+  {
+   "name": "Tamias minimus",
+   "count": 1699
+  },
+  {
+   "name": "Hybognathus amarus",
+   "count": 1671
+  },
+  {
+   "name": "Gulo gulo",
+   "count": 1660
+  },
+  {
+   "name": "Peromyscus maniculatus sonoriensis",
+   "count": 1635
+  },
+  {
+   "name": "Microtus",
+   "count": 1619
+  },
+  {
+   "name": "Notropis stramineus",
+   "count": 1580
+  },
+  {
+   "name": "Aspidoscelis uniparens",
+   "count": 1564
+  },
+  {
+   "name": "Ixodida",
+   "count": 1552
+  },
+  {
+   "name": "Neotoma mexicana",
+   "count": 1545
+  },
+  {
+   "name": "Echinococcus multilocularis",
+   "count": 1541
+  },
+  {
+   "name": "Notropis girardi",
+   "count": 1520
+  },
+  {
+   "name": "Tamiasciurus hudsonicus",
+   "count": 1494
+  },
+  {
+   "name": "Microlophus delanonis",
+   "count": 1444
+  },
+  {
+   "name": "Oligoryzomys longicaudatus",
+   "count": 1434
+  },
+  {
+   "name": "Sigmodon hirsutus",
+   "count": 1419
+  },
+  {
+   "name": "Phthiraptera",
+   "count": 1414
+  },
+  {
+   "name": "Thamnophis elegans",
+   "count": 1386
+  },
+  {
+   "name": "Microtus montanus",
+   "count": 1376
+  },
+  {
+   "name": "Reithrodontomys megalotis megalotis",
+   "count": 1333
+  },
+  {
+   "name": "Eleutherodactylus antillensis",
+   "count": 1321
+  },
+  {
+   "name": "Ursus americanus",
+   "count": 1305
+  },
+  {
+   "name": "Blarina brevicauda",
+   "count": 1303
+  },
+  {
+   "name": "Lepomis cyanellus",
+   "count": 1271
+  },
+  {
+   "name": "Bouteloua eriopoda",
+   "count": 1260
+  },
+  {
+   "name": "Holbrookia maculata",
+   "count": 1254
+  },
+  {
+   "name": "Calomys musculinus",
+   "count": 1250
+  },
+  {
+   "name": "Aspidoscelis neomexicana",
+   "count": 1248
+  },
+  {
+   "name": "Abrothrix longipilis",
+   "count": 1237
+  },
+  {
+   "name": "Chaetodipus penicillatus",
+   "count": 1235
+  },
+  {
+   "name": "Cyprinidae",
+   "count": 1199
+  },
+  {
+   "name": "Clethrionomys rutilus",
+   "count": 1181
+  },
+  {
+   "name": "Peromyscus eremicus eremicus",
+   "count": 1175
+  },
+  {
+   "name": "Eptesicus fuscus",
+   "count": 1152
+  },
+  {
+   "name": "Scaphiopus couchii",
+   "count": 1143
+  },
+  {
+   "name": "Micropterus salmoides",
+   "count": 1116
+  },
+  {
+   "name": "Tamias quadrivittatus",
+   "count": 1110
+  },
+  {
+   "name": "Parastrellus hesperus",
+   "count": 1101
+  },
+  {
+   "name": "Antrozous pallidus",
+   "count": 1089
+  },
+  {
+   "name": "Aspidoscelis exsanguis",
+   "count": 1087
+  },
+  {
+   "name": "Dipodomys merriami merriami",
+   "count": 1083
+  },
+  {
+   "name": "Lemmus trimucronatus",
+   "count": 1072
+  },
+  {
+   "name": "Cervus canadensis",
+   "count": 1054
+  },
+  {
+   "name": "Oncorhynchus clarki",
+   "count": 1054
+  },
+  {
+   "name": "Lemmus",
+   "count": 1052
+  },
+  {
+   "name": "Lithobates pipiens",
+   "count": 1048
+  },
+  {
+   "name": "Myodes rufocanus",
+   "count": 1045
+  },
+  {
+   "name": "Peromyscus nasutus",
+   "count": 1043
+  },
+  {
+   "name": "Puma concolor",
+   "count": 1016
+  },
+  {
+   "name": "Rattus rattus",
+   "count": 1010
+  },
+  {
+   "name": "unidentifiable",
+   "count": 1002
+  },
+  {
+   "name": "Napaeozapus insignis",
+   "count": 999
+  },
+  {
+   "name": "Rana pipiens",
+   "count": 988
+  },
+  {
+   "name": "Akodon azarae",
+   "count": 984
+  },
+  {
+   "name": "Lasionycteris noctivagans",
+   "count": 981
+  },
+  {
+   "name": "Perognathus amplus",
+   "count": 979
+  },
+  {
+   "name": "Mustela erminea",
+   "count": 971
+  },
+  {
+   "name": "Myotis volans",
+   "count": 967
+  },
+  {
+   "name": "Arthropoda",
+   "count": 963
+  },
+  {
+   "name": "Mastomys natalensis",
+   "count": 958
+  },
+  {
+   "name": "Cophosaurus texanus",
+   "count": 956
+  },
+  {
+   "name": "Liomys adspersus",
+   "count": 954
+  },
+  {
+   "name": "Oligoryzomys costaricensis",
+   "count": 938
+  },
+  {
+   "name": "Perognathus parvus",
+   "count": 934
+  },
+  {
+   "name": "Zapus hudsonius",
+   "count": 924
+  },
+  {
+   "name": "Myodes glareolus",
+   "count": 924
+  },
+  {
+   "name": "Lasiurus cinereus",
+   "count": 913
+  },
+  {
+   "name": "Peromyscus gossypinus",
+   "count": 912
+  },
+  {
+   "name": "Callospermophilus lateralis",
+   "count": 892
+  },
+  {
+   "name": "Crotaphytus collaris",
+   "count": 877
+  },
+  {
+   "name": "Crotalus viridis",
+   "count": 874
+  },
+  {
+   "name": "Sceloporus graciosus",
+   "count": 873
+  },
+  {
+   "name": "Callisaurus draconoides",
+   "count": 871
+  },
+  {
+   "name": "Dipodomys spectabilis",
+   "count": 871
+  },
+  {
+   "name": "Plethodon cinereus",
+   "count": 867
+  },
+  {
+   "name": "Pituophis catenifer",
+   "count": 857
+  },
+  {
+   "name": "Echinococcus",
+   "count": 853
+  },
+  {
+   "name": "Zapus princeps",
+   "count": 851
+  },
+  {
+   "name": "Tamias dorsalis",
+   "count": 831
+  },
+  {
+   "name": "Anaxyrus cognatus",
+   "count": 828
+  },
+  {
+   "name": "Pseudacris triseriata",
+   "count": 820
+  },
+  {
+   "name": "Crotalus atrox",
+   "count": 818
+  },
+  {
+   "name": "Microtus longicaudus longicaudus",
+   "count": 813
+  },
+  {
+   "name": "Spea bombifrons",
+   "count": 812
+  },
+  {
+   "name": "Urocitellus parryii",
+   "count": 807
+  },
+  {
+   "name": "Mastophorus dipodomis",
+   "count": 785
+  },
+  {
+   "name": "Sorex",
+   "count": 783
+  },
+  {
+   "name": "Perognathus flavescens",
+   "count": 771
+  },
+  {
+   "name": "Agelaius phoeniceus",
+   "count": 769
+  },
+  {
+   "name": "Neovison vison",
+   "count": 769
+  },
+  {
+   "name": "Myotis nigricans",
+   "count": 768
+  },
+  {
+   "name": "Peromyscus leucopus tornillo",
+   "count": 759
+  },
+  {
+   "name": "Ameiurus melas",
+   "count": 750
+  },
+  {
+   "name": "Lithobates chiricahuensis",
+   "count": 744
+  },
+  {
+   "name": "Polyplax borealis",
+   "count": 743
+  },
+  {
+   "name": "Myotis thysanodes",
+   "count": 742
+  },
+  {
+   "name": "Tadarida brasiliensis",
+   "count": 739
+  },
+  {
+   "name": "Thomomys talpoides",
+   "count": 735
+  },
+  {
+   "name": "Microtus ochrogaster",
+   "count": 728
+  },
+  {
+   "name": "Chaetodipus eremicus",
+   "count": 727
+  },
+  {
+   "name": "Dorosoma cepedianum",
+   "count": 723
+  },
+  {
+   "name": "Sceloporus arenicolus",
+   "count": 721
+  },
+  {
+   "name": "Tadarida brasiliensis mexicana",
+   "count": 718
+  },
+  {
+   "name": "Myotis velifer",
+   "count": 712
+  },
+  {
+   "name": "Heteromyoxyuris deserti",
+   "count": 711
+  },
+  {
+   "name": "Myotis ciliolabrum",
+   "count": 710
+  },
+  {
+   "name": "Pituophis melanoleucus",
+   "count": 709
+  },
+  {
+   "name": "Rattus",
+   "count": 709
+  },
+  {
+   "name": "Anaxyrus microscaphus",
+   "count": 708
+  },
+  {
+   "name": "Loxodontomys micropus",
+   "count": 706
+  },
+  {
+   "name": "Neotoma albigula albigula",
+   "count": 705
+  },
+  {
+   "name": "Otospermophilus variegatus",
+   "count": 703
+  },
+  {
+   "name": "Onychomys arenicola",
+   "count": 700
+  },
+  {
+   "name": "Canis latrans",
+   "count": 696
+  },
+  {
+   "name": "Bouteloua gracilis",
+   "count": 690
+  },
+  {
+   "name": "Uncinaria",
+   "count": 682
+  },
+  {
+   "name": "Molothrus ater",
+   "count": 681
+  },
+  {
+   "name": "Aspidoscelis tesselata",
+   "count": 678
+  },
+  {
+   "name": "Hoplopleura arboricola",
+   "count": 662
+  },
+  {
+   "name": "Carollia perspicillata",
+   "count": 649
+  },
+  {
+   "name": "Apodemus flavicollis",
+   "count": 648
+  },
+  {
+   "name": "Thamnophis sirtalis",
+   "count": 648
+  },
+  {
+   "name": "Oncorhynchus mykiss",
+   "count": 642
+  },
+  {
+   "name": "Gila pandora",
+   "count": 638
+  },
+  {
+   "name": "Ctenomys boliviensis",
+   "count": 634
+  },
+  {
+   "name": "Urocyon littoralis dickeyi",
+   "count": 634
+  },
+  {
+   "name": "Phrynosoma hernandesi",
+   "count": 623
+  },
+  {
+   "name": "Soil",
+   "count": 615
+  },
+  {
+   "name": "Phrynosoma modestum",
+   "count": 605
+  },
+  {
+   "name": "Gopherus agassizii",
+   "count": 605
+  },
+  {
+   "name": "Hyla squirella",
+   "count": 603
+  },
+  {
+   "name": "Anaxyrus terrestris",
+   "count": 603
+  },
+  {
+   "name": "Chaetodipus baileyi",
+   "count": 603
+  },
+  {
+   "name": "Eremophila alpestris",
+   "count": 601
+  },
+  {
+   "name": "biocrust",
+   "count": 600
+  },
+  {
+   "name": "Ammospermophilus leucurus",
+   "count": 598
+  },
+  {
+   "name": "Canis lupus familiaris",
+   "count": 593
+  },
+  {
+   "name": "Hyla cinerea",
+   "count": 593
+  },
+  {
+   "name": "Coluber flagellum",
+   "count": 582
+  },
+  {
+   "name": "Peromyscus maniculatus luteus",
+   "count": 579
+  },
+  {
+   "name": "Trematoda",
+   "count": 577
+  },
+  {
+   "name": "Tamias striatus",
+   "count": 576
+  },
+  {
+   "name": "Ptychocheilus lucius",
+   "count": 573
+  },
+  {
+   "name": "Agosia chrysogaster",
+   "count": 573
+  },
+  {
+   "name": "Microlophus bivittatus",
+   "count": 562
+  },
+  {
+   "name": "Neotoma micropus",
+   "count": 561
+  },
+  {
+   "name": "Acris crepitans",
+   "count": 559
+  },
+  {
+   "name": "Eptesicus fuscus pallidus",
+   "count": 549
+  },
+  {
+   "name": "Catharus guttatus",
+   "count": 548
+  },
+  {
+   "name": "Anaxyrus punctatus",
+   "count": 547
+  },
+  {
+   "name": "Reithrodontomys",
+   "count": 546
+  },
+  {
+   "name": "Myotis yumanensis",
+   "count": 546
+  },
+  {
+   "name": "Peromyscus crinitus auripectus",
+   "count": 546
+  },
+  {
+   "name": "Grus canadensis",
+   "count": 545
+  },
+  {
+   "name": "Sigmodon arizonae",
+   "count": 543
+  },
+  {
+   "name": "Chrysemys picta",
+   "count": 541
+  },
+  {
+   "name": "Xerospermophilus spilosoma",
+   "count": 541
+  },
+  {
+   "name": "Rana sphenocephala",
+   "count": 539
+  },
+  {
+   "name": "Urocyon littoralis santacruzae",
+   "count": 534
+  },
+  {
+   "name": "Chaetodipus hispidus",
+   "count": 533
+  },
+  {
+   "name": "Gila cypha",
+   "count": 533
+  },
+  {
+   "name": "Chaetodipus penicillatus pricei",
+   "count": 533
+  },
+  {
+   "name": "Oligoryzomys flavescens",
+   "count": 518
+  },
+  {
+   "name": "Peromyscus pectoralis laceianus",
+   "count": 518
+  },
+  {
+   "name": "Onychomys torridus",
+   "count": 517
+  },
+  {
+   "name": "Microtus miurus",
+   "count": 517
+  },
+  {
+   "name": "Salmo trutta",
+   "count": 517
+  },
+  {
+   "name": "Myotis californicus",
+   "count": 512
+  },
+  {
+   "name": "Pantosteus clarkii",
+   "count": 510
+  },
+  {
+   "name": "Corynorhinus townsendii",
+   "count": 508
+  },
+  {
+   "name": "Semotilus atromaculatus",
+   "count": 506
+  },
+  {
+   "name": "Reithrodontomys megalotis dychei",
+   "count": 505
+  },
+  {
+   "name": "Phrynosoma cornutum",
+   "count": 502
+  },
+  {
+   "name": "Apodemus peninsulae",
+   "count": 500
+  },
+  {
+   "name": "Onychomys torridus torridus",
+   "count": 498
+  },
+  {
+   "name": "Lemmus sibiricus",
+   "count": 497
+  },
+  {
+   "name": "Perognathus",
+   "count": 493
+  },
+  {
+   "name": "Rana catesbeiana",
+   "count": 490
+  },
+  {
+   "name": "Myotis occultus",
+   "count": 490
+  },
+  {
+   "name": "Gila robusta",
+   "count": 489
+  },
+  {
+   "name": "Ursus arctos",
+   "count": 488
+  },
+  {
+   "name": "Lepomis macrochirus",
+   "count": 487
+  },
+  {
+   "name": "Meriones psammophilus",
+   "count": 484
+  },
+  {
+   "name": "Catostomus insignis",
+   "count": 481
+  },
+  {
+   "name": "Tamias amoenus",
+   "count": 479
+  },
+  {
+   "name": "Calomys callosus",
+   "count": 477
+  },
+  {
+   "name": "Cyprinodon pecosensis",
+   "count": 477
+  },
+  {
+   "name": "Canis lupus",
+   "count": 477
+  },
+  {
+   "name": "Eimeria chobotari",
+   "count": 477
+  },
+  {
+   "name": "Colaptes auratus",
+   "count": 476
+  },
+  {
+   "name": "Neotoma lepida",
+   "count": 476
+  },
+  {
+   "name": "Arizona elegans",
+   "count": 469
+  },
+  {
+   "name": "Phyllotis darwini",
+   "count": 469
+  },
+  {
+   "name": "Gambelia wislizenii",
+   "count": 467
+  },
+  {
+   "name": "Ameiurus natalis",
+   "count": 465
+  },
+  {
+   "name": "Martes caurina",
+   "count": 465
+  },
+  {
+   "name": "Sylvilagus audubonii",
+   "count": 457
+  },
+  {
+   "name": "Microtus abbreviatus",
+   "count": 457
+  },
+  {
+   "name": "Pomoxis annularis",
+   "count": 457
+  },
+  {
+   "name": "Lucania parva",
+   "count": 455
+  },
+  {
+   "name": "Campostoma anomalum",
+   "count": 455
+  },
+  {
+   "name": "Myotis volans interior",
+   "count": 455
+  },
+  {
+   "name": "Plethodon neomexicanus",
+   "count": 446
+  },
+  {
+   "name": "Necromys obscurus",
+   "count": 446
+  },
+  {
+   "name": "Bubo virginianus",
+   "count": 444
+  },
+  {
+   "name": "Sorex caecutiens",
+   "count": 440
+  },
+  {
+   "name": "Trichinella",
+   "count": 438
+  },
+  {
+   "name": "Dipodomys ordii ordii",
+   "count": 434
+  },
+  {
+   "name": "Ictidomys tridecemlineatus",
+   "count": 431
+  },
+  {
+   "name": "Aneides hardii",
+   "count": 428
+  },
+  {
+   "name": "Apodemus agrarius",
+   "count": 426
+  },
+  {
+   "name": "Chaetodipus penicillatus penicillatus",
+   "count": 426
+  },
+  {
+   "name": "Akodon",
+   "count": 426
+  },
+  {
+   "name": "Oncorhynchus clarkii",
+   "count": 426
+  },
+  {
+   "name": "Dipodomys ordii oklahomae",
+   "count": 425
+  },
+  {
+   "name": "Myotis evotis",
+   "count": 424
+  },
+  {
+   "name": "Pantosteus plebeius",
+   "count": 424
+  },
+  {
+   "name": "Sorex tundrensis",
+   "count": 424
+  },
+  {
+   "name": "Holbrookia texana",
+   "count": 424
+  },
+  {
+   "name": "Kinosternon flavescens",
+   "count": 423
+  },
+  {
+   "name": "Ascarididae",
+   "count": 423
+  },
+  {
+   "name": "Oligoryzomys microtis",
+   "count": 421
+  },
+  {
+   "name": "Reithrodontomys megalotis aztecus",
+   "count": 418
+  },
+  {
+   "name": "Notiosorex crawfordi",
+   "count": 416
+  },
+  {
+   "name": "Perognathus longimembris",
+   "count": 416
+  },
+  {
+   "name": "Bufo woodhousii",
+   "count": 411
+  },
+  {
+   "name": "Hyla arenicolor",
+   "count": 410
+  },
+  {
+   "name": "Cricetulus barabensis",
+   "count": 410
+  },
+  {
+   "name": "Lithobates blairi",
+   "count": 409
+  },
+  {
+   "name": "Tamias minimus operarius",
+   "count": 406
+  },
+  {
+   "name": "Sorex monticolus obscurus",
+   "count": 406
+  },
+  {
+   "name": "Lithobates berlandieri",
+   "count": 401
+  },
+  {
+   "name": "Aspidoscelis velox",
+   "count": 400
+  },
+  {
+   "name": "Aetheca wagneri",
+   "count": 399
+  },
+  {
+   "name": "Gopherus morafkai",
+   "count": 398
+  },
+  {
+   "name": "Rattus norvegicus",
+   "count": 398
+  },
+  {
+   "name": "Aspidoscelis sexlineata",
+   "count": 395
+  },
+  {
+   "name": "Gymnorhinus cyanocephalus",
+   "count": 392
+  },
+  {
+   "name": "Diphyllobothrium",
+   "count": 391
+  },
+  {
+   "name": "Peromyscus crinitus doutti",
+   "count": 391
+  },
+  {
+   "name": "Troglodytes aedon",
+   "count": 388
+  },
+  {
+   "name": "Sigmodon hispidus berlandieri",
+   "count": 387
+  },
+  {
+   "name": "Apodemus uralensis",
+   "count": 386
+  },
+  {
+   "name": "Turdus migratorius",
+   "count": 385
+  },
+  {
+   "name": "Ctenophyllus armatus",
+   "count": 383
+  },
+  {
+   "name": "Neotoma floridana",
+   "count": 379
+  },
+  {
+   "name": "Myotis",
+   "count": 373
+  },
+  {
+   "name": "Scalopus aquaticus howelli",
+   "count": 369
+  },
+  {
+   "name": "Sorex trowbridgii",
+   "count": 364
+  },
+  {
+   "name": "Pseudacris crucifer",
+   "count": 363
+  },
+  {
+   "name": "Sceloporus clarkii",
+   "count": 363
+  },
+  {
+   "name": "Thamnophis cyrtopsis",
+   "count": 363
+  },
+  {
+   "name": "Odocoileus hemionus",
+   "count": 362
+  },
+  {
+   "name": "Pheucticus melanocephalus",
+   "count": 361
+  },
+  {
+   "name": "Artibeus jamaicensis",
+   "count": 360
+  },
+  {
+   "name": "Junco hyemalis",
+   "count": 358
+  },
+  {
+   "name": "Echinostomatidae",
+   "count": 358
+  },
+  {
+   "name": "Hoplopleura acanthopus",
+   "count": 352
+  },
+  {
+   "name": "Antrozous pallidus pallidus",
+   "count": 352
+  },
+  {
+   "name": "Pterygodermatites dipodomis",
+   "count": 351
+  },
+  {
+   "name": "Sorex fumeus",
+   "count": 351
+  },
+  {
+   "name": "Martes",
+   "count": 347
+  },
+  {
+   "name": "Microtus xanthognathus",
+   "count": 347
+  },
+  {
+   "name": "Ondatra zibethicus",
+   "count": 344
+  },
+  {
+   "name": "Terrapene ornata",
+   "count": 342
+  },
+  {
+   "name": "Tamias minimus consobrinus",
+   "count": 341
+  },
+  {
+   "name": "Anaxyrus debilis",
+   "count": 340
+  },
+  {
+   "name": "Menidia beryllina",
+   "count": 339
+  },
+  {
+   "name": "Desmognathus fuscus",
+   "count": 338
+  },
+  {
+   "name": "Molossus molossus",
+   "count": 337
+  },
+  {
+   "name": "Thamnophis marcianus",
+   "count": 336
+  },
+  {
+   "name": "Glossophaga soricina",
+   "count": 336
+  },
+  {
+   "name": "Ixodes angustus",
+   "count": 335
+  },
+  {
+   "name": "Corvus brachyrhynchos",
+   "count": 333
+  },
+  {
+   "name": "Coluber constrictor",
+   "count": 330
+  },
+  {
+   "name": "Soboliphyme baturini",
+   "count": 330
+  },
+  {
+   "name": "Callospermophilus lateralis lateralis",
+   "count": 329
+  },
+  {
+   "name": "Hoplopleura",
+   "count": 328
+  },
+  {
+   "name": "Rhinocheilus lecontei",
+   "count": 327
+  },
+  {
+   "name": "Peromyscus leucopus aridulus",
+   "count": 326
+  },
+  {
+   "name": "Morone chrysops",
+   "count": 323
+  },
+  {
+   "name": "Tamias cinereicollis",
+   "count": 323
+  },
+  {
+   "name": "Chaetodipus formosus",
+   "count": 319
+  },
+  {
+   "name": "Microtus ochrogaster haydenii",
+   "count": 317
+  },
+  {
+   "name": "Rana clamitans",
+   "count": 316
+  },
+  {
+   "name": "Eleutherodactylus cochranae",
+   "count": 315
+  },
+  {
+   "name": "Trichuris",
+   "count": 314
+  },
+  {
+   "name": "Sorex vagrans",
+   "count": 313
+  },
+  {
+   "name": "Agama picticauda",
+   "count": 313
+  },
+  {
+   "name": "Sceloporus bimaculosus",
+   "count": 312
+  },
+  {
+   "name": "Zonotrichia capensis",
+   "count": 312
+  },
+  {
+   "name": "Alticola barakshin",
+   "count": 312
+  },
+  {
+   "name": "Necromys lasiurus",
+   "count": 311
+  },
+  {
+   "name": "Cynomys gunnisoni",
+   "count": 310
+  },
+  {
+   "name": "Lepus americanus",
+   "count": 306
+  },
+  {
+   "name": "Sonora semiannulata",
+   "count": 301
+  },
+  {
+   "name": "Sigmodon fulviventer minimus",
+   "count": 301
+  },
+  {
+   "name": "Dipodomys deserti",
+   "count": 301
+  },
+  {
+   "name": "Anolis concolor",
+   "count": 299
+  },
+  {
+   "name": "Myotis lucifugus carissma",
+   "count": 298
+  },
+  {
+   "name": "Urocyon cinereoargenteus",
+   "count": 296
+  },
+  {
+   "name": "Transandinomys talamancae",
+   "count": 296
+  },
+  {
+   "name": "Amalaraeus dissimilis",
+   "count": 295
+  },
+  {
+   "name": "Conolophus subcristatus",
+   "count": 294
+  },
+  {
+   "name": "Pseudacris feriarum",
+   "count": 293
+  },
+  {
+   "name": "Apodemus",
+   "count": 291
+  },
+  {
+   "name": "Hypsiglena torquata",
+   "count": 290
+  },
+  {
+   "name": "Dipodomys merriami ambiguus",
+   "count": 289
+  },
+  {
+   "name": "Melospiza melodia",
+   "count": 288
+  },
+  {
+   "name": "Larus glaucescens",
+   "count": 287
+  },
+  {
+   "name": "Dicrostonyx",
+   "count": 286
+  },
+  {
+   "name": "Diadophis punctatus",
+   "count": 285
+  },
+  {
+   "name": "Myotis lucifugus",
+   "count": 285
+  },
+  {
+   "name": "Megabothris calcarifer",
+   "count": 285
+  },
+  {
+   "name": "Glaucomys sabrinus",
+   "count": 284
+  },
+  {
+   "name": "Tantilla nigriceps",
+   "count": 284
+  },
+  {
+   "name": "Micropterus punctulatus",
+   "count": 281
+  },
+  {
+   "name": "Microtus montanus nanus",
+   "count": 281
+  },
+  {
+   "name": "Macrotus californicus",
+   "count": 280
+  },
+  {
+   "name": "Plestiodon obsoletus",
+   "count": 279
+  },
+  {
+   "name": "Allactaga sibirica",
+   "count": 277
+  },
+  {
+   "name": "Lontra canadensis",
+   "count": 277
+  },
+  {
+   "name": "Sorex cinereus cinereus",
+   "count": 277
+  },
+  {
+   "name": "Hymenolepis",
+   "count": 276
+  },
+  {
+   "name": "Boiga irregularis",
+   "count": 276
+  },
+  {
+   "name": "Chaetodipus nelsoni",
+   "count": 275
+  },
+  {
+   "name": "Contracaecum",
+   "count": 275
+  },
+  {
+   "name": "Rana blairi",
+   "count": 274
+  },
+  {
+   "name": "Zonotrichia leucophrys",
+   "count": 273
+  },
+  {
+   "name": "Catostomidae",
+   "count": 272
+  },
+  {
+   "name": "Pipilo maculatus",
+   "count": 271
+  },
+  {
+   "name": "Micropterus dolomieu",
+   "count": 271
+  },
+  {
+   "name": "Dipodomys ordii luteolus",
+   "count": 271
+  },
+  {
+   "name": "Pseudacris nigrita",
+   "count": 270
+  },
+  {
+   "name": "Myotis thysanodes thysanodes",
+   "count": 270
+  },
+  {
+   "name": "Piranga ludoviciana",
+   "count": 269
+  },
+  {
+   "name": "Peromyscus crinitus",
+   "count": 268
+  },
+  {
+   "name": "Trachemys scripta",
+   "count": 268
+  },
+  {
+   "name": "Artibeus lituratus",
+   "count": 268
+  },
+  {
+   "name": "Anoplura",
+   "count": 267
+  },
+  {
+   "name": "Lynx rufus",
+   "count": 267
+  },
+  {
+   "name": "Patagona gigas",
+   "count": 266
+  },
+  {
+   "name": "Falco sparverius",
+   "count": 266
+  },
+  {
+   "name": "Spizella passerina",
+   "count": 265
+  },
+  {
+   "name": "Phodopus roborovskii",
+   "count": 265
+  },
+  {
+   "name": "Meriones unguiculatus",
+   "count": 264
+  },
+  {
+   "name": "Chaetodipus baileyi baileyi",
+   "count": 264
+  },
+  {
+   "name": "Physa",
+   "count": 262
+  },
+  {
+   "name": "Didelphis marsupialis",
+   "count": 261
+  },
+  {
+   "name": "Rana chiricahuensis",
+   "count": 261
+  },
+  {
+   "name": "Physa acuta",
+   "count": 260
+  },
+  {
+   "name": "Artibeus planirostris",
+   "count": 259
+  },
+  {
+   "name": "Neotoma lepida monstrabilis",
+   "count": 258
+  },
+  {
+   "name": "Urocitellus undulatus",
+   "count": 258
+  },
+  {
+   "name": "Euryoryzomys nitidus",
+   "count": 258
+  },
+  {
+   "name": "Cricetulus migratorius",
+   "count": 257
+  },
+  {
+   "name": "Sorex palustris",
+   "count": 256
+  },
+  {
+   "name": "Ochotona pallasi",
+   "count": 256
+  },
+  {
+   "name": "Peromyscus maniculatus gambelii",
+   "count": 256
+  },
+  {
+   "name": "Sorex monticola",
+   "count": 255
+  },
+  {
+   "name": "Fratercula cirrhata",
+   "count": 255
+  },
+  {
+   "name": "Vulpes vulpes",
+   "count": 254
+  },
+  {
+   "name": "Soboliphyme",
+   "count": 254
+  },
+  {
+   "name": "Stagnicola",
+   "count": 254
+  },
+  {
+   "name": "Heterodon nasicus",
+   "count": 253
+  },
+  {
+   "name": "Peromyscus attwateri",
+   "count": 253
+  },
+  {
+   "name": "Onychomys leucogaster pallescens",
+   "count": 252
+  },
+  {
+   "name": "Myotis evotis evotis",
+   "count": 251
+  },
+  {
+   "name": "Kinosternon sonoriense",
+   "count": 251
+  },
+  {
+   "name": "Lasiurus cinereus cinereus",
+   "count": 251
+  },
+  {
+   "name": "Astyanax mexicanus",
+   "count": 250
+  },
+  {
+   "name": "Myotis auriculus",
+   "count": 250
+  },
+  {
+   "name": "Heteroxynema cucullatum",
+   "count": 250
+  },
+  {
+   "name": "Oligoryzomys",
+   "count": 249
+  },
+  {
+   "name": "Reithrodontomys fulvescens",
+   "count": 248
+  },
+  {
+   "name": "Carollia brevicauda",
+   "count": 247
+  },
+  {
+   "name": "Aspidoscelis",
+   "count": 247
+  },
+  {
+   "name": "Geomys bursarius",
+   "count": 246
+  },
+  {
+   "name": "Sceloporus poinsettii",
+   "count": 246
+  },
+  {
+   "name": "Cryptotis parva",
+   "count": 245
+  },
+  {
+   "name": "Sciurus aberti",
+   "count": 245
+  },
+  {
+   "name": "Tamias",
+   "count": 245
+  },
+  {
+   "name": "Tamias rufus",
+   "count": 245
+  },
+  {
+   "name": "Aythya affinis",
+   "count": 245
+  },
+  {
+   "name": "Emoia caeruleocauda",
+   "count": 244
+  },
+  {
+   "name": "Thylamys elegans",
+   "count": 244
+  },
+  {
+   "name": "Vulpes lagopus",
+   "count": 244
+  },
+  {
+   "name": "Quiscalus mexicanus",
+   "count": 244
+  },
+  {
+   "name": "Coluber taeniatus",
+   "count": 243
+  },
+  {
+   "name": "Rangifer tarandus",
+   "count": 243
+  },
+  {
+   "name": "Synaptomys borealis",
+   "count": 241
+  },
+  {
+   "name": "Perca flavescens",
+   "count": 241
+  },
+  {
+   "name": "Gambusia nobilis",
+   "count": 240
+  },
+  {
+   "name": "Urocitellus mollis",
+   "count": 239
+  },
+  {
+   "name": "Chelemys macronyx",
+   "count": 238
+  },
+  {
+   "name": "Dipus sagitta",
+   "count": 236
+  },
+  {
+   "name": "Tamias umbrinus adsitus",
+   "count": 236
+  },
+  {
+   "name": "Peromyscus pectoralis",
+   "count": 235
+  },
+  {
+   "name": "Accipiter cooperii",
+   "count": 235
+  },
+  {
+   "name": "Acanthocephala",
+   "count": 235
+  },
+  {
+   "name": "Thamnophis radix",
+   "count": 235
+  },
+  {
+   "name": "Myotis yumanensis yumanensis",
+   "count": 233
+  },
+  {
+   "name": "Corrodopsylla curvata",
+   "count": 230
+  },
+  {
+   "name": "Peromyscus maniculatus or Peromyscus leucopus",
+   "count": 229
+  },
+  {
+   "name": "Poecile gambeli",
+   "count": 229
+  },
+  {
+   "name": "Cricetulus longicaudatus",
+   "count": 229
+  },
+  {
+   "name": "Reithrodontomys montanus",
+   "count": 228
+  },
+  {
+   "name": "Anolis pinchoti",
+   "count": 228
+  },
+  {
+   "name": "Blarina hylophaga",
+   "count": 226
+  },
+  {
+   "name": "Setophaga coronata",
+   "count": 225
+  },
+  {
+   "name": "Tympanuchus pallidicinctus",
+   "count": 225
+  },
+  {
+   "name": "Sorex hoyi",
+   "count": 225
+  },
+  {
+   "name": "Cyprinodon tularosa",
+   "count": 224
+  },
+  {
+   "name": "Sorex jacksoni",
+   "count": 224
+  },
+  {
+   "name": "Procyon lotor",
+   "count": 224
+  },
+  {
+   "name": "Toxostoma curvirostre",
+   "count": 224
+  },
+  {
+   "name": "Cyanocitta stelleri",
+   "count": 222
+  },
+  {
+   "name": "Castor canadensis",
+   "count": 222
+  },
+  {
+   "name": "Eleutherodactylus portoricensis",
+   "count": 222
+  },
+  {
+   "name": "Proechimys semispinosus",
+   "count": 221
+  },
+  {
+   "name": "Xerospermophilus tereticaudus",
+   "count": 221
+  },
+  {
+   "name": "Gila",
+   "count": 221
+  },
+  {
+   "name": "Apalone spinifera",
+   "count": 221
+  },
+  {
+   "name": "Sialia mexicana",
+   "count": 220
+  },
+  {
+   "name": "Sorex unguiculatus",
+   "count": 219
+  },
+  {
+   "name": "Carpodacus mexicanus",
+   "count": 219
+  },
+  {
+   "name": "Sorex obscurus",
+   "count": 219
+  },
+  {
+   "name": "Parastrellus hesperus hesperus",
+   "count": 217
+  },
+  {
+   "name": "Oncorhynchus gilae",
+   "count": 217
+  },
+  {
+   "name": "Chaetodipus intermedius intermedius",
+   "count": 216
+  },
+  {
+   "name": "Trachemys gaigeae",
+   "count": 216
+  },
+  {
+   "name": "Loxia curvirostra",
+   "count": 216
+  },
+  {
+   "name": "Carlia fuscum",
+   "count": 216
+  },
+  {
+   "name": "Amphalius runatus necopinus",
+   "count": 216
+  },
+  {
+   "name": "Phalaenoptilus nuttallii",
+   "count": 215
+  },
+  {
+   "name": "Dendroica coronata",
+   "count": 214
+  },
+  {
+   "name": "Ictidomys parvidens",
+   "count": 214
+  },
+  {
+   "name": "Oestridae",
+   "count": 214
+  },
+  {
+   "name": "Myotis velifer brevis",
+   "count": 213
+  },
+  {
+   "name": "Ochotona collaris",
+   "count": 212
+  },
+  {
+   "name": "Alticola strelzowi",
+   "count": 212
+  },
+  {
+   "name": "Perognathus flavus flavus",
+   "count": 211
+  },
+  {
+   "name": "Neotoma stephensi",
+   "count": 211
+  },
+  {
+   "name": "Tamias canipes",
+   "count": 211
+  },
+  {
+   "name": "Protospirura ascaroidea",
+   "count": 211
+  },
+  {
+   "name": "Orycteroxenus soricis",
+   "count": 210
+  },
+  {
+   "name": "Dipodomys ordii longipes",
+   "count": 210
+  },
+  {
+   "name": "Proechimys",
+   "count": 210
+  },
+  {
+   "name": "Lagopus lagopus",
+   "count": 210
+  },
+  {
+   "name": "Eleutherodactylus lentus",
+   "count": 210
+  },
+  {
+   "name": "Pylodictis olivaris",
+   "count": 209
+  },
+  {
+   "name": "Accipiter striatus",
+   "count": 208
+  },
+  {
+   "name": "Sceloporus merriami",
+   "count": 208
+  },
+  {
+   "name": "Uria aalge",
+   "count": 208
+  },
+  {
+   "name": "Strigeidae",
+   "count": 207
+  },
+  {
+   "name": "Uroderma bilobatum",
+   "count": 207
+  },
+  {
+   "name": "Sceloporus jarrovi",
+   "count": 206
+  },
+  {
+   "name": "Octodon degus",
+   "count": 206
+  },
+  {
+   "name": "Peromyscus crinitus stephensi",
+   "count": 206
+  },
+  {
+   "name": "Catostomus catostomus",
+   "count": 206
+  },
+  {
+   "name": "Otospermophilus variegatus grammurus",
+   "count": 205
+  },
+  {
+   "name": "Arostrilepis",
+   "count": 205
+  },
+  {
+   "name": "Dionda episcopa",
+   "count": 204
+  },
+  {
+   "name": "Dicrostonyx groenlandicus rubricatus",
+   "count": 203
+  },
+  {
+   "name": "Hipposideros caffer",
+   "count": 203
+  },
+  {
+   "name": "Chaetodipus",
+   "count": 202
+  },
+  {
+   "name": "Chordeiles minor",
+   "count": 201
+  },
+  {
+   "name": "Conirostrum cinereum",
+   "count": 201
+  },
+  {
+   "name": "Plethodon jordani",
+   "count": 200
+  },
+  {
+   "name": "Oxyuridae",
+   "count": 200
+  },
+  {
+   "name": "Lepus californicus",
+   "count": 200
+  },
+  {
+   "name": "Meda fulgida",
+   "count": 200
+  },
+  {
+   "name": "Peromyscus leucopus arizonae",
+   "count": 200
+  },
+  {
+   "name": "Peromyscus merriami merriami",
+   "count": 199
+  },
+  {
+   "name": "Geococcyx californianus",
+   "count": 198
+  },
+  {
+   "name": "Peromyscus nasutus griseus",
+   "count": 198
+  },
+  {
+   "name": "Onychomys leucogaster ruidosae",
+   "count": 197
+  },
+  {
+   "name": "Akodon mimus",
+   "count": 197
+  },
+  {
+   "name": "Peromyscus leucopus or Peromyscus maniculatus",
+   "count": 196
+  },
+  {
+   "name": "Chaetodipus rudinoris",
+   "count": 196
+  },
+  {
+   "name": "Calomys",
+   "count": 196
+  },
+  {
+   "name": "Perognathus flavescens apache",
+   "count": 196
+  },
+  {
+   "name": "Dipodomys deserti deserti",
+   "count": 196
+  },
+  {
+   "name": "Stenocranius gregalis",
+   "count": 196
+  },
+  {
+   "name": "Anaxyrus americanus",
+   "count": 196
+  },
+  {
+   "name": "Chaetodipus spinatus",
+   "count": 195
+  },
+  {
+   "name": "Peromyscus leucopus texanus",
+   "count": 195
+  },
+  {
+   "name": "Urocitellus elegans",
+   "count": 195
+  },
+  {
+   "name": "Sceloporus magister",
+   "count": 193
+  },
+  {
+   "name": "Peromyscus nasutus nasutus",
+   "count": 193
+  },
+  {
+   "name": "Aphelocoma californica",
+   "count": 192
+  },
+  {
+   "name": "Ovis canadensis",
+   "count": 192
+  },
+  {
+   "name": "Carpodacus cassinii",
+   "count": 192
+  },
+  {
+   "name": "Reithrodontomys fulvescens fulvescens",
+   "count": 192
+  },
+  {
+   "name": "Archilochus alexandri",
+   "count": 191
+  },
+  {
+   "name": "Dipodomys microps",
+   "count": 191
+  },
+  {
+   "name": "Myotis californicus stephensi",
+   "count": 190
+  },
+  {
+   "name": "Sturnira lilium",
+   "count": 190
+  },
+  {
+   "name": "Salsuginus",
+   "count": 190
+  },
+  {
+   "name": "Microtus montanus fusus",
+   "count": 189
+  },
+  {
+   "name": "Biomphalaria sudanica",
+   "count": 189
+  },
+  {
+   "name": "Microtus fortis",
+   "count": 188
+  },
+  {
+   "name": "Peromyscus leucopus ochraceus",
+   "count": 187
+  },
+  {
+   "name": "Neotoma cinerea",
+   "count": 186
+  },
+  {
+   "name": "Passer domesticus",
+   "count": 186
+  },
+  {
+   "name": "Microtus operarius",
+   "count": 186
+  },
+  {
+   "name": "Crotalus scutulatus",
+   "count": 186
+  },
+  {
+   "name": "Dicrostonyx unalascensis x Dicrostonyx groenlandicus rubricatus",
+   "count": 184
+  },
+  {
+   "name": "Setophaga petechia",
+   "count": 184
+  },
+  {
+   "name": "Buteo jamaicensis",
+   "count": 184
+  },
+  {
+   "name": "Zapus princeps princeps",
+   "count": 182
+  },
+  {
+   "name": "Onychomys",
+   "count": 181
+  },
+  {
+   "name": "Sturnus vulgaris",
+   "count": 181
+  },
+  {
+   "name": "Mus triton",
+   "count": 181
+  },
+  {
+   "name": "Ochotona princeps saxatilis",
+   "count": 181
+  },
+  {
+   "name": "Myodes rutilus dawsoni",
+   "count": 180
+  },
+  {
+   "name": "Rhinichthys cobitis",
+   "count": 180
+  },
+  {
+   "name": "Eimeria langebarteli",
+   "count": 180
+  },
+  {
+   "name": "Alces americanus",
+   "count": 180
+  },
+  {
+   "name": "Larrea tridentata",
+   "count": 180
+  },
+  {
+   "name": "Perognathus longimembris gulosus",
+   "count": 179
+  },
+  {
+   "name": "Cottus bairdii",
+   "count": 179
+  },
+  {
+   "name": "Plagiorchiida",
+   "count": 179
+  },
+  {
+   "name": "Batrachoseps attenuatus",
+   "count": 178
+  },
+  {
+   "name": "Sigmodon fulviventer",
+   "count": 178
+  },
+  {
+   "name": "Ochrotomys nuttalli",
+   "count": 178
+  },
+  {
+   "name": "Phrynosoma platyrhinos",
+   "count": 178
+  },
+  {
+   "name": "Peromyscopsylla ostsibirica",
+   "count": 177
+  },
+  {
+   "name": "Phyllotis xanthopygus",
+   "count": 177
+  },
+  {
+   "name": "Osmeridae",
+   "count": 176
+  },
+  {
+   "name": "Callipepla gambelii",
+   "count": 175
+  },
+  {
+   "name": "Sorex ugyunak",
+   "count": 175
+  },
+  {
+   "name": "Cyrtonyx montezumae",
+   "count": 174
+  },
+  {
+   "name": "Ascaphus truei",
+   "count": 174
+  },
+  {
+   "name": "Corvus corax",
+   "count": 174
+  },
+  {
+   "name": "Sturnella neglecta",
+   "count": 174
+  },
+  {
+   "name": "Parahaemoproteus",
+   "count": 173
+  },
+  {
+   "name": "Platyrrhinus helleri",
+   "count": 172
+  },
+  {
+   "name": "Desmognathus ochrophaeus",
+   "count": 172
+  },
+  {
+   "name": "Tamias umbrinus",
+   "count": 171
+  },
+  {
+   "name": "Callipepla squamata",
+   "count": 171
+  },
+  {
+   "name": "Peromyscus nudipes",
+   "count": 171
+  },
+  {
+   "name": "Crotalus molossus",
+   "count": 171
+  },
+  {
+   "name": "Carollia castanea",
+   "count": 170
+  },
+  {
+   "name": "Pimephales vigilax",
+   "count": 170
+  },
+  {
+   "name": "Dipodomys",
+   "count": 170
+  },
+  {
+   "name": "Carollia",
+   "count": 170
+  },
+  {
+   "name": "Quinqueserialis",
+   "count": 169
+  },
+  {
+   "name": "Onychomys leucogaster arcticeps",
+   "count": 169
+  },
+  {
+   "name": "Amalaraeus dissimilis dissimilis",
+   "count": 168
+  },
+  {
+   "name": "Tamias townsendii",
+   "count": 168
+  },
+  {
+   "name": "Salvadora grahamiae",
+   "count": 167
+  },
+  {
+   "name": "Polyplax",
+   "count": 167
+  },
+  {
+   "name": "Erethizon dorsatum",
+   "count": 167
+  },
+  {
+   "name": "Dorosoma",
+   "count": 167
+  },
+  {
+   "name": "Passerculus sandwichensis",
+   "count": 166
+  },
+  {
+   "name": "Chen caerulescens",
+   "count": 166
+  },
+  {
+   "name": "Lepomis megalotis",
+   "count": 166
+  },
+  {
+   "name": "Antigone canadensis tabida",
+   "count": 165
+  },
+  {
+   "name": "Tetrabothrius",
+   "count": 165
+  },
+  {
+   "name": "Lanius ludovicianus",
+   "count": 164
+  },
+  {
+   "name": "Peromyscus eremicus anthonyi",
+   "count": 164
+  },
+  {
+   "name": "Contopus sordidulus",
+   "count": 163
+  },
+  {
+   "name": "Anaxyrus speciosus",
+   "count": 163
+  },
+  {
+   "name": "Vulpes",
+   "count": 163
+  },
+  {
+   "name": "Chaetodipus goldmani",
+   "count": 161
+  },
+  {
+   "name": "Euphagus cyanocephalus",
+   "count": 161
+  },
+  {
+   "name": "Eptesicus gobiensis",
+   "count": 161
+  },
+  {
+   "name": "Calcarius ornatus",
+   "count": 161
+  },
+  {
+   "name": "Sitta carolinensis",
+   "count": 160
+  },
+  {
+   "name": "Neotoma",
+   "count": 160
+  },
+  {
+   "name": "Sylvilagus audubonii arizonae",
+   "count": 159
+  },
+  {
+   "name": "Bulinus",
+   "count": 159
+  },
+  {
+   "name": "Aspidoscelis marmorata",
+   "count": 158
+  },
+  {
+   "name": "Eimeria reedi",
+   "count": 158
+  },
+  {
+   "name": "Oryzomys",
+   "count": 158
+  },
+  {
+   "name": "Grus canadensis canadensis",
+   "count": 158
+  },
+  {
+   "name": "Aspidoscelis gularis",
+   "count": 157
+  },
+  {
+   "name": "Anas platyrhynchos",
+   "count": 157
+  },
+  {
+   "name": "Tamias dorsalis dorsalis",
+   "count": 156
+  },
+  {
+   "name": "Colibri coruscans",
+   "count": 155
+  },
+  {
+   "name": "Bombycilla cedrorum",
+   "count": 155
+  },
+  {
+   "name": "Sorex haydeni",
+   "count": 155
+  },
+  {
+   "name": "Sciurus niger",
+   "count": 155
+  },
+  {
+   "name": "Dipodomys ordii chapmani",
+   "count": 155
+  },
+  {
+   "name": "Schistosomatidae",
+   "count": 155
+  },
+  {
+   "name": "Metallura tyrianthina",
+   "count": 154
+  },
+  {
+   "name": "Pipilo fuscus",
+   "count": 154
+  },
+  {
+   "name": "Wilsonia pusilla",
+   "count": 154
+  },
+  {
+   "name": "Microtus pennsylvanicus pennsylvanicus",
+   "count": 154
+  },
+  {
+   "name": "Spinus magellanicus",
+   "count": 154
+  },
+  {
+   "name": "Desmodus rotundus",
+   "count": 154
+  },
+  {
+   "name": "Corynorhinus townsendii pallescens",
+   "count": 154
+  },
+  {
+   "name": "Apodemus sylvaticus",
+   "count": 154
+  },
+  {
+   "name": "Thamnophis proximus",
+   "count": 154
+  },
+  {
+   "name": "Picoides villosus",
+   "count": 153
+  },
+  {
+   "name": "Tamias sibiricus",
+   "count": 151
+  },
+  {
+   "name": "Microtus pennsylvanicus modestus",
+   "count": 151
+  },
+  {
+   "name": "Catharus ustulatus",
+   "count": 151
+  },
+  {
+   "name": "Apodemus argenteus",
+   "count": 151
+  },
+  {
+   "name": "Lampropeltis splendida",
+   "count": 151
+  },
+  {
+   "name": "Salmo gilae",
+   "count": 151
+  },
+  {
+   "name": "Akodon puer",
+   "count": 150
+  },
+  {
+   "name": "Sorex nanus",
+   "count": 150
+  },
+  {
+   "name": "Psiloscops flammeolus",
+   "count": 150
+  },
+  {
+   "name": "Empidonax oberholseri",
+   "count": 149
+  },
+  {
+   "name": "Pipilo chlorurus",
+   "count": 149
+  },
+  {
+   "name": "Ellobius tancrei",
+   "count": 149
+  },
+  {
+   "name": "Pooecetes gramineus",
+   "count": 148
+  },
+  {
+   "name": "Hemidactylus frenatus",
+   "count": 148
+  },
+  {
+   "name": "Blarina",
+   "count": 147
+  },
+  {
+   "name": "Peromyscus nasutus penicillatus",
+   "count": 147
+  },
+  {
+   "name": "Alticola semicanus",
+   "count": 147
+  },
+  {
+   "name": "Peromyscus maniculatus blandus",
+   "count": 147
+  },
+  {
+   "name": "Antilocapra americana",
+   "count": 147
+  },
+  {
+   "name": "Pharyngodonidae",
+   "count": 147
+  },
+  {
+   "name": "Neotoma cinerea arizonae",
+   "count": 147
+  },
+  {
+   "name": "Mustela frenata",
+   "count": 146
+  },
+  {
+   "name": "Sorex araneus",
+   "count": 145
+  },
+  {
+   "name": "Akodon boliviensis",
+   "count": 145
+  },
+  {
+   "name": "Crotalus lepidus",
+   "count": 145
+  },
+  {
+   "name": "Nematospiroides",
+   "count": 145
+  },
+  {
+   "name": "Diptera",
+   "count": 144
+  },
+  {
+   "name": "Neohaematopinus pacificus",
+   "count": 143
+  },
+  {
+   "name": "Grus canadensis tabida",
+   "count": 143
+  },
+  {
+   "name": "Dipodomys ordii medius",
+   "count": 143
+  },
+  {
+   "name": "Notropis dorsalis",
+   "count": 143
+  },
+  {
+   "name": "Necromys lenguarum",
+   "count": 142
+  },
+  {
+   "name": "Sorex palustris navigator",
+   "count": 142
+  },
+  {
+   "name": "Sialia currucoides",
+   "count": 142
+  },
+  {
+   "name": "Eleutherodactylus coqui",
+   "count": 142
+  },
+  {
+   "name": "Microlophus indefatigabilis",
+   "count": 142
+  },
+  {
+   "name": "Ammospermophilus harrisii",
+   "count": 141
+  },
+  {
+   "name": "Microtus pennsylvanicus uligocola",
+   "count": 141
+  },
+  {
+   "name": "Myiarchus cinerascens",
+   "count": 140
+  },
+  {
+   "name": "Sayornis saya",
+   "count": 140
+  },
+  {
+   "name": "Lepidodactylus lugubris",
+   "count": 140
+  },
+  {
+   "name": "Pyrocephalus rubinus",
+   "count": 140
+  },
+  {
+   "name": "Chaetodipus intermedius crinitus",
+   "count": 140
+  },
+  {
+   "name": "Trichobilharzia",
+   "count": 140
+  },
+  {
+   "name": "Spizella breweri",
+   "count": 139
+  },
+  {
+   "name": "Athene cunicularia",
+   "count": 139
+  },
+  {
+   "name": "Amphispiza bilineata",
+   "count": 139
+  },
+  {
+   "name": "Vulpes macrotis neomexicana",
+   "count": 139
+  },
+  {
+   "name": "Scotinomys xerampelinus",
+   "count": 138
+  },
+  {
+   "name": "Acris gryllus",
+   "count": 137
+  },
+  {
+   "name": "Larus glaucescens x Larus argentatus",
+   "count": 137
+  },
+  {
+   "name": "Mus minutoides",
+   "count": 137
+  },
+  {
+   "name": "Anas crecca",
+   "count": 137
+  },
+  {
+   "name": "Perognathus parvus trumbellensis",
+   "count": 137
+  },
+  {
+   "name": "Scaphiopus holbrookii",
+   "count": 137
+  },
+  {
+   "name": "Aspidoscelis sonorae",
+   "count": 137
+  },
+  {
+   "name": "Diplostomatidae",
+   "count": 137
+  },
+  {
+   "name": "Gordionus kimberleyae",
+   "count": 137
+  },
+  {
+   "name": "Sorex arcticus",
+   "count": 136
+  },
+  {
+   "name": "Ammospermophilus interpres",
+   "count": 136
+  },
+  {
+   "name": "Sorex monticolus monticolus",
+   "count": 136
+  },
+  {
+   "name": "Dipodomys ordii priscus",
+   "count": 136
+  },
+  {
+   "name": "Tyrannus verticalis",
+   "count": 136
+  },
+  {
+   "name": "Coccothraustes vespertinus",
+   "count": 136
+  },
+  {
+   "name": "Coleonyx brevis",
+   "count": 135
+  },
+  {
+   "name": "Peromyscus leucopus noveboracensis",
+   "count": 135
+  },
+  {
+   "name": "Otus kennicottii",
+   "count": 134
+  },
+  {
+   "name": "Uma notata",
+   "count": 134
+  },
+  {
+   "name": "Cloeotis percivali",
+   "count": 134
+  },
+  {
+   "name": "Sylvilagus",
+   "count": 133
+  },
+  {
+   "name": "Rhinella marina",
+   "count": 133
+  },
+  {
+   "name": "Trichostrongylidae",
+   "count": 132
+  },
+  {
+   "name": "Geomys arenarius",
+   "count": 132
+  },
+  {
+   "name": "Blarina carolinensis",
+   "count": 132
+  },
+  {
+   "name": "Zapus hudsonius luteus",
+   "count": 132
+  },
+  {
+   "name": "Orchopeas leucopus",
+   "count": 131
+  },
+  {
+   "name": "Melospiza lincolnii",
+   "count": 131
+  },
+  {
+   "name": "Mephitis mephitis",
+   "count": 131
+  },
+  {
+   "name": "Myotis ciliolabrum melanorhinus",
+   "count": 131
+  },
+  {
+   "name": "Leptotyphlops dulcis",
+   "count": 131
+  },
+  {
+   "name": "Richardsonius balteatus",
+   "count": 130
+  },
+  {
+   "name": "Zenaida asiatica",
+   "count": 130
+  },
+  {
+   "name": "Lynx canadensis",
+   "count": 130
+  },
+  {
+   "name": "Tamias dorsalis utahensis",
+   "count": 130
+  },
+  {
+   "name": "Setophaga coronata auduboni",
+   "count": 130
+  },
+  {
+   "name": "Capillaria",
+   "count": 129
+  },
+  {
+   "name": "Baiomys taylori",
+   "count": 129
+  },
+  {
+   "name": "Tropidoclonion lineatum",
+   "count": 129
+  },
+  {
+   "name": "Carduelis pinus",
+   "count": 128
+  },
+  {
+   "name": "Ochotona hyperborea",
+   "count": 128
+  },
+  {
+   "name": "Asio otus",
+   "count": 128
+  },
+  {
+   "name": "Miniopterus schreibersi",
+   "count": 127
+  },
+  {
+   "name": "Hybognathus hankinsoni",
+   "count": 127
+  },
+  {
+   "name": "Biomphalaria",
+   "count": 127
+  },
+  {
+   "name": "Microdipodops pallidus",
+   "count": 127
+  },
+  {
+   "name": "Nyctinomops macrotis",
+   "count": 125
+  },
+  {
+   "name": "Gehyra mutilata",
+   "count": 125
+  },
+  {
+   "name": "Rana sylvatica",
+   "count": 125
+  },
+  {
+   "name": "Thomomys bottae grahamensis",
+   "count": 125
+  },
+  {
+   "name": "Vireo gilvus",
+   "count": 124
+  },
+  {
+   "name": "Tyto alba",
+   "count": 124
+  },
+  {
+   "name": "Oryzomys palustris",
+   "count": 124
+  },
+  {
+   "name": "Sitta pygmaea",
+   "count": 124
+  },
+  {
+   "name": "Myadestes townsendi",
+   "count": 124
+  },
+  {
+   "name": "Sceloporus occidentalis",
+   "count": 124
+  },
+  {
+   "name": "Phodopus campbelli",
+   "count": 124
+  },
+  {
+   "name": "Myodes gapperi galei",
+   "count": 123
+  },
+  {
+   "name": "Chelydra serpentina",
+   "count": 123
+  },
+  {
+   "name": "Paranoplocephala",
+   "count": 123
+  },
+  {
+   "name": "Biomphalaria pfeifferi",
+   "count": 123
+  },
+  {
+   "name": "Thomomys bottae aureus",
+   "count": 123
+  },
+  {
+   "name": "Plestiodon multivirgatus",
+   "count": 123
+  },
+  {
+   "name": "Dicrostonyx groenlandicus",
+   "count": 123
+  },
+  {
+   "name": "Thylamys venustus",
+   "count": 122
+  },
+  {
+   "name": "Neotoma leucodon",
+   "count": 122
+  },
+  {
+   "name": "Syphacia",
+   "count": 122
+  },
+  {
+   "name": "Phenacobius mirabilis",
+   "count": 122
+  },
+  {
+   "name": "Percina macrolepida",
+   "count": 122
+  },
+  {
+   "name": "Dipodomys ordii cupidineus",
+   "count": 122
+  },
+  {
+   "name": "Peromyscus maniculatus ozarkiarum",
+   "count": 122
+  },
+  {
+   "name": "Catallagia dacenkoi",
+   "count": 121
+  },
+  {
+   "name": "Xerospermophilus spilosoma canescens",
+   "count": 121
+  },
+  {
+   "name": "Dermanura phaeotis",
+   "count": 121
+  },
+  {
+   "name": "Lampropeltis triangulum",
+   "count": 121
+  },
+  {
+   "name": "Icterus bullockii",
+   "count": 120
+  },
+  {
+   "name": "Juniperus monosperma",
+   "count": 120
+  },
+  {
+   "name": "Thamnophis rufipunctatus",
+   "count": 120
+  },
+  {
+   "name": "Taxidea taxus",
+   "count": 119
+  },
+  {
+   "name": "Neoechinorhynchus",
+   "count": 119
+  },
+  {
+   "name": "Pseudemys scripta",
+   "count": 119
+  },
+  {
+   "name": "Geothlypis trichas",
+   "count": 119
+  },
+  {
+   "name": "Plagiorchis",
+   "count": 119
+  },
+  {
+   "name": "Myodes gapperi brevicaudus",
+   "count": 119
+  },
+  {
+   "name": "Tantilla hobartsmithi",
+   "count": 119
+  },
+  {
+   "name": "Crotalus ornatus",
+   "count": 119
+  },
+  {
+   "name": "Hyla femoralis",
+   "count": 118
+  },
+  {
+   "name": "Peromyscus californicus",
+   "count": 118
+  },
+  {
+   "name": "Anairetes reguloides",
+   "count": 118
+  },
+  {
+   "name": "Sceloporus poinsetti",
+   "count": 118
+  },
+  {
+   "name": "Mionectes striaticollis",
+   "count": 118
+  },
+  {
+   "name": "Pseudoeurycea smithi",
+   "count": 118
+  },
+  {
+   "name": "Dicrostonyx groenlandicus groenlandicus",
+   "count": 117
+  },
+  {
+   "name": "Carduelis tristis",
+   "count": 117
+  },
+  {
+   "name": "Microtus longicaudus baileyi",
+   "count": 116
+  },
+  {
+   "name": "Meriones meridianus",
+   "count": 116
+  },
+  {
+   "name": "Buteo swainsoni",
+   "count": 116
+  },
+  {
+   "name": "Oporornis tolmiei",
+   "count": 116
+  },
+  {
+   "name": "Larus argentatus",
+   "count": 116
+  },
+  {
+   "name": "Hymenolepididae",
+   "count": 116
+  },
+  {
+   "name": "Gorilla gorilla gorilla",
+   "count": 115
+  },
+  {
+   "name": "Perognathus flavus hopiensis",
+   "count": 115
+  },
+  {
+   "name": "Rana utricularia",
+   "count": 115
+  },
+  {
+   "name": "Passerella iliaca",
+   "count": 114
+  },
+  {
+   "name": "Eimeria arizonensis",
+   "count": 114
+  },
+  {
+   "name": "Apodemus speciosus",
+   "count": 114
+  },
+  {
+   "name": "Mus",
+   "count": 114
+  },
+  {
+   "name": "Peromyscus difficilis",
+   "count": 113
+  },
+  {
+   "name": "Nerodia erythrogaster",
+   "count": 113
+  },
+  {
+   "name": "Anaxyrus boreas",
+   "count": 113
+  },
+  {
+   "name": "Geothlypis tolmiei",
+   "count": 112
+  },
+  {
+   "name": "Fratercula corniculata",
+   "count": 112
+  },
+  {
+   "name": "Tamiasciurus hudsonicus mogollonensis",
+   "count": 112
+  },
+  {
+   "name": "Arostrilepis macrocirrosa",
+   "count": 112
+  },
+  {
+   "name": "Anoplocephalidae",
+   "count": 112
+  },
+  {
+   "name": "Microlophus grayii",
+   "count": 111
+  },
+  {
+   "name": "Lemniscomys striatus",
+   "count": 111
+  },
+  {
+   "name": "Tamias quadrivittatus quadrivittatus",
+   "count": 111
+  },
+  {
+   "name": "Pantosteus platyrhynchus",
+   "count": 111
+  },
+  {
+   "name": "Zenaida macroura",
+   "count": 111
+  },
+  {
+   "name": "Sphyrapicus nuchalis",
+   "count": 111
+  },
+  {
+   "name": "Calamospiza melanocorys",
+   "count": 111
+  },
+  {
+   "name": "Myotis septentrionalis",
+   "count": 111
+  },
+  {
+   "name": "Corvus cryptoleucus",
+   "count": 110
+  },
+  {
+   "name": "Peromyscus fraterculus",
+   "count": 110
+  },
+  {
+   "name": "Oxymycterus paramensis",
+   "count": 110
+  },
+  {
+   "name": "Thomomys umbrinus",
+   "count": 110
+  },
+  {
+   "name": "Phenacomys intermedius",
+   "count": 110
+  },
+  {
+   "name": "Glossophaga leachii",
+   "count": 110
+  },
+  {
+   "name": "Onychomys leucogaster fuliginosus",
+   "count": 110
+  },
+  {
+   "name": "Psaltriparus minimus",
+   "count": 109
+  },
+  {
+   "name": "Lasiopodomys brandtii",
+   "count": 109
+  },
+  {
+   "name": "Cardinalis cardinalis",
+   "count": 109
+  },
+  {
+   "name": "Rhinolophus simulator",
+   "count": 109
+  },
+  {
+   "name": "Aspidoscelis flagellicauda",
+   "count": 109
+  },
+  {
+   "name": "Ochotona dauurica",
+   "count": 108
+  },
+  {
+   "name": "Chaerephon pumilus",
+   "count": 108
+  },
+  {
+   "name": "Orchopeas caedens",
+   "count": 108
+  },
+  {
+   "name": "Sigmodon ochrognathus",
+   "count": 108
+  },
+  {
+   "name": "Geusibia ashcrafti",
+   "count": 108
+  },
+  {
+   "name": "Megabothris quirini",
+   "count": 107
+  },
+  {
+   "name": "Chaetodipus fallax",
+   "count": 107
+  },
+  {
+   "name": "Eleutherodactylus schwartzi",
+   "count": 107
+  },
+  {
+   "name": "Tamias minimus minimus",
+   "count": 107
+  },
+  {
+   "name": "Empidonax wrightii",
+   "count": 107
+  },
+  {
+   "name": "Regulus calendula",
+   "count": 107
+  },
+  {
+   "name": "Peromyscus boylii utahensis",
+   "count": 107
+  },
+  {
+   "name": "Pomoxis nigromaculatus",
+   "count": 107
+  },
+  {
+   "name": "Meriones libycus",
+   "count": 106
+  },
+  {
+   "name": "Thomomys bottae connectens",
+   "count": 106
+  },
+  {
+   "name": "Sistrurus tergeminus",
+   "count": 106
+  },
+  {
+   "name": "Hyla chrysoscelis",
+   "count": 105
+  },
+  {
+   "name": "Sylvilagus floridanus",
+   "count": 105
+  },
+  {
+   "name": "Notophthalmus viridescens",
+   "count": 105
+  },
+  {
+   "name": "Diglossa brunneiventris",
+   "count": 105
+  },
+  {
+   "name": "Plethodon glutinosus",
+   "count": 105
+  },
+  {
+   "name": "Auriparus flaviceps",
+   "count": 105
+  },
+  {
+   "name": "Pseudotriton ruber",
+   "count": 105
+  },
+  {
+   "name": "Sigmodon ochrognathus montanus",
+   "count": 105
+  },
+  {
+   "name": "Sorex roboratus",
+   "count": 104
+  },
+  {
+   "name": "Salvadora deserticola",
+   "count": 104
+  },
+  {
+   "name": "Lemmiscus curtatus",
+   "count": 104
+  },
+  {
+   "name": "Thomomys bottae albatus",
+   "count": 104
+  },
+  {
+   "name": "Citellus undulatus",
+   "count": 104
+  },
+  {
+   "name": "Neotoma micropus canescens",
+   "count": 104
+  },
+  {
+   "name": "Dipodomys merriami olivaceus",
+   "count": 104
+  },
+  {
+   "name": "Natrix sipedon",
+   "count": 104
+  },
+  {
+   "name": "Clangula hyemalis",
+   "count": 104
+  },
+  {
+   "name": "Thorius",
+   "count": 104
+  },
+  {
+   "name": "Microtus mongolicus",
+   "count": 103
+  },
+  {
+   "name": "Chaetodipus californicus",
+   "count": 102
+  },
+  {
+   "name": "Etheostoma nigrum",
+   "count": 102
+  },
+  {
+   "name": "Sturnella magna lilianae",
+   "count": 102
+  },
+  {
+   "name": "Adelomyia melanogenys",
+   "count": 102
+  },
+  {
+   "name": "Rauschtineria eutamii",
+   "count": 102
+  },
+  {
+   "name": "Dipodomys agilis agilis",
+   "count": 102
+  },
+  {
+   "name": "Bufo boreas",
+   "count": 101
+  },
+  {
+   "name": "Thryomanes bewickii",
+   "count": 101
+  },
+  {
+   "name": "Amphispiza belli",
+   "count": 101
+  },
+  {
+   "name": "Toxascaris leonina",
+   "count": 101
+  },
+  {
+   "name": "Microtus maximowiczii",
+   "count": 101
+  },
+  {
+   "name": "Myocastor coypus",
+   "count": 101
+  },
+  {
+   "name": "Anaxyrus fowleri",
+   "count": 101
+  },
+  {
+   "name": "Desmognathus monticola",
+   "count": 101
+  },
+  {
+   "name": "Oreoscoptes montanus",
+   "count": 100
+  },
+  {
+   "name": "Cratogeomys castanops",
+   "count": 100
+  },
+  {
+   "name": "Xanthocephalus xanthocephalus",
+   "count": 100
+  },
+  {
+   "name": "Microtus longicaudus leucophaeus",
+   "count": 100
+  },
+  {
+   "name": "Cricetidae",
+   "count": 100
+  },
+  {
+   "name": "Gastrophryne olivacea",
+   "count": 99
+  },
+  {
+   "name": "Ammospermophilus leucurus cinnamomeus",
+   "count": 99
+  },
+  {
+   "name": "Reithrodontomys mexicanus",
+   "count": 99
+  },
+  {
+   "name": "Cardellina pusilla",
+   "count": 99
+  },
+  {
+   "name": "Crotalus cerastes",
+   "count": 99
+  },
+  {
+   "name": "Anas acuta",
+   "count": 98
+  },
+  {
+   "name": "Eimeria albigulae",
+   "count": 98
+  },
+  {
+   "name": "Neotoma stephensi stephensi",
+   "count": 98
+  },
+  {
+   "name": "Carduelis psaltria",
+   "count": 98
+  },
+  {
+   "name": "Thalarctos",
+   "count": 98
+  },
+  {
+   "name": "Sceloporus virgatus",
+   "count": 98
+  },
+  {
+   "name": "Sorex cinereus lesueurii",
+   "count": 97
+  },
+  {
+   "name": "Scalopus aquaticus",
+   "count": 97
+  },
+  {
+   "name": "Leucocytozoon",
+   "count": 97
+  },
+  {
+   "name": "Mesocestoides",
+   "count": 97
+  },
+  {
+   "name": "Choeronycteris mexicana",
+   "count": 97
+  },
+  {
+   "name": "Akodon varius",
+   "count": 97
+  },
+  {
+   "name": "Anolis carolinensis",
+   "count": 97
+  },
+  {
+   "name": "Ixoreus naevius",
+   "count": 96
+  },
+  {
+   "name": "Chondestes grammacus",
+   "count": 96
+  },
+  {
+   "name": "Calomys lepidus",
+   "count": 96
+  },
+  {
+   "name": "Clethrionomys",
+   "count": 96
+  },
+  {
+   "name": "Kinosternon hirtipes",
+   "count": 96
+  },
+  {
+   "name": "Eurycea bislineata",
+   "count": 95
+  },
+  {
+   "name": "Neotoma lepida sanrafaeli",
+   "count": 95
+  },
+  {
+   "name": "Melanerpes formicivorus",
+   "count": 95
+  },
+  {
+   "name": "Elgaria kingii",
+   "count": 95
+  },
+  {
+   "name": "Tamias speciosus",
+   "count": 95
+  },
+  {
+   "name": "Fahrenholzia pinnata",
+   "count": 94
+  },
+  {
+   "name": "Peromyscus eva",
+   "count": 94
+  },
+  {
+   "name": "Pteronotus davyi",
+   "count": 94
+  },
+  {
+   "name": "Aegolius acadicus",
+   "count": 94
+  },
+  {
+   "name": "Ammospermophilus harrisii harrisii",
+   "count": 94
+  },
+  {
+   "name": "Xerospermophilus spilosoma marginatus",
+   "count": 94
+  },
+  {
+   "name": "Fundulus grandis",
+   "count": 94
+  },
+  {
+   "name": "Sceloporus consobrinus",
+   "count": 94
+  },
+  {
+   "name": "Neotoma mexicana inopinata",
+   "count": 94
+  },
+  {
+   "name": "Oreotrochilus melanogaster",
+   "count": 94
+  },
+  {
+   "name": "Picoides pubescens",
+   "count": 93
+  },
+  {
+   "name": "Cynopterus brachyotis",
+   "count": 93
+  },
+  {
+   "name": "Salvadora hexalepis",
+   "count": 93
+  },
+  {
+   "name": "Equus caballus",
+   "count": 93
+  },
+  {
+   "name": "Digenea",
+   "count": 93
+  },
+  {
+   "name": "Oncorhynchus",
+   "count": 93
+  },
+  {
+   "name": "Eutamias",
+   "count": 93
+  },
+  {
+   "name": "Microtus oeconomus macfarlani",
+   "count": 92
+  },
+  {
+   "name": "Neotamias quadrivittatus",
+   "count": 92
+  },
+  {
+   "name": "Hydrochoerus hydrochaeris",
+   "count": 92
+  },
+  {
+   "name": "Dipsosaurus dorsalis",
+   "count": 92
+  },
+  {
+   "name": "Megascops kennicottii",
+   "count": 92
+  },
+  {
+   "name": "Campylorhynchus brunneicapillus",
+   "count": 92
+  },
+  {
+   "name": "Lama glama",
+   "count": 92
+  },
+  {
+   "name": "Sorex trowbridgii trowbridgii",
+   "count": 91
+  },
+  {
+   "name": "Junco hyemalis caniceps",
+   "count": 91
+  },
+  {
+   "name": "Akodon albiventer",
+   "count": 91
+  },
+  {
+   "name": "Pecari tajacu",
+   "count": 91
+  },
+  {
+   "name": "Quiscalus quiscula",
+   "count": 91
+  },
+  {
+   "name": "Trichobilharzia querquedulae",
+   "count": 91
+  },
+  {
+   "name": "Anolis sagrei",
+   "count": 90
+  },
+  {
+   "name": "Stegophorus",
+   "count": 90
+  },
+  {
+   "name": "Alticola",
+   "count": 90
+  },
+  {
+   "name": "Sorex monticolus cf.",
+   "count": 90
+  },
+  {
+   "name": "Taenia twitchelli",
+   "count": 90
+  },
+  {
+   "name": "Perisoreus canadensis",
+   "count": 90
+  },
+  {
+   "name": "Colinus virginianus",
+   "count": 90
+  },
+  {
+   "name": "Idionycteris phyllotis",
+   "count": 90
+  },
+  {
+   "name": "Aspidoscelis sexlineatus",
+   "count": 90
+  },
+  {
+   "name": "Anas americana",
+   "count": 89
+  },
+  {
+   "name": "Coleonyx variegatus",
+   "count": 89
+  },
+  {
+   "name": "Akodon fumeus",
+   "count": 89
+  },
+  {
+   "name": "Microdipodops megacephalus",
+   "count": 89
+  },
+  {
+   "name": "Thamnophis eques",
+   "count": 89
+  },
+  {
+   "name": "Myotis grisescens",
+   "count": 89
+  },
+  {
+   "name": "Odobenus rosmarus",
+   "count": 88
+  },
+  {
+   "name": "Neacomys spinosus",
+   "count": 88
+  },
+  {
+   "name": "Anas platyrhynchos diazi",
+   "count": 88
+  },
+  {
+   "name": "Leptonycteris yerbabuenae",
+   "count": 88
+  },
+  {
+   "name": "Zonotrichia leucophrys gambelii",
+   "count": 88
+  },
+  {
+   "name": "Vermivora celata",
+   "count": 88
+  },
+  {
+   "name": "Dipodomys heermanni",
+   "count": 88
+  },
+  {
+   "name": "Citellus",
+   "count": 87
+  },
+  {
+   "name": "Moniliformis clarki",
+   "count": 87
+  },
+  {
+   "name": "Hyla gratiosa",
+   "count": 87
+  },
+  {
+   "name": "Baiomys taylori taylori",
+   "count": 87
+  },
+  {
+   "name": "Urocitellus richardsonii",
+   "count": 87
+  },
+  {
+   "name": "Mallophaga",
+   "count": 87
+  },
+  {
+   "name": "Spea intermontana",
+   "count": 87
+  },
+  {
+   "name": "Myiothlypis coronata",
+   "count": 87
+  },
+  {
+   "name": "Neotoma devia monstrabilis",
+   "count": 87
+  },
+  {
+   "name": "Hymenolepis spinocirrosa",
+   "count": 87
+  },
+  {
+   "name": "Myotis californicus californicus",
+   "count": 86
+  },
+  {
+   "name": "Marmota caligata",
+   "count": 86
+  },
+  {
+   "name": "Ctenomys erikacuellarae",
+   "count": 86
+  },
+  {
+   "name": "Holochilus sciureus",
+   "count": 86
+  },
+  {
+   "name": "Peromyscus polionotus",
+   "count": 86
+  },
+  {
+   "name": "Crotalus cerberus",
+   "count": 86
+  },
+  {
+   "name": "Ambystoma mavortium",
+   "count": 86
+  },
+  {
+   "name": "Hymenolepis pusilla",
+   "count": 86
+  },
+  {
+   "name": "Otospermophilus beecheyi",
+   "count": 85
+  },
+  {
+   "name": "Tamias siskiyou",
+   "count": 85
+  },
+  {
+   "name": "Onychomys leucogaster melanophrys",
+   "count": 85
+  },
+  {
+   "name": "Ctenomys opimus",
+   "count": 85
+  },
+  {
+   "name": "Heteromys desmarestianus",
+   "count": 85
+  },
+  {
+   "name": "Spatula clypeata",
+   "count": 85
+  },
+  {
+   "name": "Ursus maritimus",
+   "count": 85
+  },
+  {
+   "name": "Rana berlandieri",
+   "count": 85
+  },
+  {
+   "name": "Schizorchis ochotonae",
+   "count": 85
+  },
+  {
+   "name": "Dipodomys nelsoni",
+   "count": 84
+  },
+  {
+   "name": "Dipodomys panamintinus mohavensis",
+   "count": 84
+  },
+  {
+   "name": "Icterus galbula",
+   "count": 84
+  },
+  {
+   "name": "Dermanura anderseni",
+   "count": 84
+  },
+  {
+   "name": "Sturnira erythromos",
+   "count": 84
+  },
+  {
+   "name": "Cathartes aura",
+   "count": 84
+  },
+  {
+   "name": "Citellus tridecemlineatus",
+   "count": 84
+  },
+  {
+   "name": "Apodemus geisha",
+   "count": 84
+  },
+  {
+   "name": "Chaetodipus arenarius",
+   "count": 83
+  },
+  {
+   "name": "Peromyscus maniculatus gracilis",
+   "count": 83
+  },
+  {
+   "name": "Sorex isodon",
+   "count": 83
+  },
+  {
+   "name": "Alcataenia fraterculae",
+   "count": 83
+  },
+  {
+   "name": "Thomomys",
+   "count": 83
+  },
+  {
+   "name": "Dermanura watsoni",
+   "count": 83
+  },
+  {
+   "name": "Phyllotis",
+   "count": 83
+  },
+  {
+   "name": "Cycleptus elongatus",
+   "count": 83
+  },
+  {
+   "name": "Myotis davidii",
+   "count": 83
+  },
+  {
+   "name": "Euchoreutes naso",
+   "count": 83
+  },
+  {
+   "name": "Microtus montanus arizonensis",
+   "count": 82
+  },
+  {
+   "name": "Noturus flavus",
+   "count": 82
+  },
+  {
+   "name": "Hylaeamys megacephalus",
+   "count": 82
+  },
+  {
+   "name": "Neotoma albigula warreni",
+   "count": 82
+  },
+  {
+   "name": "Amara alpina",
+   "count": 82
+  },
+  {
+   "name": "Dipodomys spectabilis spectabilis",
+   "count": 82
+  },
+  {
+   "name": "Selasphorus platycercus",
+   "count": 81
+  },
+  {
+   "name": "Haemorhous mexicanus",
+   "count": 81
+  },
+  {
+   "name": "Vireo plumbeus",
+   "count": 81
+  },
+  {
+   "name": "Megabothris abantis",
+   "count": 81
+  },
+  {
+   "name": "Pseudemys concinna",
+   "count": 81
+  },
+  {
+   "name": "Fulica americana",
+   "count": 81
+  },
+  {
+   "name": "Sorex pribilofensis",
+   "count": 81
+  },
+  {
+   "name": "Oryzomys palustris texensis",
+   "count": 81
+  },
+  {
+   "name": "Tiaroga cobitis",
+   "count": 81
+  },
+  {
+   "name": "Allactaga bullata",
+   "count": 81
+  },
+  {
+   "name": "Echinoparyphium recurvatum",
+   "count": 81
+  },
+  {
+   "name": "Vulpes velox",
+   "count": 80
+  },
+  {
+   "name": "Hirundo pyrrhonota",
+   "count": 80
+  },
+  {
+   "name": "Toxostoma bendirei",
+   "count": 80
+  },
+  {
+   "name": "Urocitellus canus",
+   "count": 80
+  },
+  {
+   "name": "Cnemidophorus tigris",
+   "count": 79
+  },
+  {
+   "name": "Dipodomys ordii richardsoni",
+   "count": 79
+  },
+  {
+   "name": "Coeligena coeligena",
+   "count": 79
+  },
+  {
+   "name": "Oligoryzomys destructor",
+   "count": 79
+  },
+  {
+   "name": "Myodes centralis",
+   "count": 79
+  },
+  {
+   "name": "Crenosoma",
+   "count": 79
+  },
+  {
+   "name": "Eolagurus luteus",
+   "count": 79
+  },
+  {
+   "name": "Akodon aerosus",
+   "count": 78
+  },
+  {
+   "name": "Gastrophryne carolinensis",
+   "count": 78
+  },
+  {
+   "name": "Calidris mauri",
+   "count": 78
+  },
+  {
+   "name": "Coccothraustes vespertinus californicus",
+   "count": 78
+  },
+  {
+   "name": "Bucephala albeola",
+   "count": 78
+  },
+  {
+   "name": "Artibeus hirsutus",
+   "count": 78
+  },
+  {
+   "name": "Certhia americana",
+   "count": 78
+  },
+  {
+   "name": "Anthus rubescens",
+   "count": 78
+  },
+  {
+   "name": "Tachycineta thalassina",
+   "count": 78
+  },
+  {
+   "name": "Coeligena violifer",
+   "count": 78
+  },
+  {
+   "name": "Buteo regalis",
+   "count": 78
+  },
+  {
+   "name": "Eimeria dipodomysis",
+   "count": 78
+  },
+  {
+   "name": "Nyctinomops femorosaccus",
+   "count": 78
+  },
+  {
+   "name": "Pomoxis",
+   "count": 78
+  },
+  {
+   "name": "Bogertophis subocularis",
+   "count": 77
+  },
+  {
+   "name": "Dipodomys ordii montanusns",
+   "count": 77
+  },
+  {
+   "name": "Hybognathus nuchalis",
+   "count": 77
+  },
+  {
+   "name": "Dendragapus obscurus",
+   "count": 77
+  },
+  {
+   "name": "Dipodomys merriami llanoensis",
+   "count": 77
+  },
+  {
+   "name": "Marmota broweri",
+   "count": 77
+  },
+  {
+   "name": "Thomomys talpoides kaibabensis",
+   "count": 77
+  },
+  {
+   "name": "Calcarius lapponicus",
+   "count": 77
+  },
+  {
+   "name": "Reithrodontomys creper",
+   "count": 77
+  },
+  {
+   "name": "Salmo clarki",
+   "count": 77
+  },
+  {
+   "name": "Chaetodipus pernix",
+   "count": 76
+  },
+  {
+   "name": "Taricha granulosa",
+   "count": 76
+  },
+  {
+   "name": "Apodemus speciosus speciosus",
+   "count": 76
+  },
+  {
+   "name": "Perimyotis subflavus",
+   "count": 76
+  },
+  {
+   "name": "Macropus rufus",
+   "count": 76
+  },
+  {
+   "name": "Opheodrys aestivus",
+   "count": 76
+  },
+  {
+   "name": "Sceloporus",
+   "count": 76
+  },
+  {
+   "name": "Masticophis taeniatus",
+   "count": 76
+  },
+  {
+   "name": "Zonotrichia leucophrys oriantha",
+   "count": 76
+  },
+  {
+   "name": "Plethodon vehiculum",
+   "count": 76
+  },
+  {
+   "name": "Cratogeomys goldmani",
+   "count": 76
+  },
+  {
+   "name": "Corrodopsylla curvata curvata",
+   "count": 75
+  },
+  {
+   "name": "Neotoma cinerea orolestes",
+   "count": 75
+  },
+  {
+   "name": "Sigmodon hispidus texianus",
+   "count": 75
+  },
+  {
+   "name": "Empidonax hammondii",
+   "count": 75
+  },
+  {
+   "name": "Bos indicus",
+   "count": 75
+  },
+  {
+   "name": "Sciurus carolinensis",
+   "count": 75
+  },
+  {
+   "name": "Pongo abelii",
+   "count": 75
+  },
+  {
+   "name": "Tachuris rubrigastra",
+   "count": 75
+  },
+  {
+   "name": "Akodon dayi",
+   "count": 74
+  },
+  {
+   "name": "Ammospermophilus leucurus pennipes",
+   "count": 74
+  },
+  {
+   "name": "Sphyrapicus thyroideus",
+   "count": 74
+  },
+  {
+   "name": "Falco columbarius",
+   "count": 74
+  },
+  {
+   "name": "Mergus merganser",
+   "count": 74
+  },
+  {
+   "name": "Sitta canadensis",
+   "count": 74
+  },
+  {
+   "name": "Oropsylla alaskensis",
+   "count": 74
+  },
+  {
+   "name": "Alcataenia armillaris",
+   "count": 74
+  },
+  {
+   "name": "Sigmodon",
+   "count": 73
+  },
+  {
+   "name": "Antigone canadensis canadensis",
+   "count": 73
+  },
+  {
+   "name": "Urocyon cinereoargenteus scottii",
+   "count": 73
+  },
+  {
+   "name": "Melanerpes uropygialis",
+   "count": 73
+  },
+  {
+   "name": "Clethrionomys gapperi",
+   "count": 73
+  },
+  {
+   "name": "Dipodomys agilis",
+   "count": 73
+  },
+  {
+   "name": "Hirundo rustica",
+   "count": 73
+  },
+  {
+   "name": "Selasphorus rufus",
+   "count": 73
+  },
+  {
+   "name": "Sylvilagus audubonii warreni",
+   "count": 73
+  },
+  {
+   "name": "Fundulus sciadicus",
+   "count": 73
+  },
+  {
+   "name": "Phrygilus fruticeti",
+   "count": 73
+  },
+  {
+   "name": "Protospirura",
+   "count": 73
+  },
+  {
+   "name": "Piranga flava",
+   "count": 73
+  },
+  {
+   "name": "Diorchis",
+   "count": 73
+  },
+  {
+   "name": "Cyprinella venusta",
+   "count": 72
+  },
+  {
+   "name": "Microtus oregoni",
+   "count": 72
+  },
+  {
+   "name": "Guiraca caerulea",
+   "count": 72
+  },
+  {
+   "name": "Enhydra lutris",
+   "count": 72
+  },
+  {
+   "name": "Cistothorus palustris",
+   "count": 72
+  },
+  {
+   "name": "Taenia hydatigena",
+   "count": 72
+  },
+  {
+   "name": "Phrygilus plebejus",
+   "count": 72
+  },
+  {
+   "name": "Esox lucius",
+   "count": 72
+  },
+  {
+   "name": "Rana",
+   "count": 72
+  },
+  {
+   "name": "Neoechinorhynchus emyditoides",
+   "count": 71
+  },
+  {
+   "name": "Stelgidopteryx serripennis",
+   "count": 71
+  },
+  {
+   "name": "Perognathus arenarius",
+   "count": 71
+  },
+  {
+   "name": "Falco mexicanus",
+   "count": 71
+  },
+  {
+   "name": "Sylvilagus audubonii neomexicanus",
+   "count": 71
+  },
+  {
+   "name": "Heligmosomum polygyrum",
+   "count": 71
+  },
+  {
+   "name": "Syphacia peromysci",
+   "count": 71
+  },
+  {
+   "name": "Cardinalis sinuatus",
+   "count": 71
+  },
+  {
+   "name": "Myotis armiensis",
+   "count": 71
+  },
+  {
+   "name": "Salvelinus fontinalis",
+   "count": 71
+  },
+  {
+   "name": "Empidonax occidentalis",
+   "count": 70
+  },
+  {
+   "name": "Rissa tridactyla",
+   "count": 70
+  },
+  {
+   "name": "Vireo olivaceus",
+   "count": 70
+  },
+  {
+   "name": "Sturnira",
+   "count": 70
+  },
+  {
+   "name": "Ctenomys steinbachi",
+   "count": 70
+  },
+  {
+   "name": "Ancylostomatidae",
+   "count": 70
+  },
+  {
+   "name": "Didelphis virginiana",
+   "count": 70
+  },
+  {
+   "name": "Ammospermophilus leucurus escalante",
+   "count": 70
+  },
+  {
+   "name": "Aythya americana",
+   "count": 70
+  },
+  {
+   "name": "Myodes rufocanus bedfordiae",
+   "count": 70
+  },
+  {
+   "name": "Parastrellus hesperus maximus",
+   "count": 70
+  },
+  {
+   "name": "Asio flammeus",
+   "count": 70
+  },
+  {
+   "name": "Bulinus globosus",
+   "count": 70
+  },
+  {
+   "name": "Artibeus",
+   "count": 70
+  },
+  {
+   "name": "Perognathus flavescens flavescens",
+   "count": 69
+  },
+  {
+   "name": "Aimophila ruficeps",
+   "count": 69
+  },
+  {
+   "name": "Leptonycteris curasoae sanborni",
+   "count": 69
+  },
+  {
+   "name": "Physaloptera massino",
+   "count": 69
+  },
+  {
+   "name": "Ictiobus bubalus",
+   "count": 69
+  },
+  {
+   "name": "Metallura phoebe",
+   "count": 69
+  },
+  {
+   "name": "Akodon mollis",
+   "count": 69
+  },
+  {
+   "name": "Lasiurus blossevillii",
+   "count": 69
+  },
+  {
+   "name": "Neotoma mexicana scopulorum",
+   "count": 69
+  },
+  {
+   "name": "Canis familiaris",
+   "count": 69
+  },
+  {
+   "name": "Regulus satrapa",
+   "count": 69
+  },
+  {
+   "name": "Tamias cratericus",
+   "count": 69
+  },
+  {
+   "name": "Acris blanchardi",
+   "count": 69
+  },
+  {
+   "name": "Phleocryptes melanops",
+   "count": 69
+  },
+  {
+   "name": "Tyrannus vociferans",
+   "count": 68
+  },
+  {
+   "name": "Agkistrodon contortrix",
+   "count": 68
+  },
+  {
+   "name": "Pan troglodytes",
+   "count": 68
+  },
+  {
+   "name": "Charadrius vociferus",
+   "count": 68
+  },
+  {
+   "name": "Ictinia mississippiensis",
+   "count": 68
+  },
+  {
+   "name": "Baiomys taylori ater",
+   "count": 68
+  },
+  {
+   "name": "Crocidura suaveolens",
+   "count": 68
+  },
+  {
+   "name": "Capillaria anatis",
+   "count": 68
+  },
+  {
+   "name": "Moxostoma macrolepidotum",
+   "count": 67
+  },
+  {
+   "name": "Toxostoma crissale",
+   "count": 67
+  },
+  {
+   "name": "Salpinctes obsoletus",
+   "count": 67
+  },
+  {
+   "name": "Philander opossum",
+   "count": 67
+  },
+  {
+   "name": "Bubo virginianus pallescens",
+   "count": 67
+  },
+  {
+   "name": "Vireo huttoni",
+   "count": 67
+  },
+  {
+   "name": "Sphyrapicus varius",
+   "count": 67
+  },
+  {
+   "name": "Storeria occipitomaculata",
+   "count": 67
+  },
+  {
+   "name": "Volatinia jacarina",
+   "count": 67
+  },
+  {
+   "name": "Bufo",
+   "count": 67
+  },
+  {
+   "name": "Sorex navigator",
+   "count": 67
+  },
+  {
+   "name": "Perognathus flavescens coryi",
+   "count": 67
+  },
+  {
+   "name": "Tetrabothrius alcae",
+   "count": 67
+  },
+  {
+   "name": "Hyla chrysoscelis or Hyla versicolor",
+   "count": 67
+  },
+  {
+   "name": "Desmognathus quadramaculatus",
+   "count": 67
+  },
+  {
+   "name": "Desmognathus",
+   "count": 67
+  },
+  {
+   "name": "Aphelocoma ultramarina",
+   "count": 66
+  },
+  {
+   "name": "Mimus polyglottos",
+   "count": 66
+  },
+  {
+   "name": "Puma concolor aztecus",
+   "count": 66
+  },
+  {
+   "name": "Ictidomys tridecemlineatus pallidus",
+   "count": 66
+  },
+  {
+   "name": "Meringis arachis",
+   "count": 66
+  },
+  {
+   "name": "Sylvilagus nuttallii pinetis",
+   "count": 66
+  },
+  {
+   "name": "Passerina amoena",
+   "count": 66
+  },
+  {
+   "name": "Neurotrichus gibbsii",
+   "count": 66
+  },
+  {
+   "name": "Myopus schisticolor",
+   "count": 66
+  },
+  {
+   "name": "Dallia pectoralis",
+   "count": 66
+  },
+  {
+   "name": "Aethia cristatella",
+   "count": 66
+  },
+  {
+   "name": "Branta canadensis",
+   "count": 65
+  },
+  {
+   "name": "Schizorchis",
+   "count": 65
+  },
+  {
+   "name": "Graomys domorum",
+   "count": 65
+  },
+  {
+   "name": "Bubo virginianus pinorum",
+   "count": 65
+  },
+  {
+   "name": "Myotis ciliolabrum ciliolabrum",
+   "count": 65
+  },
+  {
+   "name": "Pleochaetis exilis",
+   "count": 65
+  },
+  {
+   "name": "Uria lomvia",
+   "count": 65
+  },
+  {
+   "name": "Perognathus fasciatus",
+   "count": 65
+  },
+  {
+   "name": "Anas strepera",
+   "count": 65
+  },
+  {
+   "name": "Nycteris thebaica",
+   "count": 65
+  },
+  {
+   "name": "Hemiechinus auritus",
+   "count": 65
+  },
+  {
+   "name": "Catenotaenia",
+   "count": 65
+  },
+  {
+   "name": "Panthera uncia",
+   "count": 65
+  },
+  {
+   "name": "Myodes gapperi gapperi",
+   "count": 64
+  },
+  {
+   "name": "Progne subis",
+   "count": 64
+  },
+  {
+   "name": "Felis catus",
+   "count": 64
+  },
+  {
+   "name": "Sylvilagus nuttallii",
+   "count": 64
+  },
+  {
+   "name": "Sorex merriami",
+   "count": 64
+  },
+  {
+   "name": "Cuterebra austeni",
+   "count": 64
+  },
+  {
+   "name": "Nerodia rhombifera",
+   "count": 64
+  },
+  {
+   "name": "Diglossa cyanea",
+   "count": 64
+  },
+  {
+   "name": "Geomys knoxjonesi",
+   "count": 64
+  },
+  {
+   "name": "Holbrookia elegans",
+   "count": 64
+  },
+  {
+   "name": "Ammospermophilus leucurus leucurus",
+   "count": 63
+  },
+  {
+   "name": "Natalus",
+   "count": 63
+  },
+  {
+   "name": "Junco hyemalis oreganus",
+   "count": 63
+  },
+  {
+   "name": "Peromyscus maniculatus rubidus",
+   "count": 63
+  },
+  {
+   "name": "Masticophis flagellum",
+   "count": 63
+  },
+  {
+   "name": "Myodes gapperi ochraceus",
+   "count": 63
+  },
+  {
+   "name": "Geomys bursarius lutesceus",
+   "count": 63
+  },
+  {
+   "name": "Falco peregrinus",
+   "count": 63
+  },
+  {
+   "name": "Dipodomys nitratoides",
+   "count": 63
+  },
+  {
+   "name": "Microtus pinetorum",
+   "count": 63
+  },
+  {
+   "name": "Dipodomys compactus",
+   "count": 63
+  },
+  {
+   "name": "Thomomys bottae virgineus",
+   "count": 63
+  },
+  {
+   "name": "Juga",
+   "count": 63
+  },
+  {
+   "name": "Phasianus colchicus",
+   "count": 62
+  },
+  {
+   "name": "Xerospermophilus tereticaudus tereticaudus",
+   "count": 62
+  },
+  {
+   "name": "Plasmodium",
+   "count": 62
+  },
+  {
+   "name": "Dipodomys spectabilis baileyi",
+   "count": 62
+  },
+  {
+   "name": "Microtus mexicanus",
+   "count": 62
+  },
+  {
+   "name": "Heliodoxa leadbeateri",
+   "count": 62
+  },
+  {
+   "name": "Phyllostomus discolor verrucosus",
+   "count": 62
+  },
+  {
+   "name": "Tamias merriami merriami",
+   "count": 62
+  },
+  {
+   "name": "Myotis velifer incautus",
+   "count": 62
+  },
+  {
+   "name": "Luxilus cornutus",
+   "count": 62
+  },
+  {
+   "name": "Ambystoma opacum",
+   "count": 62
+  },
+  {
+   "name": "Chaerephon ansorgei",
+   "count": 62
+  },
+  {
+   "name": "Pusa hispida",
+   "count": 61
+  },
+  {
+   "name": "Aimophila cassinii",
+   "count": 61
+  },
+  {
+   "name": "Culaea inconstans",
+   "count": 61
+  },
+  {
+   "name": "Zonotrichia albicollis",
+   "count": 61
+  },
+  {
+   "name": "Laridae",
+   "count": 61
+  },
+  {
+   "name": "Porzana carolina",
+   "count": 61
+  },
+  {
+   "name": "Amazilia amazilia",
+   "count": 61
+  },
+  {
+   "name": "Bufo punctatus",
+   "count": 61
+  },
+  {
+   "name": "Ovis canadensis mexicana",
+   "count": 61
+  },
+  {
+   "name": "Martes pennanti",
+   "count": 61
+  },
+  {
+   "name": "Diplostomoidea",
+   "count": 61
+  },
+  {
+   "name": "Pterostichus tareumiut",
+   "count": 61
+  },
+  {
+   "name": "Paramphistomidae",
+   "count": 61
+  },
+  {
+   "name": "Liomys pictus",
+   "count": 60
+  },
+  {
+   "name": "Phyllostomus hastatus",
+   "count": 60
+  },
+  {
+   "name": "Dipodomys panamintinus",
+   "count": 60
+  },
+  {
+   "name": "Tamiasciurus hudsonicus fremonti",
+   "count": 60
+  },
+  {
+   "name": "Hyla versicolor",
+   "count": 60
+  },
+  {
+   "name": "Bassariscus astutus",
+   "count": 60
+  },
+  {
+   "name": "Stizostedion vitreum",
+   "count": 60
+  },
+  {
+   "name": "Coccyzus americanus",
+   "count": 60
+  },
+  {
+   "name": "Cynomys ludovicianus",
+   "count": 60
+  },
+  {
+   "name": "Thamnophis saurita",
+   "count": 60
+  },
+  {
+   "name": "Ochthoeca rufipectoralis",
+   "count": 60
+  },
+  {
+   "name": "Melospiza georgiana",
+   "count": 60
+  },
+  {
+   "name": "Lampropeltis getula",
+   "count": 60
+  },
+  {
+   "name": "Carollia subrufa",
+   "count": 60
+  },
+  {
+   "name": "Odocoileus virginianus",
+   "count": 60
+  },
+  {
+   "name": "Etheostoma radiosum",
+   "count": 60
+  },
+  {
+   "name": "Poecile atricapilla atricapilla",
+   "count": 60
+  },
+  {
+   "name": "Rana aurora",
+   "count": 60
+  },
+  {
+   "name": "Porrocaecum",
+   "count": 60
+  },
+  {
+   "name": "Gyraulus",
+   "count": 60
+  },
+  {
+   "name": "Perognathus amplus taylori",
+   "count": 60
+  },
+  {
+   "name": "Salvelinus malma",
+   "count": 60
+  },
+  {
+   "name": "Apodemus argenteus argenteus",
+   "count": 59
+  },
+  {
+   "name": "Reithrodontomys fulvescens intermedius",
+   "count": 59
+  },
+  {
+   "name": "Pseudacris ocularis",
+   "count": 59
+  },
+  {
+   "name": "Aix sponsa",
+   "count": 59
+  },
+  {
+   "name": "Pantherophis guttatus",
+   "count": 59
+  },
+  {
+   "name": "Icteria virens",
+   "count": 59
+  },
+  {
+   "name": "Etheostoma exile",
+   "count": 59
+  },
+  {
+   "name": "Scapanus townsendii",
+   "count": 59
+  },
+  {
+   "name": "Notropis atherinoides",
+   "count": 59
+  },
+  {
+   "name": "Anolis biporcatus",
+   "count": 59
+  },
+  {
+   "name": "Moxostoma congestum",
+   "count": 58
+  },
+  {
+   "name": "Thomomys bottae mutabilis",
+   "count": 58
+  },
+  {
+   "name": "Anas carolinensis",
+   "count": 58
+  },
+  {
+   "name": "Trombiculidae",
+   "count": 58
+  },
+  {
+   "name": "Polioptila caerulea",
+   "count": 58
+  },
+  {
+   "name": "Picoides scalaris",
+   "count": 58
+  },
+  {
+   "name": "Dipodomys ordii sanrafaeli",
+   "count": 58
+  },
+  {
+   "name": "Sylvilagus audubonii cedrophilus",
+   "count": 58
+  },
+  {
+   "name": "Neotoma mexicana fallax",
+   "count": 58
+  },
+  {
+   "name": "Sylvilagus audubonii baileyi",
+   "count": 58
+  },
+  {
+   "name": "Larus delawarensis",
+   "count": 58
+  },
+  {
+   "name": "Limnodromus scolopaceus",
+   "count": 58
+  },
+  {
+   "name": "Perognathus longimembris arizonensis",
+   "count": 58
+  },
+  {
+   "name": "Artibeus lituratus intermedius",
+   "count": 58
+  },
+  {
+   "name": "Physa gyrina",
+   "count": 58
+  },
+  {
+   "name": "Microtus oeconomus operarius",
+   "count": 58
+  },
+  {
+   "name": "Geomys bursarius major",
+   "count": 58
+  },
+  {
+   "name": "Onychomys leucogaster albescens",
+   "count": 58
+  },
+  {
+   "name": "Nerodia fasciata",
+   "count": 57
+  },
+  {
+   "name": "Ceratophyllus vison",
+   "count": 57
+  },
+  {
+   "name": "Leptodactylus albilabris",
+   "count": 57
+  },
+  {
+   "name": "Motacilla flava",
+   "count": 57
+  },
+  {
+   "name": "Cardellina rubrifrons",
+   "count": 57
+  },
+  {
+   "name": "Rhinolophus blasii",
+   "count": 57
+  },
+  {
+   "name": "Ammospermophilus leucurus peninsulae",
+   "count": 57
+  },
+  {
+   "name": "Balantiopteryx plicata",
+   "count": 56
+  },
+  {
+   "name": "Onychomys leucogaster missouriensis",
+   "count": 56
+  },
+  {
+   "name": "Carphophis amoenus",
+   "count": 56
+  },
+  {
+   "name": "Tamias umbrinus sedulus",
+   "count": 56
+  },
+  {
+   "name": "Setophaga ruticilla",
+   "count": 56
+  },
+  {
+   "name": "Pteronotus parnellii",
+   "count": 56
+  },
+  {
+   "name": "Pseudacris ornata",
+   "count": 56
+  },
+  {
+   "name": "Accipiter gentilis",
+   "count": 56
+  },
+  {
+   "name": "Ammodramus savannarum",
+   "count": 56
+  },
+  {
+   "name": "Hirundo fulva",
+   "count": 56
+  },
+  {
+   "name": "Tympanuchus phasianellus",
+   "count": 56
+  },
+  {
+   "name": "Thomomys bottae cervinus",
+   "count": 56
+  },
+  {
+   "name": "Synaptomys cooperi",
+   "count": 56
+  },
+  {
+   "name": "Catamenia analis",
+   "count": 56
+  },
+  {
+   "name": "Homo sapiens",
+   "count": 56
+  },
+  {
+   "name": "Spinus psaltria",
+   "count": 56
+  },
+  {
+   "name": "Calidris minutilla",
+   "count": 56
+  },
+  {
+   "name": "Circus cyaneus",
+   "count": 56
+  },
+  {
+   "name": "Odocoileus hemionus hemionus",
+   "count": 56
+  },
+  {
+   "name": "Lagopus mutus",
+   "count": 56
+  },
+  {
+   "name": "Myotis fortidens",
+   "count": 56
+  },
+  {
+   "name": "Bonasa umbellus",
+   "count": 56
+  },
+  {
+   "name": "Macaca mulatta",
+   "count": 56
+  },
+  {
+   "name": "Dipodomys ordii compactus",
+   "count": 56
+  },
+  {
+   "name": "Peromyscus eremicus fraterculus",
+   "count": 56
+  },
+  {
+   "name": "Anolis fuscoauratus",
+   "count": 56
+  },
+  {
+   "name": "Capillariidae",
+   "count": 56
+  },
+  {
+   "name": "Lygosoma laterale",
+   "count": 55
+  },
+  {
+   "name": "Trichuris dipodomis",
+   "count": 55
+  },
+  {
+   "name": "Oxyura jamaicensis",
+   "count": 55
+  },
+  {
+   "name": "Dipodomys merriami frenatus",
+   "count": 55
+  },
+  {
+   "name": "Suncus murinus",
+   "count": 55
+  },
+  {
+   "name": "Dicrostonyx torquatus stevensoni",
+   "count": 55
+  },
+  {
+   "name": "Monogenea",
+   "count": 55
+  },
+  {
+   "name": "Polyonymus caroli",
+   "count": 55
+  },
+  {
+   "name": "Chordeiles acutipennis",
+   "count": 55
+  },
+  {
+   "name": "Gyrinophilus porphyriticus",
+   "count": 55
+  },
+  {
+   "name": "Lymnaeidae",
+   "count": 55
+  },
+  {
+   "name": "Sylvilagus audubonii minor",
+   "count": 55
+  },
+  {
+   "name": "Raillietina",
+   "count": 55
+  },
+  {
+   "name": "Cryptotis parva parva",
+   "count": 55
+  },
+  {
+   "name": "Scaphiopus hammondii",
+   "count": 55
+  },
+  {
+   "name": "Eimeria balphae",
+   "count": 54
+  },
+  {
+   "name": "Thomomys bottae opulentus",
+   "count": 54
+  },
+  {
+   "name": "Sorex preblei",
+   "count": 54
+  },
+  {
+   "name": "Citellus parryii",
+   "count": 54
+  },
+  {
+   "name": "Myodes gapperi arizonensis",
+   "count": 54
+  },
+  {
+   "name": "Taenia krabbei",
+   "count": 54
+  },
+  {
+   "name": "Phalaropus tricolor",
+   "count": 54
+  },
+  {
+   "name": "Sigmodon hispidus eremicus",
+   "count": 54
+  },
+  {
+   "name": "Dendroica nigrescens",
+   "count": 54
+  },
+  {
+   "name": "Elaphe obsoleta",
+   "count": 54
+  },
+  {
+   "name": "Anairetes nigrocristatus",
+   "count": 54
+  },
+  {
+   "name": "Salmonidae",
+   "count": 54
+  },
+  {
+   "name": "Phyllostomus discolor",
+   "count": 54
+  },
+  {
+   "name": "Opheodrys vernalis",
+   "count": 53
+  },
+  {
+   "name": "Anolis cybotes",
+   "count": 53
+  },
+  {
+   "name": "Rallus limicola",
+   "count": 53
+  },
+  {
+   "name": "Storeria dekayi",
+   "count": 53
+  },
+  {
+   "name": "Sorex cinereus cf.",
+   "count": 53
+  },
+  {
+   "name": "Thomomys bottae mearnsi",
+   "count": 53
+  },
+  {
+   "name": "Heterodon platyrhinos",
+   "count": 53
+  },
+  {
+   "name": "Terrapene carolina",
+   "count": 53
+  },
+  {
+   "name": "Vireo solitarius",
+   "count": 53
+  },
+  {
+   "name": "Thomomys bottae modicus",
+   "count": 53
+  },
+  {
+   "name": "Thomomys bottae hueyi",
+   "count": 53
+  },
+  {
+   "name": "Turdus chiguanco",
+   "count": 53
+  },
+  {
+   "name": "Phalacrocorax auritus",
+   "count": 53
+  },
+  {
+   "name": "Andrya",
+   "count": 53
+  },
+  {
+   "name": "Sorex gracillimus",
+   "count": 53
+  },
+  {
+   "name": "Rhinolophus swinnyi",
+   "count": 53
+  },
+  {
+   "name": "Thamnophis ordinoides",
+   "count": 53
+  },
+  {
+   "name": "Nephelomys devius",
+   "count": 53
+  },
+  {
+   "name": "Anolis townsendi",
+   "count": 53
+  },
+  {
+   "name": "Schistosoma",
+   "count": 53
+  },
+  {
+   "name": "Rhyacotriton olympicus",
+   "count": 52
+  },
+  {
+   "name": "Chaetodipus dalquesti",
+   "count": 52
+  },
+  {
+   "name": "Tamias minimus silvaticus",
+   "count": 52
+  },
+  {
+   "name": "Mustela nigripes",
+   "count": 52
+  },
+  {
+   "name": "Neotamias minimus",
+   "count": 52
+  },
+  {
+   "name": "Empidonax difficilis",
+   "count": 52
+  },
+  {
+   "name": "Dipodomys agilis martinensis",
+   "count": 52
+  },
+  {
+   "name": "Eptesicus nilssonii",
+   "count": 52
+  },
+  {
+   "name": "Reithrodontomys megalotis zacatacae",
+   "count": 52
+  },
+  {
+   "name": "Patagifer",
+   "count": 52
+  },
+  {
+   "name": "Thomomys bottae actuosus",
+   "count": 52
+  },
+  {
+   "name": "Ictalurus lupus",
+   "count": 52
+  },
+  {
+   "name": "Erignathus barbatus",
+   "count": 52
+  },
+  {
+   "name": "Sturnira oporaphilum",
+   "count": 52
+  },
+  {
+   "name": "Rousettus amplexicaudatus",
+   "count": 52
+  },
+  {
+   "name": "Baeolophus ridgwayi",
+   "count": 52
+  },
+  {
+   "name": "Molothrus aeneus",
+   "count": 52
+  },
+  {
+   "name": "Aythya collaris",
+   "count": 52
+  },
+  {
+   "name": "Nucifraga columbiana",
+   "count": 52
+  },
+  {
+   "name": "Dendroica coronata auduboni",
+   "count": 52
+  },
+  {
+   "name": "Pipistrellus hesperus",
+   "count": 52
+  },
+  {
+   "name": "Lycaon pictus pictus",
+   "count": 52
+  },
+  {
+   "name": "Neotoma stephensi relicta",
+   "count": 52
+  },
+  {
+   "name": "Thoopterus nigrescens",
+   "count": 51
+  },
+  {
+   "name": "Osteopilus septentrionalis",
+   "count": 51
+  },
+  {
+   "name": "Aetheca thamba",
+   "count": 51
+  },
+  {
+   "name": "Elaenia albiceps",
+   "count": 51
+  },
+  {
+   "name": "Bufo cognatus",
+   "count": 51
+  },
+  {
+   "name": "Artibeus obscurus",
+   "count": 51
+  },
+  {
+   "name": "Nerodia sipedon",
+   "count": 51
+  },
+  {
+   "name": "Cratogeomys castanops perplanus",
+   "count": 51
+  },
+  {
+   "name": "Ovis aries",
+   "count": 51
+  },
+  {
+   "name": "Urocitellus beldingi",
+   "count": 51
+  },
+  {
+   "name": "Panthera onca",
+   "count": 51
+  },
+  {
+   "name": "Anas clypeata",
+   "count": 51
+  },
+  {
+   "name": "Chaetodipus spinatus bryanti",
+   "count": 50
+  },
+  {
+   "name": "Leptotyphlops humilis",
+   "count": 50
+  },
+  {
+   "name": "Phaethornis malaris",
+   "count": 50
+  },
+  {
+   "name": "Gordius robustus",
+   "count": 50
+  },
+  {
+   "name": "Cavia aperea",
+   "count": 50
+  },
+  {
+   "name": "Lemmus lemmus",
+   "count": 50
+  },
+  {
+   "name": "Canis latrans mearnsi",
+   "count": 50
+  },
+  {
+   "name": "Pipraeidea bonariensis",
+   "count": 50
+  },
+  {
+   "name": "Sturnira parvidens",
+   "count": 50
+  },
+  {
+   "name": "Scaphiopus",
+   "count": 50
+  },
+  {
+   "name": "Dipodomys ordii columbianus",
+   "count": 50
+  },
+  {
+   "name": "Lasiurus borealis",
+   "count": 50
+  },
+  {
+   "name": "Euderma maculatum",
+   "count": 50
+  },
+  {
+   "name": "Echinococcus granulosus",
+   "count": 50
+  },
+  {
+   "name": "Ictalurus furcatus",
+   "count": 50
+  },
+  {
+   "name": "Dipodomys agilis plectilis",
+   "count": 50
+  },
+  {
+   "name": "Gehyra oceanica",
+   "count": 50
+  },
+  {
+   "name": "Mustela vison",
+   "count": 49
+  },
+  {
+   "name": "Cyanocitta cristata",
+   "count": 49
+  },
+  {
+   "name": "Baeolophus wollweberi",
+   "count": 49
+  },
+  {
+   "name": "Poospiza hispaniolensis",
+   "count": 49
+  },
+  {
+   "name": "Thomomys talpoides rostralis",
+   "count": 49
+  },
+  {
+   "name": "Melanerpes lewis",
+   "count": 49
+  },
+  {
+   "name": "Spatula discors",
+   "count": 49
+  },
+  {
+   "name": "Plethodon richmondi",
+   "count": 49
+  },
+  {
+   "name": "Bassariscus astutus flavus",
+   "count": 49
+  },
+  {
+   "name": "Planorbella",
+   "count": 49
+  },
+  {
+   "name": "Larus canus brachyrhynchus",
+   "count": 49
+  },
+  {
+   "name": "Thalurania furcata",
+   "count": 49
+  },
+  {
+   "name": "Ardea herodias",
+   "count": 49
+  },
+  {
+   "name": "Peromyscus truei comanche",
+   "count": 49
+  },
+  {
+   "name": "Perognathus parvus clarus",
+   "count": 49
+  },
+  {
+   "name": "Spinus pinus",
+   "count": 49
+  },
+  {
+   "name": "Nephelomys levipes",
+   "count": 49
+  },
+  {
+   "name": "Ctenomys lewisi",
+   "count": 49
+  },
+  {
+   "name": "Dumetella carolinensis",
+   "count": 49
+  },
+  {
+   "name": "Citellinema bifurcatum",
+   "count": 49
+  },
+  {
+   "name": "Tantilla atriceps",
+   "count": 49
+  },
+  {
+   "name": "Eleutherodactylus wightmanae",
+   "count": 49
+  },
+  {
+   "name": "Myotis diminutus",
+   "count": 49
+  },
+  {
+   "name": "Pinicola enucleator",
+   "count": 48
+  },
+  {
+   "name": "Junco hyemalis mearnsi",
+   "count": 48
+  },
+  {
+   "name": "Setophaga graciae",
+   "count": 48
+  },
+  {
+   "name": "Dipodomys ordii sennetti",
+   "count": 48
+  },
+  {
+   "name": "Ensatina eschscholtzii",
+   "count": 48
+  },
+  {
+   "name": "Seiurus aurocapillus",
+   "count": 48
+  },
+  {
+   "name": "Dicrostonyx torquatus",
+   "count": 48
+  },
+  {
+   "name": "Sorex arizonae",
+   "count": 48
+  },
+  {
+   "name": "Rana pretiosa",
+   "count": 48
+  },
+  {
+   "name": "Oochoristica",
+   "count": 48
+  },
+  {
+   "name": "Zapus",
+   "count": 48
+  },
+  {
+   "name": "Larus canus",
+   "count": 48
+  },
+  {
+   "name": "Notemigonus crysoleucas",
+   "count": 48
+  },
+  {
+   "name": "Lasiurus cinereus semotus",
+   "count": 48
+  },
+  {
+   "name": "Piranga rubra",
+   "count": 48
+  },
+  {
+   "name": "Lemmiscus curtatus levidensis",
+   "count": 48
+  },
+  {
+   "name": "Carollia perspicillata azteca",
+   "count": 48
+  },
+  {
+   "name": "Myotis velifer velifer",
+   "count": 48
+  },
+  {
+   "name": "Melanomys caliginosus",
+   "count": 48
+  },
+  {
+   "name": "Lithobates palustris",
+   "count": 48
+  },
+  {
+   "name": "Schistosoma bovis",
+   "count": 48
+  },
+  {
+   "name": "Peromyscus sonoriensis",
+   "count": 48
+  }
+ ]
+}
