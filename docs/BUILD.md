@@ -131,10 +131,24 @@ Getting this wrong returns fewer results with no error, which is why
 plain Node, no framework. Every rule in it exists because breaking it fails
 silently.
 
-## Testing gap
+## Testing
 
-There is no browser test. `npm run verify` covers the pure functions, and
-`ssr = true` means a page's rendered output can be diffed with `curl`. Neither
-covers clicking. Adding a row, toggling AND/OR, and the multi-select all run
-through `bind:` paths that have broken once. Playwright with three smoke tests
-would close it.
+Three layers, cheapest first:
+
+| | Covers | Run |
+|---|---|---|
+| `npm run verify` | URL ↔ query ↔ Elasticsearch body. Pure functions, no browser | seconds |
+| `npm run check` / `lint` | types, a11y lint | seconds |
+| `npm run test:e2e` | clicking: adding rows, AND/OR, NOT, multi-select, autocomplete | ~10s |
+
+Playwright starts the dev server itself (`reuseExistingServer`), so no setup.
+
+**Clicks before hydration are swallowed** — the SSR'd markup has no handlers yet.
+`e2e/form.spec.ts` has an `open()` helper that waits; use it instead of
+`page.goto` or the test fails confusingly, with a snapshot showing the click
+simply did nothing.
+
+**Do not wrap a `<select>` in its `<label>`.** The option text folds into the
+accessible name, so the control announces as "Rank — choose — Scientific name
+Phylum Class…". Use `for`/`id`. Playwright's strict mode catches this, which is
+how it was found.

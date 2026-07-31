@@ -15,9 +15,10 @@ export type VocabValue = {
 	documentation_url: string;
 };
 
-export type GuidPrefix = {
-	value: string;
-	count: number;
+/** A value with its record count in the current snapshot. */
+export type CountedValue = { value: string; count: number };
+
+export type GuidPrefix = CountedValue & {
 	institution: string;
 	collection_cde: string;
 };
@@ -28,7 +29,8 @@ export type Schema = {
 	ranks: Rank[];
 	attribute_types: AttributeTypeDef[];
 	vocabularies: Record<string, VocabValue[]>;
-	countries: string[];
+	countries: CountedValue[];
+	states: CountedValue[];
 	guid_prefixes: GuidPrefix[];
 	sorts: { id: string; label: string }[];
 	limits: { max_per_page: number; max_result_window: number; max_export_rows: number };
@@ -63,8 +65,8 @@ export type BoolOp = 'and' | 'or';
 export type SearchQuery = {
 	/** block 1 — any of these organisms */
 	taxa: TaxonPair[];
-	/** block 1, but AND-ed: which collections hold the record, not what it is.
-	 *  Values OR among themselves. */
+	/** block 3: which collections hold the record, not what it is.
+	 *  Values OR among themselves, and AND against everything else. */
 	guid_prefixes: string[];
 	/** block 2 — assertions about the specimen */
 	attributes: AttributePair[];
@@ -73,8 +75,8 @@ export type SearchQuery = {
 	method: string;
 	/** block 3 — one scope */
 	locality: string;
-	country: string;
-	state_prov: string;
+	countries: string[];
+	states: string[];
 	collected_from: string;
 	collected_to: string;
 	collector_id: string;
@@ -90,8 +92,8 @@ export const EMPTY_QUERY: SearchQuery = {
 	attr_op: 'and',
 	method: '',
 	locality: '',
-	country: '',
-	state_prov: '',
+	countries: [],
+	states: [],
 	collected_from: '',
 	collected_to: '',
 	collector_id: '',

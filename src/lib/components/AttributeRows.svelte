@@ -4,8 +4,9 @@
 	let {
 		rows = $bindable(),
 		op = $bindable(),
+		advanced = false,
 		schema
-	}: { rows: AttributePair[]; op: BoolOp; schema: Schema } = $props();
+	}: { rows: AttributePair[]; op: BoolOp; advanced?: boolean; schema: Schema } = $props();
 
 	function typeDef(id: string) {
 		return schema.attribute_types.find((t) => t.id === id) ?? null;
@@ -27,7 +28,7 @@
 </script>
 
 <div class="rows">
-	{#if rows.length > 1}
+	{#if advanced && rows.length > 1}
 		<fieldset class="opsel">
 			<legend class="lbl">Combine rows with</legend>
 			<label><input type="radio" bind:group={op} value="and" /> AND — all must hold</label>
@@ -40,56 +41,61 @@
 		{@const vocab = vocabFor(row.type)}
 		{#if i > 0}<div class="op">{op.toUpperCase()}</div>{/if}
 		<div class="row" class:negated={row.negated}>
-			<label class="neg" title="Require that the specimen does NOT carry this">
-				<input type="checkbox" bind:checked={row.negated} />
-				<span>NOT</span>
-			</label>
+			<div class="controls">
+				{#if advanced}
+					<label class="neg" title="Require that the specimen does NOT carry this">
+						<input type="checkbox" bind:checked={row.negated} />
+						<span>NOT</span>
+					</label>
+				{/if}
 
-			<label class="grow">
-				<span class="lbl">Attribute</span>
-				<select bind:value={row.type} onchange={() => (rows[i].value = '')}>
-					<option value="">— choose —</option>
-					{#each schema.attribute_types as t (t.id)}
-						<option value={t.id} title={t.description}>{t.label}</option>
-					{/each}
-				</select>
-			</label>
-
-			<label class="grow">
-				<span class="lbl">
-					Value
-					{#if vocab}<em class="hint">{vocab.length} controlled values</em>
-					{:else if row.type}<em class="hint">free text</em>{/if}
-				</span>
-				{#if vocab}
-					<select bind:value={row.value}>
+				<div class="field grow">
+					<label class="lbl" for="attr-type-{i}">Attribute</label>
+					<select id="attr-type-{i}" bind:value={row.type} onchange={() => (rows[i].value = '')}>
 						<option value="">— choose —</option>
-						{#each vocab as v (v.value)}
-							<!-- children indent under their parent; depth never exceeds 2 (D22). Keep on one
-							     line: a wrapped <option> collapses the leading spaces away. -->
-							<option value={v.value} title={v.description}
-								>{v.value.includes(':') ? '    ' : ''}{v.value}</option
-							>
+						{#each schema.attribute_types as t (t.id)}
+							<option value={t.id} title={t.description}>{t.label}</option>
 						{/each}
 					</select>
-				{:else}
-					<input
-						type="text"
-						bind:value={row.value}
-						disabled={!row.type}
-						placeholder={row.type ? 'value' : 'choose an attribute first'}
-					/>
-				{/if}
-			</label>
+				</div>
 
-			<button type="button" class="rm" onclick={() => remove(i)} aria-label="Remove this row">
-				×
-			</button>
+				<div class="field grow">
+					<label class="lbl" for="attr-value-{i}">
+						Value <em class="hint">optional</em>
+						{#if vocab}<em class="hint">· {vocab.length} controlled values</em>
+						{:else if row.type}<em class="hint">· free text</em>{/if}
+					</label>
+					{#if vocab}
+						<select id="attr-value-{i}" bind:value={row.value}>
+							<option value="">— any value —</option>
+							{#each vocab as v (v.value)}
+								<!-- children indent under their parent; depth never exceeds 2 (D22). Keep on one
+								     line: a wrapped <option> collapses the leading spaces away. -->
+								<option value={v.value} title={v.description}
+									>{v.value.includes(':') ? '    ' : ''}{v.value}</option
+								>
+							{/each}
+						</select>
+					{:else}
+						<input
+							id="attr-value-{i}"
+							type="text"
+							bind:value={row.value}
+							disabled={!row.type}
+							placeholder={row.type ? 'any value' : 'choose an attribute first'}
+						/>
+					{/if}
+				</div>
+
+				<button type="button" class="rm" onclick={() => remove(i)} aria-label="Remove this row">
+					×
+				</button>
+			</div>
+
+			{#if def?.description}
+				<p class="desc">{def.description}</p>
+			{/if}
 		</div>
-
-		{#if def?.description}
-			<p class="desc">{def.description}</p>
-		{/if}
 	{/each}
 
 	<button type="button" class="add" onclick={add}>+ Add attribute</button>
@@ -126,9 +132,29 @@
 		gap: 0.3rem;
 		font-size: 0.82rem;
 	}
+	/* Overrides the global `.row` for this component only: the description has to
+	   sit inside the box, so the box stacks and `.controls` carries the flex row.
+	   Scoped class beats `:global(.row)` on specificity. */
+	.row {
+		flex-direction: column;
+		align-items: stretch;
+		gap: 0.45rem;
+	}
+	.controls {
+		display: flex;
+		gap: 0.6rem;
+		align-items: flex-end;
+	}
 	.row.negated {
 		border-color: #b4544a;
 		background: color-mix(in srgb, #b4544a 8%, var(--panel));
+	}
+	/* `form label` stacks by default; keep the value hint on the caption's line so
+	   choosing a type doesn't grow the row. */
+	.field label {
+		flex-direction: row;
+		align-items: baseline;
+		gap: 0.35rem;
 	}
 	.hint {
 		font-style: normal;
@@ -144,7 +170,7 @@
 		white-space: nowrap;
 	}
 	.desc {
-		margin: -0.1rem 0 0.3rem 0.5rem;
+		margin: 0;
 		font-size: 0.78rem;
 		color: var(--muted);
 		max-width: 70ch;

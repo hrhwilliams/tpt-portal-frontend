@@ -3,6 +3,7 @@
 	import { goto } from '$app/navigation';
 	import { resolve } from '$app/paths';
 	import AttributeRows from '$lib/components/AttributeRows.svelte';
+	import MultiSelect from '$lib/components/MultiSelect.svelte';
 	import TaxonRows from '$lib/components/TaxonRows.svelte';
 	import { hasNegatedRow, toParams } from '$lib/query';
 	import type { SearchQuery } from '$lib/types';
@@ -16,13 +17,35 @@
 	// This must be $state, not a writable $derived: $derived does not proxy its
 	// value, so `q.attributes` would be a plain array and pushing a row through
 	// `bind:` would not re-render. Deep reactivity is the whole requirement here.
-	// eslint-disable-next-line svelte/prefer-writable-derived
 	let q = $state<SearchQuery>(untrack(() => structuredClone(data.query)));
+
+	// Opens itself when a shared link already uses one of these, so a pasted URL
+	// never hides part of its own query.
+	const usesAdvanced = (s: SearchQuery) =>
+		hasNegatedRow(s) || s.attr_op === 'or' || s.method.trim() !== '';
+	let advanced = $state(untrack(() => usesAdvanced(data.query)));
+
 	$effect(() => {
 		q = structuredClone(data.query);
+		advanced = usesAdvanced(data.query);
 	});
 
+	/** Hidden inputs must not keep filtering. Switching off discards them. */
+	function toggleAdvanced(on: boolean) {
+		advanced = on;
+		if (!on) {
+			q.attributes = q.attributes.map((a) => ({ ...a, negated: false }));
+			q.attr_op = 'and';
+			q.method = '';
+		}
+	}
+
 	const negated = $derived(hasNegatedRow(q));
+	const opts = (vals: { value: string; count: number }[]) =>
+		vals.map((v) => ({ value: v.value, label: v.value, hint: v.count.toLocaleString() }));
+	const collectionOptions = $derived(opts(data.schema.guid_prefixes));
+	const countryOptions = $derived(opts(data.schema.countries));
+	const stateOptions = $derived(opts(data.schema.states));
 	const searchUrl = $derived(resolve(`/search?${toParams(q).toString()}`));
 
 	function submit(e: SubmitEvent) {
@@ -45,8 +68,8 @@
 
 <form onsubmit={submit}>
 	<fieldset>
-		<legend>1 · Which organisms, and from where held</legend>
-		<TaxonRows bind:rows={q.taxa} bind:guidPrefixes={q.guid_prefixes} schema={data.schema} />
+		<legend>1 · Record search</legend>
+		<TaxonRows bind:rows={q.taxa} schema={data.schema} />
 		<p class="note">
 			Suggestions come from the current snapshot. A name that is not listed can still be searched
 			for.
@@ -54,24 +77,37 @@
 	</fieldset>
 
 	<fieldset>
-		<legend>2 · What was recorded about them</legend>
-		<AttributeRows bind:rows={q.attributes} bind:op={q.attr_op} schema={data.schema} />
+		<legend>2 · Record attributes</legend>
+		<AttributeRows bind:rows={q.attributes} bind:op={q.attr_op} {advanced} schema={data.schema} />
 
-		<label class="method">
-			<span class="lbl">Method contains</span>
-			<input type="text" bind:value={q.method} disabled={negated} placeholder="e.g. immunoblot" />
+		<label class="adv">
+			<input
+				type="checkbox"
+				checked={advanced}
+				onchange={(e) => toggleAdvanced(e.currentTarget.checked)}
+			/>
+			<span>Advanced</span>
+			<em>negate a row, switch AND/OR, filter by method</em>
 		</label>
-		{#if negated}
-			<p class="note warn">
-				Method is unavailable while a row is negated. “No <em>detected</em> row
-				<em>by this method</em>” would still match a specimen whose positive was found another way.
-			</p>
-		{:else}
-			<p class="note">
-				Method is recorded as prose, not from a controlled list, so matching is approximate —
-				<code>comb</code> will not find <code>combed</code>. Much of the corpus predates method
-				recording and carries none at all. The condition applies to every attribute row above.
-			</p>
+
+		{#if advanced}
+			<label class="method">
+				<span class="lbl">Method contains</span>
+				<input type="text" bind:value={q.method} disabled={negated} placeholder="e.g. immunoblot" />
+			</label>
+			{#if negated}
+				<p class="note warn">
+					Method is unavailable while a row is negated. “No <em>detected</em> row
+					<em>by this method</em>” would still match a specimen whose positive was found another
+					way.
+				</p>
+			{:else}
+				<p class="note">
+					Method is recorded as prose, not from a controlled list, so matching is approximate —
+					<code>comb</code> will not find <code>combed</code>. Much of the corpus predates method
+					recording and carries none at all. The condition applies to every attribute row above.
+				</p>
+			{/if}
 		{/if}
 
 		<p class="note honesty">
@@ -89,23 +125,42 @@
 	</fieldset>
 
 	<fieldset>
-		<legend>3 · Where and when</legend>
+		<legend>3 · Global filters</legend>
 		<div class="grid two">
+			<div class="field">
+				<span class="lbl">Held by collection</span>
+				<MultiSelect
+					id="collections"
+					bind:selected={q.guid_prefixes}
+					options={collectionOptions}
+					placeholder="Any collection"
+					filterPlaceholder="Type to filter {data.schema.guid_prefixes.length} collections…"
+				/>
+			</div>
 			<label>
 				<span class="lbl">Locality</span>
 				<input type="text" bind:value={q.locality} placeholder="e.g. Isle Royale National Park" />
 			</label>
-			<label>
+			<div class="field">
 				<span class="lbl">Country</span>
-				<select bind:value={q.country}>
-					<option value="">— any —</option>
-					{#each data.schema.countries as c (c)}<option value={c}>{c}</option>{/each}
-				</select>
-			</label>
-			<label>
+				<MultiSelect
+					id="countries"
+					bind:selected={q.countries}
+					options={countryOptions}
+					placeholder="Any country"
+					filterPlaceholder="Type to filter {data.schema.countries.length} countries…"
+				/>
+			</div>
+			<div class="field">
 				<span class="lbl">State / province</span>
-				<input type="text" bind:value={q.state_prov} />
-			</label>
+				<MultiSelect
+					id="states"
+					bind:selected={q.states}
+					options={stateOptions}
+					placeholder="Any state or province"
+					filterPlaceholder="Type to filter {data.schema.states.length} states…"
+				/>
+			</div>
 			<label>
 				<span class="lbl">Collector (Arctos agent URL)</span>
 				<input
@@ -124,7 +179,9 @@
 			</label>
 		</div>
 		<p class="note">
-			Locality matches whole place names, and applies together with the date to the
+			Values within one dropdown <strong>OR</strong> together; separate filters
+			<strong>AND</strong>. Locality matches whole place names, and applies together with the date
+			to the
 			<strong>same collecting event</strong>. Country, state and collector are record-level, so they
 			are not tied to that event — a specimen collected in two countries can match a country-A
 			search with a date from its country-B visit. Some collection dates record only a year or a
@@ -186,13 +243,32 @@
 		font-weight: 700;
 		padding: 0 0.4rem;
 	}
+	.field {
+		display: flex;
+		flex-direction: column;
+		gap: 0.2rem;
+	}
 	.grid.two {
 		display: grid;
 		grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
 		gap: 0.7rem;
 	}
+	.adv {
+		flex-direction: row;
+		align-items: baseline;
+		gap: 0.4rem;
+		margin-top: 0.8rem;
+		font-size: 0.85rem;
+		width: fit-content;
+		cursor: pointer;
+	}
+	.adv em {
+		font-style: normal;
+		font-size: 0.78rem;
+		color: var(--muted);
+	}
 	.method {
-		margin-top: 0.9rem;
+		margin-top: 0.7rem;
 		max-width: 24rem;
 	}
 	.note.warn {

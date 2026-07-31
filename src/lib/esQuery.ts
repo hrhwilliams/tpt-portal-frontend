@@ -59,21 +59,29 @@ const SOURCE = [
 const anyOf = (clauses: Clause[]): Clause =>
 	clauses.length === 1 ? clauses[0] : { bool: { should: clauses, minimum_should_match: 1 } };
 
-/** One attribute row -> one clause. `method` is null for negated rows. */
+/**
+ * One attribute row -> one clause. `method` is null for negated rows.
+ *
+ * The value is optional. Without one the row asks "carries this attribute type
+ * at all" — examined for *anything*, rather than for a named thing.
+ */
 function attributeClause(pair: AttributePair, method: string | null): Clause {
 	const flatField = DETECTION_TYPES[pair.type];
+	const value = pair.value.trim();
 
 	// Fast path: a detection-type row with no method needs no nested query at
 	// all. The flat arrays are built from the same parse as the nested docs, so
-	// the two cannot disagree.
+	// the two cannot disagree. With no value, presence of the array is the test.
 	if (flatField && !method) {
-		return { term: { [`${flatField}.hierarchy`]: pair.value } };
+		return value
+			? { term: { [`${flatField}.hierarchy`]: value } }
+			: { exists: { field: flatField } };
 	}
 
-	const filter: Clause[] = [
-		{ term: { 'attributedetail.attribute_type': pair.type } },
-		{ term: { 'attributedetail.attribute_value.hierarchy': pair.value } }
-	];
+	const filter: Clause[] = [{ term: { 'attributedetail.attribute_type': pair.type } }];
+	if (value) {
+		filter.push({ term: { 'attributedetail.attribute_value.hierarchy': value } });
+	}
 	if (method) {
 		filter.push({ match_phrase: { 'attributedetail.attribute_method': method } });
 	}
@@ -119,7 +127,7 @@ export function translate(q: SearchQuery, schema: Schema): Translation {
 	}
 
 	// ---- block 2: attributes, AND or OR ------------------------------------
-	const rows = q.attributes.filter((a) => a.type && a.value);
+	const rows = q.attributes.filter((a) => a.type);
 	const negated = rows.some((a) => a.negated);
 	const method = negated ? '' : q.method.trim();
 
@@ -177,6 +185,11 @@ export function translate(q: SearchQuery, schema: Schema): Translation {
 				'(and a parent-level examination pairs with a child-level outcome).'
 		);
 	}
+	if (rows.some((r) => !r.value.trim())) {
+		notes.push(
+			'A row with no value asks whether the attribute is recorded at all, whatever its value.'
+		);
+	}
 
 	// Collection, not identity: AND-ed against the taxon block rather than OR-ed
 	// into it, or a prefix would return the whole collection regardless of taxon.
@@ -202,8 +215,15 @@ export function translate(q: SearchQuery, schema: Schema): Translation {
 
 	// ---- block 3: scope ----------------------------------------------------
 	// Record-level. These are NOT correlated with the event date.
-	if (q.country) filter.push({ term: { country: q.country } });
-	if (q.state_prov) filter.push({ term: { state_prov: q.state_prov } });
+	for (const [field, values] of [
+		['country', q.countries],
+		['state_prov', q.states]
+	] as const) {
+		const v = values.filter(Boolean);
+		if (v.length) {
+			filter.push(v.length === 1 ? { term: { [field]: v[0] } } : { terms: { [field]: v } });
+		}
+	}
 	if (q.collector_id) filter.push({ term: { collector_ids: q.collector_id } });
 
 	// Per event, and in ONE clause so they describe the same visit.
@@ -229,7 +249,7 @@ export function translate(q: SearchQuery, schema: Schema): Translation {
 				'collecting events is missed by the top-level date.'
 		);
 	}
-	if ((q.country || q.state_prov) && eventFilter.length) {
+	if ((q.countries.length || q.states.length) && eventFilter.length) {
 		notes.push(
 			'Country and state are record-level and are NOT correlated with the event date: the ' +
 				'source carries no per-event political geography.'

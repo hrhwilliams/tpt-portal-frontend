@@ -2,7 +2,7 @@
 	import type { Taxon } from '$lib/types';
 	import taxa from '$lib/fixtures/taxa.json';
 
-	let { value = $bindable(), rank }: { value: string; rank: string } = $props();
+	let { value = $bindable(), rank, id }: { value: string; rank: string; id?: string } = $props();
 
 	let open = $state(false);
 	let active = $state(-1);
@@ -50,6 +50,7 @@
 
 <div class="combo">
 	<input
+		{id}
 		type="text"
 		bind:value
 		{onkeydown}
@@ -76,9 +77,9 @@
 						onmouseenter={() => (active = i)}
 					>
 						<span class="name">{t.name}</span>
-						<span class="meta">
-							{t.rank}{#if t.parent_name}, in {t.parent_name}{/if} · {t.record_count.toLocaleString()}
-						</span>
+						<!-- count only: rank and parent restate this source's classification,
+						     which invites argument the portal has no way to settle -->
+						<span class="meta">{t.record_count.toLocaleString()}</span>
 					</button>
 				</li>
 			{/each}

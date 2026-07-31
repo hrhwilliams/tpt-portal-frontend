@@ -24,6 +24,12 @@
 	let open = $state(false);
 	let filter = $state('');
 	let root: HTMLDivElement | undefined = $state();
+	let filterEl: HTMLInputElement | undefined = $state();
+
+	// the input only exists while open, and effects run after the DOM updates
+	$effect(() => {
+		if (open) filterEl?.focus();
+	});
 
 	const shown = $derived.by(() => {
 		const f = filter.trim().toLowerCase();
@@ -33,12 +39,15 @@
 		);
 	});
 
+	// checked first, so what you picked stays visible in a 74-item list
+	const checked = $derived(shown.filter((o) => selected.includes(o.value)));
+	const unchecked = $derived(shown.filter((o) => !selected.includes(o.value)));
+
+	const labelOf = (v: string) => options.find((o) => o.value === v)?.label ?? v;
 	const label = $derived(
 		selected.length === 0
 			? placeholder
-			: selected.length === 1
-				? (options.find((o) => o.value === selected[0])?.label ?? selected[0])
-				: `${selected.length} selected`
+			: selected.slice(0, 2).map(labelOf).join(', ') + (selected.length > 2 ? ', …' : '')
 	);
 
 	function toggle(value: string) {
@@ -75,34 +84,42 @@
 
 	{#if open}
 		<div class="panel" id={`${id}-list`}>
-			<input
-				type="text"
-				class="filter"
-				bind:value={filter}
-				placeholder={filterPlaceholder}
-				onkeydown={(e) => e.key === 'Escape' && close()}
-			/>
-			{#if selected.length}
-				<button type="button" class="clear" onclick={() => (selected = [])}>
-					Clear {selected.length} selected
-				</button>
-			{/if}
+			<div class="bar">
+				<input
+					type="text"
+					class="filter"
+					bind:this={filterEl}
+					bind:value={filter}
+					placeholder={filterPlaceholder}
+					onkeydown={(e) => e.key === 'Escape' && close()}
+				/>
+				{#if selected.length}
+					<button type="button" class="clear" onclick={() => (selected = [])}>Clear all</button>
+				{/if}
+			</div>
+			{#snippet row(o: Option)}
+				<li>
+					<label>
+						<input
+							type="checkbox"
+							checked={selected.includes(o.value)}
+							onchange={() => toggle(o.value)}
+						/>
+						<span class="txt">{o.label}</span>
+						{#if o.hint}<span class="hint">{o.hint}</span>{/if}
+					</label>
+				</li>
+			{/snippet}
+
 			<ul>
-				{#each shown as o (o.value)}
-					<li>
-						<label>
-							<input
-								type="checkbox"
-								checked={selected.includes(o.value)}
-								onchange={() => toggle(o.value)}
-							/>
-							<span class="txt">{o.label}</span>
-							{#if o.hint}<span class="hint">{o.hint}</span>{/if}
-						</label>
-					</li>
-				{:else}
+				{#each checked as o (o.value)}{@render row(o)}{/each}
+				{#if checked.length && unchecked.length}
+					<li class="sep"><hr /></li>
+				{/if}
+				{#each unchecked as o (o.value)}{@render row(o)}{/each}
+				{#if !shown.length}
 					<li class="none">No match for “{filter}”</li>
-				{/each}
+				{/if}
 			</ul>
 		</div>
 	{/if}
@@ -158,15 +175,18 @@
 		/* wider than the trigger so long labels and the filter box aren't cramped */
 		min-width: max(100%, 18rem);
 	}
-	.filter {
-		width: 100%;
+	.bar {
+		display: flex;
+		gap: 0.3rem;
 		margin-bottom: 0.3rem;
 	}
+	.filter {
+		flex: 1;
+		min-width: 0;
+	}
 	.clear {
-		font-size: 0.75rem;
-		padding: 0.15rem 0.4rem;
-		margin-bottom: 0.3rem;
-		align-self: flex-start;
+		font-size: 0.8rem;
+		padding: 0.35rem 0.6rem;
 	}
 	ul {
 		list-style: none;
@@ -198,6 +218,11 @@
 	.hint {
 		font-size: 0.75rem;
 		color: var(--muted);
+	}
+	.sep hr {
+		border: 0;
+		border-top: 1px solid var(--line);
+		margin: 0.3rem 0;
 	}
 	.none {
 		padding: 0.3rem;

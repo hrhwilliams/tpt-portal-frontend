@@ -43,8 +43,8 @@ function decodeAttr(raw: string): AttributePair | null {
 		negated = true;
 		s = s.slice(1);
 	}
-	const parts = splitOnce(s);
-	if (!parts) return null;
+	// no `|` means no value: "carries this attribute type at all"
+	const parts = splitOnce(s) ?? [s.trim(), ''];
 	const [type, value] = parts;
 	if (!type) return null;
 	return { type, value, negated };
@@ -60,7 +60,9 @@ export function toParams(q: SearchQuery): URLSearchParams {
 		if (t.name) p.append('taxon', `${t.rank}|${t.name}`);
 	}
 	for (const a of q.attributes) {
-		if (a.type) p.append('attr', `${a.negated ? '!' : ''}${a.type}|${a.value}`);
+		if (!a.type) continue;
+		const v = a.value.trim();
+		p.append('attr', `${a.negated ? '!' : ''}${a.type}${v ? `|${v}` : ''}`);
 	}
 	if (q.attr_op === 'or' && q.attributes.length > 1) p.set('attr_op', 'or');
 	if (!hasNegatedRow(q)) put('method', q.method);
@@ -68,8 +70,12 @@ export function toParams(q: SearchQuery): URLSearchParams {
 		if (gp) p.append('prefix', gp);
 	}
 	put('locality', q.locality);
-	put('country', q.country);
-	put('state', q.state_prov);
+	for (const c of q.countries) {
+		if (c) p.append('country', c);
+	}
+	for (const st of q.states) {
+		if (st) p.append('state', st);
+	}
 	put('from', q.collected_from);
 	put('to', q.collected_to);
 	put('collector', q.collector_id);
@@ -106,8 +112,8 @@ export function fromParams(p: URLSearchParams): SearchQuery {
 		guid_prefixes: p.getAll('prefix').filter(Boolean),
 		method: p.get('method') ?? '',
 		locality: p.get('locality') ?? '',
-		country: p.get('country') ?? '',
-		state_prov: p.get('state') ?? '',
+		countries: p.getAll('country').filter(Boolean),
+		states: p.getAll('state').filter(Boolean),
 		collected_from: p.get('from') ?? '',
 		collected_to: p.get('to') ?? '',
 		collector_id: p.get('collector') ?? '',
@@ -128,10 +134,10 @@ export function isEmpty(q: SearchQuery): boolean {
 	return !(
 		q.taxa.some((t) => t.name) ||
 		q.guid_prefixes.length > 0 ||
-		q.attributes.some((a) => a.type && a.value) ||
+		q.attributes.some((a) => a.type) ||
 		q.locality ||
-		q.country ||
-		q.state_prov ||
+		q.countries.length > 0 ||
+		q.states.length > 0 ||
 		q.collected_from ||
 		q.collected_to ||
 		q.collector_id
@@ -152,9 +158,7 @@ export function validate(q: SearchQuery, maxWindow = 10000, maxPerPage = 200): s
 	for (const t of q.taxa) {
 		if (t.name && !t.rank) errors.push(`Taxon "${t.name}" has no rank.`);
 	}
-	for (const a of q.attributes) {
-		if (a.type && !a.value) errors.push(`Attribute "${a.type}" has no value.`);
-	}
+	// a row with no value is legal: "carries this attribute type at all"
 	if (q.method && hasNegatedRow(q))
 		errors.push('Method cannot be combined with a negated attribute row.');
 	return errors;

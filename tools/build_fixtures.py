@@ -182,16 +182,15 @@ def main():
         key=lambda t: t["id"].lower(),
     )
 
-    countries = load_table("ctcountry") or []
-
     schema = {
         "snapshot_date": "2026-07-01",
         "fixture": True,
         "ranks": [{"id": i, "label": l, "field": f} for i, l, f in RANKS],
         "attribute_types": attribute_types,
         "vocabularies": vocab,
-        "countries": ["United States", "Mexico", "Canada", "Chile", "Argentina"]
-        if not countries else sorted({(c.get("country") or "").strip() for c in countries} - {""}),
+        # no code table exists for either; both are aggregations in the real service
+        "countries": profile.get("country") or [],
+        "states": profile.get("state_prov") or [],
         "sorts": [
             {"id": "guid_asc", "label": "Catalog number"},
             {"id": "date_desc", "label": "Newest collection date"},
@@ -216,6 +215,7 @@ def main():
     print(f"vocabularies    : {len(vocab)} tables, "
           f"{sum(len(v) for v in vocab.values())} values")
     print(f"collections     : {len(schema['guid_prefixes'])} guid_prefix values")
+    print(f"places          : {len(schema['countries'])} countries, {len(schema['states'])} states")
     print(f"taxa            : {len(taxa)} distinct (rank, name)")
 
 

@@ -11,7 +11,7 @@
  * they are checked structurally rather than by eye.
  */
 import { readFileSync } from 'node:fs';
-import { fromParams, isEmpty } from '../src/lib/query.ts';
+import { fromParams, isEmpty, toParams } from '../src/lib/query.ts';
 import { translate } from '../src/lib/esQuery.ts';
 import type { Schema } from '../src/lib/types.ts';
 
@@ -333,6 +333,77 @@ function check(name: string, ok: boolean, detail = '') {
 		q.guid_prefixes.join(',') === 'MSB:Mamm,MSB:Para',
 		json(q.guid_prefixes)
 	);
+}
+
+// 27b — a row with no value asks whether the attribute is recorded at all
+{
+	const b = body('attr=examined for');
+	check(
+		'valueless detection row -> exists on the flat field',
+		!!b.query.bool.filter[0].exists && b.query.bool.filter[0].exists.field === 'examined_for',
+		json(b.query.bool.filter)
+	);
+}
+{
+	const b = body('attr=examined for&method=comb');
+	const inner = b.query.bool.filter[0].nested.query.bool.filter;
+	check(
+		'  with a method it is a nested clause carrying type + method only',
+		inner.length === 2 && !json(inner).includes('attribute_value'),
+		json(inner)
+	);
+}
+{
+	const b = body('attr=weight');
+	const inner = b.query.bool.filter[0].nested.query.bool.filter;
+	check(
+		'  a valueless non-detection row filters on type alone',
+		inner.length === 1 && inner[0].term['attributedetail.attribute_type'] === 'weight',
+		json(inner)
+	);
+}
+{
+	const q = fromParams(new URLSearchParams('attr=examined for'));
+	check(
+		'a valueless row is a real filter, not an empty query',
+		!isEmpty(q) && q.attributes[0].value === '',
+		json(q.attributes)
+	);
+	check(
+		'  and round-trips without a trailing pipe',
+		toParams(q).toString().includes('attr=examined+for') && !toParams(q).toString().includes('%7C'),
+		toParams(q).toString()
+	);
+}
+
+// 28 — country and state are multi-valued, and OR within each field
+{
+	const b = body('country=United States&country=Mexico&state=Alaska');
+	const f = b.query.bool.filter;
+	const c = f.find((x: any) => x.terms?.country);
+	check('two countries become one terms clause', !!c && c.terms.country.length === 2, json(f));
+	check(
+		'  a single state still uses term',
+		!!f.find((x: any) => x.term?.state_prov === 'Alaska'),
+		json(f)
+	);
+}
+
+// 29 — repeated country/state params round-trip
+{
+	const q = fromParams(new URLSearchParams('country=Mexico&country=Panama&state=Chihuahua'));
+	check(
+		'country and state parse to arrays',
+		q.countries.join(',') === 'Mexico,Panama' && q.states.join(',') === 'Chihuahua',
+		json([q.countries, q.states])
+	);
+}
+
+// 30 — the schema carries real place lists, not a hardcoded stub
+{
+	check('117 countries with counts', schema.countries.length === 117);
+	check('488 states with counts', schema.states.length === 488);
+	check('  ordered by count', schema.countries[0].value === 'United States');
 }
 
 console.log(failures === 0 ? '\nAll checks passed.' : `\n${failures} FAILED`);
