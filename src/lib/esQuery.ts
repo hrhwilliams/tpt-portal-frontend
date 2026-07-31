@@ -62,25 +62,27 @@ const anyOf = (clauses: Clause[]): Clause =>
 /**
  * One attribute row -> one clause. `method` is null for negated rows.
  *
- * The value is optional. Without one the row asks "carries this attribute type
- * at all" — examined for *anything*, rather than for a named thing.
+ * Values are optional and exact. With none the row asks "carries this attribute
+ * type at all"; with several they OR. There is no parent/child expansion — a
+ * search for `ectoparasite` matches `ectoparasite`, and a user who wants the
+ * children selects them.
  */
 function attributeClause(pair: AttributePair, method: string | null): Clause {
 	const flatField = DETECTION_TYPES[pair.type];
-	const value = pair.value.trim();
+	const values = pair.values.map((v) => v.trim()).filter(Boolean);
+	// `terms` covers one value as well as several, so there is no `term` branch
+	const match = (field: string): Clause => ({ terms: { [field]: values } });
 
 	// Fast path: a detection-type row with no method needs no nested query at
 	// all. The flat arrays are built from the same parse as the nested docs, so
 	// the two cannot disagree. With no value, presence of the array is the test.
 	if (flatField && !method) {
-		return value
-			? { term: { [`${flatField}.hierarchy`]: value } }
-			: { exists: { field: flatField } };
+		return values.length ? match(flatField) : { exists: { field: flatField } };
 	}
 
 	const filter: Clause[] = [{ term: { 'attributedetail.attribute_type': pair.type } }];
-	if (value) {
-		filter.push({ term: { 'attributedetail.attribute_value.hierarchy': value } });
+	if (values.length) {
+		filter.push(match('attributedetail.attribute_value'));
 	}
 	if (method) {
 		filter.push({ match_phrase: { 'attributedetail.attribute_method': method } });
@@ -175,17 +177,20 @@ export function translate(q: SearchQuery, schema: Schema): Translation {
 	}
 	if (rows.some((r) => !r.negated && DETECTION_TYPES[r.type]) && !method) {
 		notes.push(
-			'Detection rows with no method take the flat-array fast path — a plain `term`, no ' +
+			'Detection rows with no method take the flat-array fast path — a plain `terms`, no ' +
 				'nested query. Results are identical to the nested form.'
 		);
 	}
-	if (rows.some((r) => r.value.includes(':'))) {
+	if (rows.some((r) => r.values.filter(Boolean).length)) {
 		notes.push(
-			'Values match against `.hierarchy`, so searching a parent term also finds its children ' +
-				'(and a parent-level examination pairs with a child-level outcome).'
+			'Values match exactly — `ectoparasite` does not match `ectoparasite: flea`. Select the ' +
+				'child terms as well if you want them.'
 		);
 	}
-	if (rows.some((r) => !r.value.trim())) {
+	if (rows.some((r) => r.values.filter(Boolean).length > 1)) {
+		notes.push('Several values on one row OR together in a single `terms` clause.');
+	}
+	if (rows.some((r) => !r.values.filter(Boolean).length)) {
 		notes.push(
 			'A row with no value asks whether the attribute is recorded at all, whatever its value.'
 		);

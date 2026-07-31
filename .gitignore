@@ -25,3 +25,5 @@ vite.config.ts.timestamp-*
 *.csv
 test-results
 playwright-report
+__pycache__
+venv

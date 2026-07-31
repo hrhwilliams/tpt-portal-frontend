@@ -1,4 +1,5 @@
 <script lang="ts">
+	import MultiSelect from './MultiSelect.svelte';
 	import type { AttributePair, BoolOp, Schema } from '$lib/types';
 
 	let {
@@ -19,7 +20,7 @@
 	}
 
 	function add() {
-		rows = [...rows, { type: '', value: '', negated: false }];
+		rows = [...rows, { type: '', values: [], negated: false }];
 	}
 
 	function remove(i: number) {
@@ -51,7 +52,7 @@
 
 				<div class="field grow">
 					<label class="lbl" for="attr-type-{i}">Attribute</label>
-					<select id="attr-type-{i}" bind:value={row.type} onchange={() => (rows[i].value = '')}>
+					<select id="attr-type-{i}" bind:value={row.type} onchange={() => (rows[i].values = [])}>
 						<option value="">— choose —</option>
 						{#each schema.attribute_types as t (t.id)}
 							<option value={t.id} title={t.description}>{t.label}</option>
@@ -62,25 +63,25 @@
 				<div class="field grow">
 					<label class="lbl" for="attr-value-{i}">
 						Value <em class="hint">optional</em>
-						{#if vocab}<em class="hint">· {vocab.length} controlled values</em>
+						{#if vocab}<em class="hint">· pick any number</em>
 						{:else if row.type}<em class="hint">· free text</em>{/if}
 					</label>
 					{#if vocab}
-						<select id="attr-value-{i}" bind:value={row.value}>
-							<option value="">— any value —</option>
-							{#each vocab as v (v.value)}
-								<!-- children indent under their parent; depth never exceeds 2 (D22). Keep on one
-								     line: a wrapped <option> collapses the leading spaces away. -->
-								<option value={v.value} title={v.description}
-									>{v.value.includes(':') ? '    ' : ''}{v.value}</option
-								>
-							{/each}
-						</select>
+						<!-- controlled vocabulary: pick several, they OR. Free-text types stay a
+						     single input — there is nothing to enumerate. -->
+						<MultiSelect
+							id="attr-value-{i}"
+							bind:selected={row.values}
+							options={vocab.map((v) => ({ value: v.value, label: v.value }))}
+							placeholder="Any value"
+							filterPlaceholder="Type to filter {vocab.length} values…"
+						/>
 					{:else}
 						<input
 							id="attr-value-{i}"
 							type="text"
-							bind:value={row.value}
+							value={row.values[0] ?? ''}
+							oninput={(e) => (row.values = [e.currentTarget.value])}
 							disabled={!row.type}
 							placeholder={row.type ? 'any value' : 'choose an attribute first'}
 						/>

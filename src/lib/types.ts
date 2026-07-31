@@ -54,8 +54,11 @@ export type TaxonPair = {
 /** One row of the attribute block. */
 export type AttributePair = {
 	type: string;
-	value: string;
-	/** true = the specimen must NOT carry this (type, value) */
+	/** Empty = "carries this attribute type at all". Several values OR within
+	 *  the row; there is no parent/child expansion, so `ectoparasite` means
+	 *  exactly that and children are picked explicitly. */
+	values: string[];
+	/** true = the specimen must NOT carry this */
 	negated: boolean;
 };
 

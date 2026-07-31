@@ -41,7 +41,7 @@ function check(name: string, ok: boolean, detail = '') {
 	check(
 		'  that clause carries type, value and method together',
 		inner.length === 3 &&
-			json(inner).includes('attribute_value.hierarchy') &&
+			json(inner).includes('attributedetail.attribute_value') &&
 			json(inner).includes('attribute_method')
 	);
 }
@@ -54,7 +54,7 @@ function check(name: string, ok: boolean, detail = '') {
 		'taxonomy queries subfamily.split',
 		s.includes('subfamily.split') && !s.includes('"subfamily":')
 	);
-	check('detection queries .hierarchy', s.includes('detected.hierarchy'));
+	check('detection queries the flat keyword exactly', s.includes('"detected":["endoparasite'));
 }
 
 // 3 — event date and locality in one clause, so they describe the same visit
@@ -70,7 +70,7 @@ function check(name: string, ok: boolean, detail = '') {
 	const b = body('attr=detected|endoparasite: cestode');
 	check(
 		'detection row, no method -> flat term, no nested query',
-		json(b.query).includes('detected.hierarchy') && !json(b.query).includes('nested'),
+		json(b.query).includes('"detected"') && !json(b.query).includes('nested'),
 		json(b.query)
 	);
 }
@@ -85,8 +85,8 @@ function check(name: string, ok: boolean, detail = '') {
 		json(b.query)
 	);
 	check(
-		'  the must_not runs against .hierarchy, not the bare field',
-		json(b.query.bool.must_not).includes('detected.hierarchy')
+		'  the must_not targets the flat detection array',
+		json(b.query.bool.must_not).includes('"detected"')
 	);
 }
 
@@ -129,7 +129,7 @@ function check(name: string, ok: boolean, detail = '') {
 	const q = fromParams(new URLSearchParams(qs));
 	check(
 		'value containing "|" survives the round trip',
-		q.attributes[0].value === 'a|b' && q.attributes[0].negated === true,
+		q.attributes[0].values.join() === 'a|b' && q.attributes[0].negated === true,
 		json(q.attributes)
 	);
 	check('  and a second row parses independently', q.attributes[1].type === 'examined for');
@@ -230,7 +230,7 @@ function check(name: string, ok: boolean, detail = '') {
 	);
 	const f = b.query.bool.filter;
 	const taxonBlock = f.filter((c: any) => c.bool?.should).length;
-	const attrTerms = f.filter((c: any) => c.term && json(c.term).includes('.hierarchy')).length;
+	const attrTerms = f.filter((c: any) => c.terms?.detected || c.terms?.examined_for).length;
 	const ev = f.filter((c: any) => c.nested?.path === 'events').length;
 	check(
 		'(taxonA OR taxonB) AND (attr AND attr) AND (scope)',
@@ -366,7 +366,7 @@ function check(name: string, ok: boolean, detail = '') {
 	const q = fromParams(new URLSearchParams('attr=examined for'));
 	check(
 		'a valueless row is a real filter, not an empty query',
-		!isEmpty(q) && q.attributes[0].value === '',
+		!isEmpty(q) && q.attributes[0].values.length === 0,
 		json(q.attributes)
 	);
 	check(
@@ -374,6 +374,36 @@ function check(name: string, ok: boolean, detail = '') {
 		toParams(q).toString().includes('attr=examined+for') && !toParams(q).toString().includes('%7C'),
 		toParams(q).toString()
 	);
+}
+
+// 27c — several values on one row OR into a single terms clause
+{
+	const b = body('attr=detected|ectoparasite: flea; ectoparasite: louse');
+	const f = b.query.bool.filter;
+	check(
+		'two values on one row -> one terms clause on the flat field',
+		f.length === 1 && f[0].terms?.detected?.length === 2,
+		json(f)
+	);
+	check(
+		'  values are exact, with no ancestor expansion',
+		!json(f).includes('hierarchy') && !json(f).includes('"ectoparasite"'),
+		json(f)
+	);
+}
+{
+	const b = body('attr=sex|male; female');
+	const inner = b.query.bool.filter[0].nested.query.bool.filter;
+	check(
+		'multi-value on a nested (non-detection) row uses terms too',
+		!!inner.find((c: any) => c.terms?.['attributedetail.attribute_value']?.length === 2),
+		json(inner)
+	);
+}
+{
+	const q = fromParams(new URLSearchParams('attr=detected|a; b; c'));
+	check('values round-trip through the URL', q.attributes[0].values.join(',') === 'a,b,c');
+	check('  and re-encode canonically', toParams(q).get('attr') === 'detected|a; b; c');
 }
 
 // 28 — country and state are multi-valued, and OR within each field

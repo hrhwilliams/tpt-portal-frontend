@@ -45,9 +45,15 @@ function decodeAttr(raw: string): AttributePair | null {
 	}
 	// no `|` means no value: "carries this attribute type at all"
 	const parts = splitOnce(s) ?? [s.trim(), ''];
-	const [type, value] = parts;
+	const [type, joined] = parts;
 	if (!type) return null;
-	return { type, value, negated };
+	// Several values OR within the row. `;` is safe as the separator: controlled
+	// values never contain one, and free-text types are single-valued in the form.
+	const values = joined
+		.split(';')
+		.map((v) => v.trim())
+		.filter(Boolean);
+	return { type, values, negated };
 }
 
 export function toParams(q: SearchQuery): URLSearchParams {
@@ -61,8 +67,8 @@ export function toParams(q: SearchQuery): URLSearchParams {
 	}
 	for (const a of q.attributes) {
 		if (!a.type) continue;
-		const v = a.value.trim();
-		p.append('attr', `${a.negated ? '!' : ''}${a.type}${v ? `|${v}` : ''}`);
+		const v = a.values.map((x) => x.trim()).filter(Boolean);
+		p.append('attr', `${a.negated ? '!' : ''}${a.type}${v.length ? `|${v.join('; ')}` : ''}`);
 	}
 	if (q.attr_op === 'or' && q.attributes.length > 1) p.set('attr_op', 'or');
 	if (!hasNegatedRow(q)) put('method', q.method);

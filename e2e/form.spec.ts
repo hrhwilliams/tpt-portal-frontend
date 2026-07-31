@@ -39,14 +39,47 @@ test('a composed search reaches the URL and the query', async ({ page }) => {
 
 	await page.getByRole('button', { name: '+ Add attribute' }).click();
 	await page.getByLabel('Attribute').selectOption('detected');
-	await page.getByLabel('Value').selectOption('ectoparasite');
+
+	// controlled vocabulary -> MultiSelect, so several values can be picked
+	await page.getByRole('button', { name: 'Any value' }).click();
+	await page.getByRole('checkbox', { name: 'ectoparasite', exact: true }).check();
+	await page.keyboard.press('Escape');
 
 	await page.getByRole('button', { name: 'Search', exact: true }).click();
 
 	await expect(page).toHaveURL(/taxon=genus%7CSorex/);
 	await expect(page).toHaveURL(/attr=detected%7Cectoparasite/);
-	await expect(page.locator('pre')).toContainText('detected.hierarchy');
+	await expect(page.locator('pre')).toContainText('"detected"');
 	await expect(page.locator('pre')).toContainText('genus.split');
+});
+
+test('several values on one attribute row OR together', async ({ page }) => {
+	await open(page);
+
+	await page.getByRole('button', { name: '+ Add attribute' }).click();
+	await page.getByLabel('Attribute').selectOption('detected');
+	await page.getByRole('button', { name: 'Any value' }).click();
+	await page.getByRole('checkbox', { name: 'ectoparasite: flea' }).check();
+	await page.getByRole('checkbox', { name: 'ectoparasite: louse' }).check();
+	await page.keyboard.press('Escape');
+
+	await page.getByRole('button', { name: 'Search', exact: true }).click();
+	await expect(page.locator('pre')).toContainText('"terms"');
+	await expect(page.locator('pre')).toContainText('ectoparasite: flea');
+	await expect(page.locator('pre')).toContainText('ectoparasite: louse');
+});
+
+test('a free-text attribute type keeps a single text input', async ({ page }) => {
+	await open(page);
+
+	await page.getByRole('button', { name: '+ Add attribute' }).click();
+	await page.getByLabel('Attribute').selectOption('age');
+
+	await expect(page.getByRole('button', { name: 'Any value' })).toHaveCount(0);
+	await page.getByLabel(/^Value/).fill('adult');
+	await page.getByRole('button', { name: 'Search', exact: true }).click();
+
+	await expect(page).toHaveURL(/attr=age%7Cadult/);
 });
 
 test('an attribute with no value searches for the type alone', async ({ page }) => {
