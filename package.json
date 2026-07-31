@@ -14,7 +14,6 @@
 		"format": "prettier --write .",
 		"fixtures": "python tools/build_fixtures.py",
 		"test:ingest": "python tools/test_ingest.py",
-		"verify": "node --experimental-strip-types tools/verify_translation.ts",
 		"profile:detection": "python tools/profile_detection_matrix.py docs/data/dataset/msb.csv docs/data/profiles/detection_matrix.json",
 		"profile:collections": "python tools/profile_prefix_sciname.py docs/data/dataset/msb.csv docs/data/profiles/prefix_sciname.json",
 		"test:e2e": "playwright test"

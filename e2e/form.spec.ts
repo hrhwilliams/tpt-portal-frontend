@@ -3,7 +3,8 @@ import { expect, test } from '@playwright/test';
 /**
  * Covers the interaction the static checks cannot see: clicking. Every one of
  * these goes through a `bind:` path, and that path has broken once already.
- * `npm run verify` covers the pure functions; this covers the widgets.
+ * The URL is the whole request, so these assert on the URL — running results
+ * needs the Rust service, which these tests do not start.
  */
 
 /** There are several MultiSelects and the results box also uses `.panel`. */
@@ -49,8 +50,6 @@ test('a composed search reaches the URL and the query', async ({ page }) => {
 
 	await expect(page).toHaveURL(/taxon=genus%7CSorex/);
 	await expect(page).toHaveURL(/attr=detected%7Cectoparasite/);
-	await expect(page.locator('pre')).toContainText('"detected"');
-	await expect(page.locator('pre')).toContainText('genus.split');
 });
 
 test('several values on one attribute row OR together', async ({ page }) => {
@@ -64,9 +63,7 @@ test('several values on one attribute row OR together', async ({ page }) => {
 	await page.keyboard.press('Escape');
 
 	await page.getByRole('button', { name: 'Search', exact: true }).click();
-	await expect(page.locator('pre')).toContainText('"terms"');
-	await expect(page.locator('pre')).toContainText('ectoparasite: flea');
-	await expect(page.locator('pre')).toContainText('ectoparasite: louse');
+	await expect(page).toHaveURL(/ectoparasite%3A\+flea%3B\+ectoparasite%3A\+louse/);
 });
 
 test('a free-text attribute type keeps a single text input', async ({ page }) => {
@@ -90,8 +87,6 @@ test('an attribute with no value searches for the type alone', async ({ page }) 
 	await page.getByRole('button', { name: 'Search', exact: true }).click();
 
 	await expect(page).toHaveURL(/attr=examined\+for(&|$)/);
-	await expect(page.locator('pre')).toContainText('"exists"');
-	await expect(page.locator('pre')).toContainText('examined_for');
 });
 
 test('NOT, AND/OR and method are hidden until Advanced is on', async ({ page }) => {
@@ -116,13 +111,11 @@ test('a link using advanced options opens expanded', async ({ page }) => {
 
 test('switching Advanced off discards its filters', async ({ page }) => {
 	await open(page, '/search?attr=detected%7Cectoparasite&attr=detected%7Cendoparasite&attr_op=or');
-	await expect(page.locator('pre')).toContainText('minimum_should_match');
 
 	await page.getByRole('checkbox', { name: 'Advanced' }).uncheck();
 	await page.getByRole('button', { name: 'Search', exact: true }).click();
 
 	await expect(page).not.toHaveURL(/attr_op=or/);
-	await expect(page.locator('pre')).not.toContainText('minimum_should_match');
 });
 
 test('NOT disables the method input', async ({ page }) => {
@@ -136,16 +129,14 @@ test('NOT disables the method input', async ({ page }) => {
 	await expect(page.getByText('Method is unavailable')).toBeVisible();
 });
 
-test('AND/OR toggle changes the emitted query', async ({ page }) => {
+test('AND/OR toggle reaches the URL', async ({ page }) => {
 	await open(page, '/search?attr=detected%7Cectoparasite&attr=detected%7Cendoparasite');
-	await expect(page.locator('pre')).not.toContainText('minimum_should_match');
 
 	await page.getByRole('checkbox', { name: 'Advanced' }).check();
 	await page.getByRole('radio', { name: /^OR/ }).check();
 	await page.getByRole('button', { name: 'Search', exact: true }).click();
 
 	await expect(page).toHaveURL(/attr_op=or/);
-	await expect(page.locator('pre')).toContainText('minimum_should_match');
 });
 
 test('collection multi-select: checked float to the top, label truncates at two', async ({
@@ -176,7 +167,7 @@ test('collection multi-select: checked float to the top, label truncates at two'
 	);
 
 	await page.getByRole('button', { name: 'Search', exact: true }).click();
-	await expect(page.locator('pre')).toContainText('"terms"');
+	await expect(page).toHaveURL(/prefix=MSB%3AMamm&prefix=MSB%3APara&prefix=MSB%3ABird/);
 });
 
 test('Clear empties the collection selection', async ({ page }) => {

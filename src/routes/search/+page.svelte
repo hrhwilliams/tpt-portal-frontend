@@ -48,6 +48,11 @@
 	const stateOptions = $derived(opts(data.schema.states));
 	const searchUrl = $derived(resolve(`/search?${toParams(q).toString()}`));
 
+	// The service decides which fields come back, so the table follows it.
+	const columns = $derived(data.hits?.length ? Object.keys(data.hits[0]) : []);
+	const cell = (v: unknown) =>
+		v == null ? '' : typeof v === 'object' ? JSON.stringify(v) : String(v);
+
 	function submit(e: SubmitEvent) {
 		e.preventDefault();
 		q.page = 1; // changing a filter resets paging
@@ -205,18 +210,36 @@
 	</div>
 {/if}
 
-{#if data.translation}
+{#if data.hits}
 	<div class="panel">
-		<h2>Query sent to Elasticsearch</h2>
-		<p class="note">
-			No backend exists yet, so the search stops here. This is the body the Rust service would send.
-		</p>
-		{#if data.translation.notes.length}
-			<ul class="notes">
-				{#each data.translation.notes as n (n)}<li>{n}</li>{/each}
-			</ul>
+		<h2>
+			{data.total.toLocaleString()}{data.totalIsLowerBound ? '+' : ''} result{data.total === 1
+				? ''
+				: 's'}
+			{#if data.hits.length < data.total}
+				<span class="muted">— showing {data.hits.length.toLocaleString()}</span>
+			{/if}
+		</h2>
+		{#if data.hits.length}
+			<!-- ponytail: columns are whatever the service returns. Spec 05's real
+			     table — chosen columns, expandable events, "10,000+" — replaces this. -->
+			<div class="scroll">
+				<table>
+					<thead>
+						<tr
+							>{#each columns as c (c)}<th>{c}</th>{/each}</tr
+						>
+					</thead>
+					<tbody>
+						{#each data.hits as hit, i (i)}
+							<tr
+								>{#each columns as c (c)}<td>{cell(hit[c])}</td>{/each}</tr
+							>
+						{/each}
+					</tbody>
+				</table>
+			</div>
 		{/if}
-		<pre>{JSON.stringify(data.translation.body, null, 2)}</pre>
 	</div>
 {:else if data.submitted && !data.errors.length}
 	<div class="panel">
@@ -305,21 +328,28 @@
 	.errors {
 		border-color: #b4544a;
 	}
-	.notes {
-		font-size: 0.8rem;
+	.muted {
+		font-weight: 400;
 		color: var(--muted);
-		max-width: 88ch;
 	}
-	.notes li {
-		margin-bottom: 0.25rem;
-	}
-	pre {
+	.scroll {
 		overflow-x: auto;
-		background: var(--bg);
+	}
+	table {
+		border-collapse: collapse;
+		font-size: 0.8rem;
+		white-space: nowrap;
+	}
+	th,
+	td {
 		border: 1px solid var(--line);
-		border-radius: 6px;
-		padding: 0.7rem;
-		font-size: 0.78rem;
-		line-height: 1.4;
+		padding: 0.25rem 0.5rem;
+		text-align: left;
+		max-width: 40ch;
+		overflow: hidden;
+		text-overflow: ellipsis;
+	}
+	th {
+		background: var(--bg);
 	}
 </style>

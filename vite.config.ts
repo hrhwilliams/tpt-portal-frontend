@@ -3,6 +3,8 @@ import { sveltekit } from '@sveltejs/kit/vite';
 import { defineConfig } from 'vite';
 
 export default defineConfig({
+	define: { __API_BASE__: JSON.stringify('http://localhost:2334') },
+
 	plugins: [
 		sveltekit({
 			compilerOptions: {
