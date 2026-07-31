@@ -1,42 +1,23 @@
-# sv
+# TPT specimen search portal — frontend
 
-Everything you need to build a Svelte project, powered by [`sv`](https://github.com/sveltejs/cli).
-
-## Creating a project
-
-If you're seeing this, you've probably already done this step. Congrats!
+Public search over natural history specimen records from Arctos. SvelteKit,
+statically hosted, talking to a Rust + Elasticsearch service that does not exist
+yet.
 
 ```sh
-# create a new project
-npx sv create my-app
+npm install
+npm run dev        # http://localhost:5173
+npm run verify     # asserts the URL -> Elasticsearch translation
 ```
 
-To recreate this project with the same configuration:
+A search currently stops at the query it would send and renders it — there is no
+backend to answer it.
 
-```sh
-# recreate this project
-bun x sv@0.16.6 create --template minimal --types ts --add prettier eslint --install bun tpt-portal-frontend
-```
+## Docs
 
-## Developing
-
-Once you've created a project and installed dependencies with `npm install` (or `pnpm install` or `yarn`), start a development server:
-
-```sh
-npm run dev
-
-# or start the server and open the app in a new browser tab
-npm run dev -- --open
-```
-
-## Building
-
-To create a production version of your app:
-
-```sh
-npm run build
-```
-
-You can preview the production build with `npm run preview`.
-
-> To deploy your app, you may need to install an [adapter](https://svelte.dev/docs/kit/adapters) for your target environment.
+| | |
+|---|---|
+| [docs/DESIGN.md](docs/DESIGN.md) | What is being built and why. Start here |
+| [docs/BUILD.md](docs/BUILD.md) | How to run it, what a fixture is, what to do next |
+| [docs/specs/](docs/specs/) | Detail: mapping, API contracts, the data validation behind both |
+| [tools/README.md](tools/README.md) | Profilers and the fixture generator |

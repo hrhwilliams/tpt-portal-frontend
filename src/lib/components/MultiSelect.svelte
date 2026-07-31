@@ -155,6 +155,8 @@
 		max-height: 16rem;
 		display: flex;
 		flex-direction: column;
+		/* wider than the trigger so long labels and the filter box aren't cramped */
+		min-width: max(100%, 18rem);
 	}
 	.filter {
 		width: 100%;
@@ -169,8 +171,9 @@
 	ul {
 		list-style: none;
 		margin: 0;
-		padding: 0;
+		padding: 0 0.4rem 0 0; /* keeps the scrollbar off the counts */
 		overflow-y: auto;
+		scrollbar-gutter: stable;
 	}
 	/* `.ms` is load-bearing: Svelte 5 scopes with :where(), so a bare `li label`
 	   ties with the global `form label` and loses to it. */

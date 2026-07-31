@@ -40,6 +40,9 @@
 			--accent-soft: #26364a;
 		}
 	}
+	:global(*, *::before, *::after) {
+		box-sizing: border-box;
+	}
 	:global(body) {
 		margin: 0;
 		background: var(--bg);
