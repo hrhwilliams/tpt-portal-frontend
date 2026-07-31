@@ -278,7 +278,7 @@ function check(name: string, ok: boolean, detail = '') {
 	const should = f.find((c: any) => c.bool?.should);
 	check(
 		'collection filter is a sibling of the taxon block, not inside it',
-		!!f.find((c: any) => c.term?.guid_prefix === 'MSB:Mamm') &&
+		!!f.find((c: any) => c.terms?.guid_prefix?.[0] === 'MSB:Mamm') &&
 			!json(should).includes('guid_prefix'),
 		json(f)
 	);
@@ -315,12 +315,12 @@ function check(name: string, ok: boolean, detail = '') {
 	);
 }
 
-// 26 — one collection still emits the cheaper term
+// 26 — one collection emits the same `terms` shape as several
 {
 	const b = body('prefix=MSB:Para');
 	check(
-		'a single collection uses term, not terms',
-		!!b.query.bool.filter[0].term?.guid_prefix && !json(b.query).includes('"terms"'),
+		'a single collection is a one-element terms clause, not a term',
+		b.query.bool.filter[0].terms?.guid_prefix?.length === 1 && !json(b.query).includes('"term"'),
 		json(b.query)
 	);
 }
@@ -413,8 +413,8 @@ function check(name: string, ok: boolean, detail = '') {
 	const c = f.find((x: any) => x.terms?.country);
 	check('two countries become one terms clause', !!c && c.terms.country.length === 2, json(f));
 	check(
-		'  a single state still uses term',
-		!!f.find((x: any) => x.term?.state_prov === 'Alaska'),
+		'  and a single state uses the same terms shape',
+		!!f.find((x: any) => x.terms?.state_prov?.[0] === 'Alaska'),
 		json(f)
 	);
 }

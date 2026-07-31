@@ -201,12 +201,10 @@ export function translate(q: SearchQuery, schema: Schema): Translation {
 	const prefixes = q.guid_prefixes.filter(Boolean);
 	if (prefixes.length) {
 		// `guid_prefix` is an exact keyword, so `terms` is the OR — cheaper than a
-		// `should` of `term`s and it needs no analysis.
-		filter.push(
-			prefixes.length === 1
-				? { term: { guid_prefix: prefixes[0] } }
-				: { terms: { guid_prefix: prefixes } }
-		);
+		// `should` of `term`s and it needs no analysis. One value or several, it
+		// stays `terms`: a single clause shape is one less thing to reason about,
+		// and ES treats a one-element `terms` identically to a `term`.
+		filter.push({ terms: { guid_prefix: prefixes } });
 		if (prefixes.length > 1) {
 			notes.push(`${prefixes.length} collections are OR-combined into one \`terms\` clause.`);
 		}
@@ -226,7 +224,7 @@ export function translate(q: SearchQuery, schema: Schema): Translation {
 	] as const) {
 		const v = values.filter(Boolean);
 		if (v.length) {
-			filter.push(v.length === 1 ? { term: { [field]: v[0] } } : { terms: { [field]: v } });
+			filter.push({ terms: { [field]: v } });
 		}
 	}
 	if (q.collector_id) filter.push({ term: { collector_ids: q.collector_id } });
