@@ -13,6 +13,8 @@ import {
  *
  *   taxon=species|Myodes gapperi
  *   taxon=species|Myodes rutilus     -> OR
+ *   taxon=genus|Sorex|parasite of; host of parasite
+ *                                    -> the row's relationships, OR within the row
  *   attr=examined for|ectoparasite
  *   attr=!detected|ectoparasite      -> `!` negates
  *   attr_op=or                       -> absent means AND
@@ -28,12 +30,30 @@ function splitOnce(s: string): [string, string] | null {
 	return [s.slice(0, i).trim(), s.slice(i + 1).trim()];
 }
 
+/**
+ * `rank|name` or `rank|name|relation; relation`.
+ *
+ * Rank comes off the FIRST `|` and relations off the LAST, because the name is
+ * the only free-text field of the three. A name that itself contains a `|` and
+ * carries no relations loses its tail to the relations slot — theoretical, and
+ * the value simply matches no relationship.
+ */
 function decodeTaxon(raw: string): TaxonPair | null {
 	const parts = splitOnce(raw);
 	if (!parts) return null;
-	const [rank, name] = parts;
+	const [rank, rest] = parts;
+	const cut = rest.lastIndexOf('|');
+	const name = cut < 0 ? rest : rest.slice(0, cut).trim();
 	if (!name) return null;
-	return { rank, name };
+	const relations =
+		cut < 0
+			? []
+			: rest
+					.slice(cut + 1)
+					.split(';')
+					.map((r) => r.trim())
+					.filter(Boolean);
+	return { rank, name, relations };
 }
 
 function decodeAttr(raw: string): AttributePair | null {
@@ -63,7 +83,9 @@ export function toParams(q: SearchQuery): URLSearchParams {
 		if (v && v.trim()) p.set(k, v.trim());
 	};
 	for (const t of q.taxa) {
-		if (t.name) p.append('taxon', `${t.rank}|${t.name}`);
+		if (!t.name) continue;
+		const rel = t.relations.filter(Boolean);
+		p.append('taxon', `${t.rank}|${t.name}${rel.length ? `|${rel.join('; ')}` : ''}`);
 	}
 	for (const a of q.attributes) {
 		if (!a.type) continue;
@@ -86,7 +108,6 @@ export function toParams(q: SearchQuery): URLSearchParams {
 	put('to', q.collected_to);
 	put('collector', q.collector_id);
 	if (q.page > 1) p.set('page', String(q.page));
-	if (q.per_page !== 50) p.set('per_page', String(q.per_page));
 	if (q.sort !== 'guid_asc') p.set('sort', q.sort);
 	return p;
 }
@@ -103,7 +124,7 @@ export function fromParams(p: URLSearchParams): SearchQuery {
 	if (!taxa.length) {
 		const legacyName = p.get('taxon');
 		if (legacyName && !legacyName.includes('|')) {
-			taxa.push({ rank: p.get('rank') ?? '', name: legacyName });
+			taxa.push({ rank: p.get('rank') ?? '', name: legacyName, relations: [] });
 		}
 	}
 
@@ -124,7 +145,6 @@ export function fromParams(p: URLSearchParams): SearchQuery {
 		collected_to: p.get('to') ?? '',
 		collector_id: p.get('collector') ?? '',
 		page: Math.max(1, Number(p.get('page') ?? 1) || 1),
-		per_page: Number(p.get('per_page') ?? 50) || 50,
 		sort: p.get('sort') ?? 'guid_asc'
 	};
 	// a hand-edited link could carry both; the form cannot produce it
@@ -151,16 +171,11 @@ export function isEmpty(q: SearchQuery): boolean {
 }
 
 /** Client-side mirror of the API's validation. The backend stays authoritative. */
-export function validate(q: SearchQuery, maxWindow = 10000, maxPerPage = 200): string[] {
+export function validate(q: SearchQuery): string[] {
 	const errors: string[] = [];
 	if (isEmpty(q)) errors.push('Enter at least one filter — an unconstrained search is refused.');
 	if (q.collected_from && q.collected_to && q.collected_from > q.collected_to)
 		errors.push('Collection date range starts after it ends.');
-	if (q.per_page > maxPerPage) errors.push(`Page size is capped at ${maxPerPage}.`);
-	if ((q.page - 1) * q.per_page + q.per_page > maxWindow)
-		errors.push(
-			`Only the first ${maxWindow.toLocaleString()} results can be browsed. Narrow the search, or export.`
-		);
 	for (const t of q.taxa) {
 		if (t.name && !t.rank) errors.push(`Taxon "${t.name}" has no rank.`);
 	}

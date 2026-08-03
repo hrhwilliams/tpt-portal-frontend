@@ -80,6 +80,7 @@
 						<input
 							id="attr-value-{i}"
 							type="text"
+							autocomplete="off"
 							value={row.values[0] ?? ''}
 							oninput={(e) => (row.values = [e.currentTarget.value])}
 							disabled={!row.type}

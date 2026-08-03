@@ -24,20 +24,20 @@
 	<li>
 		<a
 			href={resolve(
-				'/search?taxon=species%7CMyodes+gapperi&taxon=species%7CMyodes+rutilus&attr=examined+for%7Cectoparasite&attr=detected%7Cectoparasite&state=Alaska&from=2024-01-01&to=2026-12-31'
+				'/search?taxon=species%7CMyodes+gapperi&taxon=species%7CMyodes+rutilus&attr=examined+for%7Cectoparasite&attr=detected%7Cectoparasite&state=Alaska&from=1990-01-01&to=2026-12-31'
 			)}
 		>
-			Either <em>Myodes</em> species, examined for and positive for ectoparasites, Alaska 2024–2026
+			Either <em>Myodes</em> species, examined for and positive for ectoparasites, Alaska 1990–2026
 		</a>
 		— all three blocks at once: an OR of taxa, an AND of attributes, and a scope.
 	</li>
 	<li>
 		<a
 			href={resolve(
-				'/search?taxon=genus%7CSorex&locality=Isle+Royale+National+Park&from=1994-01-01&to=1994-12-31&attr=detected%7Cvirus%3A+Orthohantavirus&method=immunoblot'
+				'/search?taxon=genus%7CSorex&from=1994-01-01&to=1994-12-31&attr=detected%7Cvirus%3A+Orthohantavirus&method=immunoblot'
 			)}
 		>
-			Genus <em>Sorex</em>, Isle Royale, 1994, hantavirus detected by immunoblot
+			Genus <em>Sorex</em>, 1994, hantavirus detected by immunoblot
 		</a>
 		— one attribute row with a method, so it compiles to a correlated nested clause.
 	</li>

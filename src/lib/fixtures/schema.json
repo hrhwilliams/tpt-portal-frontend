@@ -7063,6 +7063,100 @@
 			"count": 1
 		}
 	],
+	"relations": [
+		{
+			"value": "associated with",
+			"description": "The cataloged item was or is physically in contact with, or has a shared connection to, the related cataloged item. Reciprocal relationship is \"associated with\"."
+		},
+		{
+			"value": "ate",
+			"description": "Refers to a cataloged item that was eaten by the organism in the current record. Reciprocal relationship is \"eaten by.\""
+		},
+		{
+			"value": "collected with",
+			"description": "Refers to a cataloged item that was collected in the field with the organism in the current record, but only when the relationship between individuals is unclear. Do not use if the relationship (e.g., mate of, littermate of, offspring of, parasite of, etc.) is known. Do not use for split lots of individuals of the same taxon, use \"same lot as\". Reciprocal relationship is \"collected with.\""
+		},
+		{
+			"value": "depicted as",
+			"description": "The cataloged object is shown or represented by the cataloged object with the related identifier. Reciprocal relationship is depiction of."
+		},
+		{
+			"value": "depiction of",
+			"description": "The cataloged object shows or represents the object represented by the related identifier. Reciprocal relationship is depicted as."
+		},
+		{
+			"value": "eaten by",
+			"description": "Refers to a cataloged item that ingested the organism in the current record. Reciprocal relationship is \"ate.\""
+		},
+		{
+			"value": "host of parasite",
+			"description": "Refers to a record that was a parasite of the organism in the current record. Reciprocal relationship is \"parasite of.\""
+		},
+		{
+			"value": "host of symbiont",
+			"description": "References a biotic interaction in which an organism is used by another organism as a habitat (typically the physically larger of the two organisms). The association may be amensal, commensal, mutualistic, parasitic, etc.; if the symbiotic relationship is parasitic, please use \"host of\". Reciprocal relationship of this term is \"symbiont of\"."
+		},
+		{
+			"value": "in amplexus with",
+			"description": "Refers to a cataloged item that was (presumably found at time of collection) in amplexus with the organism in the current record. No implications of reproduction are intended. Reciprocal relationship is \"in amplexus with.\""
+		},
+		{
+			"value": "in same matrix as",
+			"description": "Specimens which are embedded in the same mass of rock and cannot be physically separated without additional preparation."
+		},
+		{
+			"value": "littermate or nestmate of",
+			"description": "Refers to a cataloged item that was a littermate or nestmate of the organism in the current record. No indication of relatedness is intended; use \"sibling\" if that is known. This is suitable for all individuals found in a nest (including e.g., nest parasites) or in an apparent but unconfirmed litter or family group. Reciprocal relationship is \"littermate or nestmate of.\""
+		},
+		{
+			"value": "mate of",
+			"description": "Refers to a cataloged item that was a mate of the organism in the current record. Reproduction is implied. Reciprocal relationship is \"mate of.\""
+		},
+		{
+			"value": "mounted with",
+			"description": "Refers to a cataloged item that is physically associated with the specified object through preparation in such a way that they cannot be easily separated (a loan of one object, requires a loan of all associated objects). Examples include two taxidermy mounts on a single base, two different parasites on a single slide, or two cataloged items mounted on a on a single herbarium sheet."
+		},
+		{
+			"value": "offspring of",
+			"description": "Refers to a cataloged item that is the biological parent of the organism in the current record. (Such offspring may often be embryos.) Reciprocal relationship is \"parent of.\""
+		},
+		{
+			"value": "parasite of",
+			"description": "Refers to a cataloged item that was the host of the organism in the current record. (The current record is a parasite.) Reciprocal relationship is \"host of.\""
+		},
+		{
+			"value": "parent of",
+			"description": "Refers to a cataloged item that is the biological offspring of the organism in the current record. Reciprocal relationship is \"offspring of.\""
+		},
+		{
+			"value": "same edition as",
+			"description": "Groups of multiples of one work issued together, such as of a book, print, photograph, or cast sculpture. All copies of a book, print, etc., produced from substantially the same master, and issued at one time are part of the same edition."
+		},
+		{
+			"value": "same individual as",
+			"description": "Refers to a cataloged item that is the same biological individual specimen or individual cultural object as described in the current record. For example, when parts and tissues are cataloged by separate institutions or when two individually cataloged items are refit following conservation treatment. Reciprocal relationship is \"same individual as.\""
+		},
+		{
+			"value": "same lot as",
+			"description": "Refers to a cataloged item that originally shared the same lot( individuals of the same taxon sharing the same collecting event) as the organism in the current record. Reciprocal relationship is \"same lot as\". Also Groupings into which items are divided to be sold or for another purpose."
+		},
+		{
+			"value": "same series as",
+			"description": "A conceptual grouping of visual arts works, literary works, or performance art created in succession by the same author, artist, or studio and intended by the creator(s) to be seen together or in succession as a cycle of works. Works in a series typically share the same or related subjects, the same or similar media, or other characteristics, but their defining characteristic is that they were intended to be conceptually related as a series. Individual items in a series may be cataloged separately and linked to the series."
+		},
+		{
+			"value": "self",
+			"description": "Refers primarily to the current cataloged item. GenBank numbers referencing sequences of this individual or collector numbers referring to events leading to this specimen belong here. No reciprocal."
+		},
+		{
+			"value": "sibling of",
+			"description": "Refers to a cataloged item that is the biological sibling of the organism in the current record. Reciprocal relationship is \"sibling of.\""
+		},
+		{
+			"value": "symbiont of",
+			"description": "References a biotic interaction in which an organism uses another organism as a habitat. The association may be amensal, commensal, mutualistic, parasitic, etc.; if the symbiotic relationship is parasitic, please use \"parasite of\". Reciprocal relationship of this term is \"host of symbiont\"."
+		}
+	],
 	"sorts": [
 		{
 			"id": "guid_asc",

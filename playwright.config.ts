@@ -4,7 +4,7 @@ export default defineConfig({
 	testDir: 'e2e',
 	use: { baseURL: 'http://localhost:5173' },
 	webServer: {
-		command: 'npm run dev -- --port 5173',
+		command: 'bun run dev -- --port 5173',
 		port: 5173,
 		reuseExistingServer: true
 	}

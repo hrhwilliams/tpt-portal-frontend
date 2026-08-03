@@ -31,6 +31,58 @@ test('add / remove rows, and the row count survives submit', async ({ page }) =>
 	await expect(page.getByLabel('Remove this taxon')).toHaveCount(1);
 });
 
+test('live search: an edit reaches the URL with no Search click, and typing survives it', async ({
+	page
+}) => {
+	await open(page);
+
+	await page.getByRole('button', { name: '+ Add taxon' }).click();
+	await page.getByLabel('Rank').selectOption('genus');
+	await page.getByLabel('Name').fill('Sorex');
+	await expect(page).toHaveURL(/taxon=genus%7CSorex/);
+
+	// the navigation the first edit triggered must not overwrite a later one
+	await page.getByLabel('Name').fill('Sorex cinereus');
+	await expect(page).toHaveURL(/taxon=genus%7CSorex\+cinereus/);
+	await expect(page.getByLabel('Name')).toHaveValue('Sorex cinereus');
+});
+
+test('a taxon row carries its own relationships', async ({ page }) => {
+	await open(page);
+
+	await page.getByRole('button', { name: '+ Add taxon' }).click();
+	await page.getByLabel('Rank').selectOption('genus');
+	await page.getByLabel('Name').fill('Sorex');
+
+	await page.getByRole('button', { name: 'Any relationship' }).click();
+	await page.getByRole('checkbox', { name: 'parasite of', exact: true }).check();
+	await page.getByRole('checkbox', { name: 'host of parasite' }).check();
+	await page.keyboard.press('Escape');
+
+	// third field on the row's own param, so rows cannot misalign
+	await expect(page).toHaveURL(/taxon=genus%7CSorex%7Cparasite\+of%3B\+host\+of\+parasite/);
+
+	// and a pasted link puts them back in the row
+	await open(page, '/search?taxon=genus%7CSorex%7Cate');
+	await expect(page.locator('[aria-controls="taxon-relations-0-list"] .label')).toHaveText('ate');
+});
+
+test('paging: Next advances the page, and editing a filter returns to page 1', async ({ page }) => {
+	await open(page, '/search?taxon=genus%7CSorex');
+
+	const firstRow = page.locator('tbody tr').first();
+	const rowOnPageOne = await firstRow.textContent();
+
+	await page.getByRole('button', { name: 'Next' }).click();
+	await expect(page).toHaveURL(/page=2/);
+	await expect(firstRow).not.toHaveText(rowOnPageOne ?? '');
+
+	// a different result set makes the old page number meaningless
+	await page.getByLabel('Name').fill('Peromyscus');
+	await expect(page).toHaveURL(/taxon=genus%7CPeromyscus/);
+	await expect(page).not.toHaveURL(/page=/);
+});
+
 test('a composed search reaches the URL and the query', async ({ page }) => {
 	await open(page);
 

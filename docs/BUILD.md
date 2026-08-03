@@ -78,27 +78,21 @@ whatever the service sent. Spec 05's table replaces it:
 - "no locality recorded" for eventless records, so missing reads differently
   from not-matching.
 
-### 2. Pagination
-
-`from`/`size`, capped so `from + size <= 10000`. Page number lives in the URL and
-is already in `SearchQuery`. Changing a filter resets to page 1 (already handled
-in `submit`); changing the page preserves everything else.
-
-### 3. CSV export (spec 05)
+### 2. CSV export (spec 05)
 
 Client-side from the current page is a two-hour job and useful immediately.
 The real thing streams from the backend with PIT + `search_after` — do not build
 that here. The one invariant worth a check: every `matched_*` column has the same
 element count on every row, including empties.
 
-### 4. The Rust service
+### 3. The Rust service
 
 **`axum::extract::Query` will silently drop repeated params.** The URL grammar
 repeats `taxon`, `attr` and `prefix`; `serde_urlencoded` keeps only the last of
 each. Use `serde_qs` or `axum_extra::extract::Query`. This matters for
 `GET /api/export`, which takes search params in the URL.
 
-### 5. Adapter swap
+### 4. Adapter swap
 
 `svelte-adapter-bun` contradicts the chosen topology (static hosting, no server
 runtime). Replace with `@sveltejs/adapter-static` and `fallback: '200.html'`, so
@@ -108,7 +102,14 @@ a shared query URL does not 404 on first load. Note the config lives in
 ## Conventions worth not relitigating
 
 **The URL is the state.** No store drives a search. Inputs write to a local
-buffer, submit is a `goto`, and `load` reads the URL. Param names are a public
+buffer, and `load` reads the URL. Search is live: an edit triggers a debounced
+(500 ms) `goto` with `replaceState`, so results follow typing without filling the
+history. The Search button does the same thing immediately.
+
+**The service owns the page size.** There is no `per_page` — it takes `page` and
+returns a fixed 100, which the pager hardcodes as `PAGE_SIZE`. Change both
+together. Page depth is not validated client-side for the same reason; the
+service answers `page_too_deep`. Param names are a public
 API the moment someone pastes a link into a paper — renaming one breaks published
 citations. Legacy `?rank=&taxon=` still parses for that reason.
 

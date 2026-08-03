@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { untrack } from 'svelte';
 	import { goto } from '$app/navigation';
+	import { navigating, page } from '$app/state';
 	import { resolve } from '$app/paths';
 	import AttributeRows from '$lib/components/AttributeRows.svelte';
 	import MultiSelect from '$lib/components/MultiSelect.svelte';
@@ -25,9 +26,43 @@
 		hasNegatedRow(s) || s.attr_op === 'or' || s.method.trim() !== '';
 	let advanced = $state(untrack(() => usesAdvanced(data.query)));
 
+	// Adopt the URL's query on navigation — but only when it actually differs from
+	// what is typed. Live search navigates while the user keeps typing, and a slow
+	// backend means the response lands several keystrokes later; overwriting
+	// unconditionally would swallow them.
 	$effect(() => {
+		const incoming = toParams(data.query).toString();
+		if (incoming === untrack(() => toParams(q).toString())) return;
 		q = structuredClone(data.query);
 		advanced = usesAdvanced(data.query);
+	});
+
+	// Live search: an edit navigates and `load` fetches. Debounced — typing a
+	// locality would otherwise be one Elasticsearch query per keystroke, against a
+	// 30 req/min per-IP limit. `replaceState` keeps the back button on whole
+	// searches instead of every intermediate keystroke.
+	/** Everything except the page number — what actually defines the result set. */
+	const filters = (p: URLSearchParams) =>
+		[...p]
+			.filter(([k]) => k !== 'page')
+			.map((pair) => pair.join('='))
+			.join('&');
+
+	$effect(() => {
+		const params = toParams(q);
+		if (params.toString() === page.url.searchParams.toString()) return;
+		// Page 7 of the old search is not page 7 of the new one, so an edit to any
+		// filter returns to the first page.
+		const filtersChanged = filters(params) !== filters(page.url.searchParams);
+		const timer = setTimeout(() => {
+			if (filtersChanged) q.page = 1;
+			goto(resolve(`/search?${toParams(q).toString()}`), {
+				replaceState: true,
+				keepFocus: true,
+				noScroll: true
+			});
+		}, 500);
+		return () => clearTimeout(timer);
 	});
 
 	/** Hidden inputs must not keep filtering. Switching off discards them. */
@@ -47,11 +82,25 @@
 	const countryOptions = $derived(opts(data.schema.countries));
 	const stateOptions = $derived(opts(data.schema.states));
 	const searchUrl = $derived(resolve(`/search?${toParams(q).toString()}`));
+	const searching = $derived(navigating.to !== null);
 
 	// The service decides which fields come back, so the table follows it.
 	const columns = $derived(data.hits?.length ? Object.keys(data.hits[0]) : []);
 	const cell = (v: unknown) =>
 		v == null ? '' : typeof v === 'object' ? JSON.stringify(v) : String(v);
+
+	// Same params as the search that produced the table, so the file matches what
+	// is on screen.
+	const csvUrl = $derived(`${__API_BASE__}/api/search?${page.url.searchParams}&format=csv`);
+
+	/** The service fixes the page size and takes no `per_page`. */
+	const PAGE_SIZE = 100;
+	const lastPage = $derived(Math.ceil(data.total / PAGE_SIZE));
+
+	function goPage(n: number) {
+		q.page = n;
+		goto(resolve(`/search?${toParams(q).toString()}`));
+	}
 
 	function submit(e: SubmitEvent) {
 		e.preventDefault();
@@ -68,16 +117,21 @@
 
 <h1>Search specimens</h1>
 <p class="snapshot">
-	Data current as of {data.schema.snapshot_date}. This is a snapshot, not a live view of Arctos.
+	Data current as of {data.schema.snapshot_date}.
 </p>
 
 <form onsubmit={submit}>
 	<fieldset>
-		<legend>1 · Record search</legend>
+		<legend>Search by taxonomy</legend>
 		<TaxonRows bind:rows={q.taxa} schema={data.schema} />
-		<p class="note">
+		<!-- <p class="note">
 			Suggestions come from the current snapshot. A name that is not listed can still be searched
 			for.
+		</p> -->
+		<p class="note">
+			A relationship is the record's own side of the link: <em>parasite of</em> finds the parasites,
+			<em>host of parasite</em> finds their hosts. Several on one row
+			<strong>OR</strong> together.
 		</p>
 	</fieldset>
 
@@ -98,24 +152,26 @@
 		{#if advanced}
 			<label class="method">
 				<span class="lbl">Method contains</span>
-				<input type="text" bind:value={q.method} disabled={negated} placeholder="e.g. immunoblot" />
+				<input
+					type="text"
+					bind:value={q.method}
+					disabled={negated}
+					autocomplete="off"
+					placeholder="e.g. immunoblot"
+				/>
 			</label>
 			{#if negated}
 				<p class="note warn">
-					Method is unavailable while a row is negated. “No <em>detected</em> row
-					<em>by this method</em>” would still match a specimen whose positive was found another
-					way.
+					Method is unavailable while a row is negated. &ldquo;No <em>detected</em> row
+					<em>by this method</em>&rdquo; would still match a specimen whose positive was found
+					another way.
 				</p>
 			{:else}
-				<p class="note">
-					Method is recorded as prose, not from a controlled list, so matching is approximate —
-					<code>comb</code> will not find <code>combed</code>. Much of the corpus predates method
-					recording and carries none at all. The condition applies to every attribute row above.
-				</p>
+				<p class="note">Method is recorded as prose, so matching is approximate.</p>
 			{/if}
 		{/if}
 
-		<p class="note honesty">
+		<!-- <p class="note honesty">
 			Results reflect what was recorded. A specimen with no result row is <strong>not</strong> a
 			negative — it may have been examined with the outcome unrecorded, or never examined.
 			<em>Not detected</em> returns only explicitly recorded negatives.
@@ -126,7 +182,7 @@
 			>
 				Arctos guidance on examined/detected data
 			</a>
-		</p>
+		</p> -->
 	</fieldset>
 
 	<fieldset>
@@ -144,7 +200,12 @@
 			</div>
 			<label>
 				<span class="lbl">Locality</span>
-				<input type="text" bind:value={q.locality} placeholder="e.g. Isle Royale National Park" />
+				<input
+					type="text"
+					bind:value={q.locality}
+					autocomplete="off"
+					placeholder="Any locality string"
+				/>
 			</label>
 			<div class="field">
 				<span class="lbl">Country</span>
@@ -166,14 +227,15 @@
 					filterPlaceholder="Type to filter {data.schema.states.length} states…"
 				/>
 			</div>
-			<label>
+			<!-- <label>
 				<span class="lbl">Collector (Arctos agent URL)</span>
 				<input
 					type="text"
+					autocomplete="off"
 					bind:value={q.collector_id}
 					placeholder="https://arctos…/agent/1010760"
 				/>
-			</label>
+			</label> -->
 			<label>
 				<span class="lbl">Collected from</span>
 				<input type="date" bind:value={q.collected_from} />
@@ -183,7 +245,7 @@
 				<input type="date" bind:value={q.collected_to} />
 			</label>
 		</div>
-		<p class="note">
+		<!-- <p class="note">
 			Values within one dropdown <strong>OR</strong> together; separate filters
 			<strong>AND</strong>. Locality matches whole place names, and applies together with the date
 			to the
@@ -191,7 +253,7 @@
 			are not tied to that event — a specimen collected in two countries can match a country-A
 			search with a date from its country-B visit. Some collection dates record only a year or a
 			month; a year-only date is read as 1 January, so a mid-year range will not match it.
-		</p>
+		</p> -->
 	</fieldset>
 
 	<div class="actions">
@@ -211,15 +273,40 @@
 {/if}
 
 {#if data.hits}
-	<div class="panel">
-		<h2>
-			{data.total.toLocaleString()}{data.totalIsLowerBound ? '+' : ''} result{data.total === 1
-				? ''
-				: 's'}
-			{#if data.hits.length < data.total}
-				<span class="muted">— showing {data.hits.length.toLocaleString()}</span>
+	<!-- dimmed while a newer search is in flight, so stale rows do not read as live -->
+	<div class="panel" class:stale={searching}>
+		<div class="head">
+			<h2>
+				{data.total.toLocaleString()}{data.totalIsLowerBound ? '+' : ''} result{data.total === 1
+					? ''
+					: 's'}
+				{#if data.hits.length}
+					<!-- The API origin, not a route, so `resolve()` does not apply. The service
+					     sends Content-Disposition: attachment, so a plain link downloads. -->
+					<!-- eslint-disable-next-line svelte/no-navigation-without-resolve -->
+					<a class="csv" href={csvUrl}>Export as CSV</a>
+				{/if}
+			</h2>
+			{#if lastPage > 1}
+				<nav class="pager">
+					<button
+						type="button"
+						disabled={data.query.page <= 1}
+						onclick={() => goPage(data.query.page - 1)}>← Previous</button
+					>
+					<span>
+						Page {data.query.page.toLocaleString()} of {lastPage.toLocaleString()}{data.totalIsLowerBound
+							? '+'
+							: ''}
+					</span>
+					<button
+						type="button"
+						disabled={data.query.page >= lastPage}
+						onclick={() => goPage(data.query.page + 1)}>Next →</button
+					>
+				</nav>
 			{/if}
-		</h2>
+		</div>
 		{#if data.hits.length}
 			<!-- ponytail: columns are whatever the service returns. Spec 05's real
 			     table — chosen columns, expandable events, "10,000+" — replaces this. -->
@@ -233,7 +320,13 @@
 					<tbody>
 						{#each data.hits as hit, i (i)}
 							<tr
-								>{#each columns as c (c)}<td>{cell(hit[c])}</td>{/each}</tr
+								>{#each columns as c (c)}<td
+										>{#if c === 'guid' && hit[c]}<a
+												href="https://arctos.database.museum/guid/{cell(hit[c])}"
+												target="_blank"
+												rel="noreferrer">{cell(hit[c])}</a
+											>{:else}{cell(hit[c])}{/if}</td
+									>{/each}</tr
 							>
 						{/each}
 					</tbody>
@@ -297,11 +390,6 @@
 	.note.warn {
 		color: #b4544a;
 	}
-	.honesty {
-		border-left: 3px solid var(--accent);
-		padding-left: 0.7rem;
-		margin-top: 0.9rem;
-	}
 	.actions {
 		display: flex;
 		gap: 0.6rem;
@@ -328,9 +416,26 @@
 	.errors {
 		border-color: #b4544a;
 	}
-	.muted {
+	.head {
+		display: flex;
+		justify-content: space-between;
+		align-items: baseline;
+		gap: 0.6rem;
+		flex-wrap: wrap;
+	}
+	.csv {
 		font-weight: 400;
-		color: var(--muted);
+		font-size: 0.85rem;
+		margin-left: 0.5rem;
+	}
+	.pager {
+		display: flex;
+		gap: 0.6rem;
+		align-items: center;
+		font-size: 0.85rem;
+	}
+	.stale {
+		opacity: 0.5;
 	}
 	.scroll {
 		overflow-x: auto;

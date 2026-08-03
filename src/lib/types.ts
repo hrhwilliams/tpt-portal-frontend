@@ -31,6 +31,8 @@ export type Schema = {
 	vocabularies: Record<string, VocabValue[]>;
 	countries: CountedValue[];
 	states: CountedValue[];
+	/** `relations.relationship` — how a record relates to another cataloged item */
+	relations: { value: string; description: string }[];
 	guid_prefixes: GuidPrefix[];
 	sorts: { id: string; label: string }[];
 	limits: { max_per_page: number; max_result_window: number; max_export_rows: number };
@@ -49,6 +51,10 @@ export type Taxon = {
 export type TaxonPair = {
 	rank: string;
 	name: string;
+	/** Relationships this record carries to another cataloged item. Empty = any.
+	 *  Several OR within the row; they are an extra condition on the record, not
+	 *  a statement about the related record's taxonomy. */
+	relations: string[];
 };
 
 /** One row of the attribute block. */
@@ -84,7 +90,6 @@ export type SearchQuery = {
 	collected_to: string;
 	collector_id: string;
 	page: number;
-	per_page: number;
 	sort: string;
 };
 
@@ -101,7 +106,6 @@ export const EMPTY_QUERY: SearchQuery = {
 	collected_to: '',
 	collector_id: '',
 	page: 1,
-	per_page: 50,
 	sort: 'guid_asc'
 };
 

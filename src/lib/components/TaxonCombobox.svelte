@@ -52,6 +52,7 @@
 	<input
 		{id}
 		type="text"
+		autocomplete="off"
 		bind:value
 		{onkeydown}
 		oninput={() => {

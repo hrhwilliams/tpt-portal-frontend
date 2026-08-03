@@ -191,6 +191,18 @@ def main():
         # no code table exists for either; both are aggregations in the real service
         "countries": profile.get("country") or [],
         "states": profile.get("state_prov") or [],
+        # `relations.relationship` in the mapping — how this record relates to
+        # another cataloged item. A code table, so it is complete here.
+        "relations": sorted(
+            (
+                {
+                    "value": r["id_references"],
+                    "description": (r.get("description") or "").strip(),
+                }
+                for r in (load_table("ctid_references") or [])
+            ),
+            key=lambda r: r["value"].lower(),
+        ),
         "sorts": [
             {"id": "guid_asc", "label": "Catalog number"},
             {"id": "date_desc", "label": "Newest collection date"},

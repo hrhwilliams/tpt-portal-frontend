@@ -67,6 +67,9 @@
 </script>
 
 <svelte:document onpointerdown={onDocPointerDown} />
+<!-- Escape closes from anywhere inside: focus sits on an option checkbox for most
+     of the panel's life, and a handler on the trigger never sees that key. -->
+<svelte:window onkeydown={(e) => open && e.key === 'Escape' && close()} />
 
 <div class="ms" bind:this={root}>
 	<button
@@ -75,7 +78,6 @@
 		aria-expanded={open}
 		aria-controls={`${id}-list`}
 		onclick={() => (open = !open)}
-		onkeydown={(e) => e.key === 'Escape' && close()}
 	>
 		<span class="label" class:placeholder={selected.length === 0}>{label}</span>
 		{#if selected.length > 1}<span class="badge">{selected.length}</span>{/if}
@@ -88,10 +90,10 @@
 				<input
 					type="text"
 					class="filter"
+					autocomplete="off"
 					bind:this={filterEl}
 					bind:value={filter}
 					placeholder={filterPlaceholder}
-					onkeydown={(e) => e.key === 'Escape' && close()}
 				/>
 				{#if selected.length}
 					<button type="button" class="clear" onclick={() => (selected = [])}>Clear all</button>

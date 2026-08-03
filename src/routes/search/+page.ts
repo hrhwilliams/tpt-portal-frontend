@@ -17,9 +17,7 @@ export const load: PageLoad = async ({ url, fetch }) => {
 	const schema = schemaFixture as Schema;
 	const query = fromParams(url.searchParams);
 	const submitted = url.searchParams.toString().length > 0;
-	const errors = submitted
-		? validate(query, schema.limits.max_result_window, schema.limits.max_per_page)
-		: [];
+	const errors = submitted ? validate(query) : [];
 
 	let hits: Record<string, unknown>[] | null = null;
 	let total = 0;
