@@ -7,6 +7,9 @@
 	let open = $state(false);
 	let active = $state(-1);
 
+	// every taxon row renders one of these, so the list id has to be per-instance
+	const listId = $derived(`${id ?? 'taxon'}-list`);
+
 	const all = taxa as Taxon[];
 
 	// Stands in for GET /api/taxa. Same contract: prefix match on the whole
@@ -59,16 +62,20 @@
 			open = true;
 			active = -1;
 		}}
-		onblur={() => setTimeout(() => (open = false), 120)}
+		onblur={(e) => {
+			// not a timeout race with the option's mousedown: closing only when focus
+			// actually left the combobox lets the click land on its own
+			if (!e.currentTarget.parentElement?.contains(e.relatedTarget as Node)) open = false;
+		}}
 		placeholder="e.g. Sorex"
 		role="combobox"
 		aria-expanded={open && matches.length > 0}
-		aria-controls="taxon-list"
+		aria-controls={listId}
 		aria-autocomplete="list"
 	/>
 
 	{#if open && matches.length}
-		<ul id="taxon-list" role="listbox">
+		<ul id={listId} role="listbox">
 			{#each matches as t, i (t.rank + t.name)}
 				<li role="option" aria-selected={i === active}>
 					<button
@@ -86,7 +93,7 @@
 			{/each}
 		</ul>
 	{:else if open && value.trim().length >= 2}
-		<ul id="taxon-list" role="listbox">
+		<ul id={listId} role="listbox">
 			<li class="none">No taxon matching that in this snapshot. You can still search for it.</li>
 		</ul>
 	{/if}
@@ -95,6 +102,10 @@
 <style>
 	.combo {
 		position: relative;
+	}
+	/* an input sizes itself to ~20 characters otherwise, whatever the field allows */
+	.combo input {
+		width: 100%;
 	}
 	ul {
 		position: absolute;

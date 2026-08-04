@@ -24,25 +24,29 @@
 </script>
 
 <div class="rows">
-	{#each rows as row, i (i)}
+	<!-- keyed by the row object, not `i`: an index key would hand a removed row's
+	     component instances (and their open dropdowns) to the row that survives it -->
+	{#each rows as row, i (row)}
 		{#if i > 0}<div class="op">OR</div>{/if}
 		<div class="row">
-			<!-- `for`/`id` rather than wrapping: a <label> around a <select> folds the
-			     option text into the accessible name. -->
-			<div class="field">
-				<label class="lbl" for="taxon-rank-{i}">Rank</label>
-				<select id="taxon-rank-{i}" bind:value={row.rank}>
-					<option value="">— choose —</option>
-					{#each schema.ranks as r (r.id)}
-						<option value={r.id}>{r.label}</option>
-					{/each}
-				</select>
+			<div class="pair">
+				<!-- `for`/`id` rather than wrapping: a <label> around a <select> folds the
+				     option text into the accessible name. -->
+				<div class="field rank">
+					<label class="lbl" for="taxon-rank-{i}">Rank</label>
+					<select id="taxon-rank-{i}" bind:value={row.rank}>
+						<option value="">— choose —</option>
+						{#each schema.ranks as r (r.id)}
+							<option value={r.id}>{r.label}</option>
+						{/each}
+					</select>
+				</div>
+				<div class="field name">
+					<label class="lbl" for="taxon-name-{i}">Name</label>
+					<TaxonCombobox id="taxon-name-{i}" bind:value={row.name} rank={row.rank} />
+				</div>
 			</div>
 			<div class="field grow">
-				<label class="lbl" for="taxon-name-{i}">Name</label>
-				<TaxonCombobox id="taxon-name-{i}" bind:value={row.name} rank={row.rank} />
-			</div>
-			<div class="field">
 				<span class="lbl">Related to another record as</span>
 				<MultiSelect
 					id="taxon-relations-{i}"
@@ -72,5 +76,26 @@
 	/* shared row/label/op styles are global — see +layout.svelte */
 	.note {
 		margin: 0;
+	}
+	/* rank + name are the row's left half, split 1:2; relationships (.grow) are the
+	   right half, less what the remove button takes */
+	.pair {
+		display: flex;
+		gap: 0.6rem;
+		align-items: flex-end;
+		flex: 1;
+		min-width: 0;
+	}
+	.rank {
+		flex: 1;
+		min-width: 0;
+	}
+	.name {
+		flex: 2;
+		min-width: 0;
+	}
+	/* a select sizes itself to its longest option otherwise */
+	.rank select {
+		width: 100%;
 	}
 </style>

@@ -37,7 +37,9 @@
 		</fieldset>
 	{/if}
 
-	{#each rows as row, i (i)}
+	<!-- keyed by the row object, not `i`: an index key would hand a removed row's
+	     component instances (and their open dropdowns) to the row that survives it -->
+	{#each rows as row, i (row)}
 		{@const def = typeDef(row.type)}
 		{@const vocab = vocabFor(row.type)}
 		{#if i > 0}<div class="op">{op.toUpperCase()}</div>{/if}

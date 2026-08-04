@@ -19,40 +19,21 @@ import {
  *   attr=!detected|ectoparasite      -> `!` negates
  *   attr_op=or                       -> absent means AND
  *
- * Split on the FIRST `|` only. Ranks and attribute types are controlled and
- * cannot contain one; free-text attribute values routinely do (`reproductive
- * data` uses `|` as its own internal separator), as do taxon names in theory.
+ * Each decoder below documents how it splits its own `|`s.
  */
-
-function splitOnce(s: string): [string, string] | null {
-	const i = s.indexOf('|');
-	if (i < 0) return null;
-	return [s.slice(0, i).trim(), s.slice(i + 1).trim()];
-}
 
 /**
- * `rank|name` or `rank|name|relation; relation`.
- *
- * Rank comes off the FIRST `|` and relations off the LAST, because the name is
- * the only free-text field of the three. A name that itself contains a `|` and
- * carries no relations loses its tail to the relations slot — theoretical, and
- * the value simply matches no relationship.
+ * `rank|name` or `rank|name|relation; relation`. Three controlled-ish fields, so
+ * a plain split: a taxon name containing a `|` is theoretical, and its tail would
+ * only land in the relations slot and match no relationship.
  */
 function decodeTaxon(raw: string): TaxonPair | null {
-	const parts = splitOnce(raw);
-	if (!parts) return null;
-	const [rank, rest] = parts;
-	const cut = rest.lastIndexOf('|');
-	const name = cut < 0 ? rest : rest.slice(0, cut).trim();
+	const [rank = '', name = '', rel = ''] = raw.split('|').map((s) => s.trim());
 	if (!name) return null;
-	const relations =
-		cut < 0
-			? []
-			: rest
-					.slice(cut + 1)
-					.split(';')
-					.map((r) => r.trim())
-					.filter(Boolean);
+	const relations = rel
+		.split(';')
+		.map((r) => r.trim())
+		.filter(Boolean);
 	return { rank, name, relations };
 }
 
@@ -63,9 +44,12 @@ function decodeAttr(raw: string): AttributePair | null {
 		negated = true;
 		s = s.slice(1);
 	}
-	// no `|` means no value: "carries this attribute type at all"
-	const parts = splitOnce(s) ?? [s.trim(), ''];
-	const [type, joined] = parts;
+	// Split on the FIRST `|` only, and no `|` at all means no value: "carries this
+	// attribute type at all". Free-text values routinely contain one — `reproductive
+	// data` uses it as its own internal separator.
+	const cut = s.indexOf('|');
+	const type = (cut < 0 ? s : s.slice(0, cut)).trim();
+	const joined = cut < 0 ? '' : s.slice(cut + 1).trim();
 	if (!type) return null;
 	// Several values OR within the row. `;` is safe as the separator: controlled
 	// values never contain one, and free-text types are single-valued in the form.

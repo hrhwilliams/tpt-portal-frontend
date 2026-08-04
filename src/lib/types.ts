@@ -35,7 +35,6 @@ export type Schema = {
 	relations: { value: string; description: string }[];
 	guid_prefixes: GuidPrefix[];
 	sorts: { id: string; label: string }[];
-	limits: { max_per_page: number; max_result_window: number; max_export_rows: number };
 	nonpublic_types_dropped: string[];
 };
 

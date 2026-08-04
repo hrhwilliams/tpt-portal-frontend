@@ -24,12 +24,6 @@
 	let open = $state(false);
 	let filter = $state('');
 	let root: HTMLDivElement | undefined = $state();
-	let filterEl: HTMLInputElement | undefined = $state();
-
-	// the input only exists while open, and effects run after the DOM updates
-	$effect(() => {
-		if (open) filterEl?.focus();
-	});
 
 	const shown = $derived.by(() => {
 		const f = filter.trim().toLowerCase();
@@ -64,12 +58,16 @@
 	function onDocPointerDown(e: PointerEvent) {
 		if (open && root && !root.contains(e.target as Node)) close();
 	}
+
+	// Escape closes from anywhere inside: focus sits on an option checkbox for most
+	// of the panel's life, and a handler on the trigger never sees that key. The
+	// document is already listening for the outside click, so it takes this too.
+	function onDocKeyDown(e: KeyboardEvent) {
+		if (open && e.key === 'Escape') close();
+	}
 </script>
 
-<svelte:document onpointerdown={onDocPointerDown} />
-<!-- Escape closes from anywhere inside: focus sits on an option checkbox for most
-     of the panel's life, and a handler on the trigger never sees that key. -->
-<svelte:window onkeydown={(e) => open && e.key === 'Escape' && close()} />
+<svelte:document onpointerdown={onDocPointerDown} onkeydown={onDocKeyDown} />
 
 <div class="ms" bind:this={root}>
 	<button
@@ -91,7 +89,7 @@
 					type="text"
 					class="filter"
 					autocomplete="off"
-					bind:this={filterEl}
+					{@attach (el) => el.focus()}
 					bind:value={filter}
 					placeholder={filterPlaceholder}
 				/>

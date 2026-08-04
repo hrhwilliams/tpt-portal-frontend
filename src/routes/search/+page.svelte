@@ -41,22 +41,16 @@
 	// locality would otherwise be one Elasticsearch query per keystroke, against a
 	// 30 req/min per-IP limit. `replaceState` keeps the back button on whole
 	// searches instead of every intermediate keystroke.
-	/** Everything except the page number — what actually defines the result set. */
-	const filters = (p: URLSearchParams) =>
-		[...p]
-			.filter(([k]) => k !== 'page')
-			.map((pair) => pair.join('='))
-			.join('&');
-
 	$effect(() => {
 		const params = toParams(q);
 		if (params.toString() === page.url.searchParams.toString()) return;
-		// Page 7 of the old search is not page 7 of the new one, so an edit to any
-		// filter returns to the first page.
-		const filtersChanged = filters(params) !== filters(page.url.searchParams);
+		// Only an edit gets past that early return — paging navigates directly, and
+		// `q.page` is adopted back from the URL before this runs. Page 7 of the old
+		// search is not page 7 of the new one, so the edit starts over at the first.
+		// Dropped from the target URL, not written back to `q`: the URL owns the page.
+		params.delete('page');
 		const timer = setTimeout(() => {
-			if (filtersChanged) q.page = 1;
-			goto(resolve(`/search?${toParams(q).toString()}`), {
+			goto(resolve(`/search?${params.toString()}`), {
 				replaceState: true,
 				keepFocus: true,
 				noScroll: true
@@ -98,14 +92,9 @@
 	const lastPage = $derived(Math.ceil(data.total / PAGE_SIZE));
 
 	function goPage(n: number) {
-		q.page = n;
-		goto(resolve(`/search?${toParams(q).toString()}`));
-	}
-
-	function submit(e: SubmitEvent) {
-		e.preventDefault();
-		q.page = 1; // changing a filter resets paging
-		goto(resolve(`/search?${toParams(q).toString()}`), { keepFocus: true, noScroll: true });
+		const params = toParams(q);
+		if (n > 1) params.set('page', String(n));
+		goto(resolve(`/search?${params.toString()}`));
 	}
 
 	function reset() {
@@ -120,7 +109,8 @@
 	Data current as of {data.schema.snapshot_date}.
 </p>
 
-<form onsubmit={submit}>
+<!-- Every edit already navigates; Enter must only be stopped from doing a native GET. -->
+<form onsubmit={(e) => e.preventDefault()}>
 	<fieldset>
 		<legend>Search by taxonomy</legend>
 		<TaxonRows bind:rows={q.taxa} schema={data.schema} />

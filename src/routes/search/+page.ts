@@ -3,8 +3,6 @@ import { fromParams, isEmpty, validate } from '$lib/query';
 import type { Schema } from '$lib/types';
 import type { PageLoad } from './$types';
 
-export const ssr = true;
-
 /**
  * The URL is the state: `load` reads it and produces everything the page shows.
  * The form never fetches; submitting is a navigation.

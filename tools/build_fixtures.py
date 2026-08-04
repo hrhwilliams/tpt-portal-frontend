@@ -183,7 +183,7 @@ def main():
     )
 
     schema = {
-        "snapshot_date": "2026-07-01",
+        "snapshot_date": "2026-03-09",
         "fixture": True,
         "ranks": [{"id": i, "label": l, "field": f} for i, l, f in RANKS],
         "attribute_types": attribute_types,
