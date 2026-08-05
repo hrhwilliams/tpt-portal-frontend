@@ -79,7 +79,7 @@
 	const searching = $derived(navigating.to !== null);
 
 	// The service decides which fields come back, so the table follows it.
-	const columns = $derived(data.hits?.length ? Object.keys(data.hits[0]) : []);
+	const columns = $derived(data.records?.length ? Object.keys(data.records[0]) : []);
 	const cell = (v: unknown) =>
 		v == null ? '' : typeof v === 'object' ? JSON.stringify(v) : String(v);
 
@@ -89,7 +89,13 @@
 
 	/** The service fixes the page size and takes no `per_page`. */
 	const PAGE_SIZE = 100;
-	const lastPage = $derived(Math.ceil(data.total / PAGE_SIZE));
+	/** Elasticsearch's `max_result_window`. Service-side value; change both together. */
+	const MAX_RESULT_WINDOW = 10000;
+	// `matched` is exact and uncapped, so it can name more pages than the service
+	// will serve — past the window a request is refused. Browsing stops at the
+	// window and says so; the export is not capped by it.
+	const pageCount = $derived(Math.ceil(data.matched / PAGE_SIZE));
+	const lastPage = $derived(Math.min(pageCount, Math.floor(MAX_RESULT_WINDOW / PAGE_SIZE)));
 
 	function goPage(n: number) {
 		const params = toParams(q);
@@ -262,15 +268,15 @@
 	</div>
 {/if}
 
-{#if data.hits}
+{#if data.records}
 	<!-- dimmed while a newer search is in flight, so stale rows do not read as live -->
 	<div class="panel" class:stale={searching}>
 		<div class="head">
 			<h2>
-				{data.total.toLocaleString()}{data.totalIsLowerBound ? '+' : ''} result{data.total === 1
-					? ''
-					: 's'}
-				{#if data.hits.length}
+				<!-- `matched` is an exhaustive aggregation, so the count is exact at any
+				     size. No "10,000+": that was `hits.total` hitting its counting cap. -->
+				{data.matched.toLocaleString()} result{data.matched === 1 ? '' : 's'}
+				{#if data.records.length}
 					<!-- The API origin, not a route, so `resolve()` does not apply. The service
 					     sends Content-Disposition: attachment, so a plain link downloads. -->
 					<!-- eslint-disable-next-line svelte/no-navigation-without-resolve -->
@@ -285,9 +291,7 @@
 						onclick={() => goPage(data.query.page - 1)}>← Previous</button
 					>
 					<span>
-						Page {data.query.page.toLocaleString()} of {lastPage.toLocaleString()}{data.totalIsLowerBound
-							? '+'
-							: ''}
+						Page {data.query.page.toLocaleString()} of {lastPage.toLocaleString()}
 					</span>
 					<button
 						type="button"
@@ -297,9 +301,15 @@
 				</nav>
 			{/if}
 		</div>
-		{#if data.hits.length}
+		{#if pageCount > lastPage}
+			<p class="note">
+				Only the first {MAX_RESULT_WINDOW.toLocaleString()} results can be browsed. Narrow the search,
+				or export.
+			</p>
+		{/if}
+		{#if data.records.length}
 			<!-- ponytail: columns are whatever the service returns. Spec 05's real
-			     table — chosen columns, expandable events, "10,000+" — replaces this. -->
+			     table — chosen columns, expandable events — replaces this. -->
 			<div class="scroll">
 				<table>
 					<thead>
@@ -308,7 +318,7 @@
 						>
 					</thead>
 					<tbody>
-						{#each data.hits as hit, i (i)}
+						{#each data.records as hit, i (i)}
 							<tr
 								>{#each columns as c (c)}<td
 										>{#if c === 'guid' && hit[c]}<a
