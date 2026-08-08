@@ -1,9 +1,9 @@
-import adapter from "svelte-adapter-bun";
+import adapter from "@sveltejs/adapter-netlify";
 import { sveltekit } from "@sveltejs/kit/vite";
 import { defineConfig } from "vite";
 
 export default defineConfig({
-  define: { __API_BASE__: JSON.stringify("http://localhost:2334") },
+  define: { __API_BASE__: JSON.stringify(process.env.API_BASE ?? "http://localhost:2334") },
 
   plugins: [
     sveltekit({
