@@ -1,153 +1,153 @@
 <script lang="ts">
-	import favicon from '$lib/assets/favicon.svg';
-	import { resolve } from '$app/paths';
+  import favicon from "$lib/assets/favicon.svg";
+  import { resolve } from "$app/paths";
 
-	let { children } = $props();
+  let { children } = $props();
 </script>
 
 <svelte:head>
-	<link rel="icon" href={favicon} />
+  <link rel="icon" href={favicon} />
 </svelte:head>
 
 <header>
-	<a class="brand" href={resolve('/')}>TPT specimen portal</a>
-	<nav><a href={resolve('/search')}>Search</a></nav>
+  <a class="brand" href={resolve("/")}>TPT specimen portal</a>
+  <nav><a href={resolve("/search")}>Search</a></nav>
 </header>
 
 <main>
-	{@render children()}
+  {@render children()}
 </main>
 
 <style>
-	:global(:root) {
-		--bg: #ffffff;
-		--panel: #f7f7f5;
-		--line: #d8d6d1;
-		--fg: #1b1a18;
-		--muted: #6a6862;
-		--accent: #3b6ea5;
-		--accent-soft: #dbe7f3;
-		color-scheme: light dark;
-	}
-	@media (prefers-color-scheme: dark) {
-		:global(:root) {
-			--bg: #16181a;
-			--panel: #1e2124;
-			--line: #34383d;
-			--fg: #e7e5e1;
-			--muted: #9a9891;
-			--accent: #7fb0e0;
-			--accent-soft: #26364a;
-		}
-	}
-	:global(*, *::before, *::after) {
-		box-sizing: border-box;
-	}
-	:global(body) {
-		margin: 0;
-		background: var(--bg);
-		color: var(--fg);
-		font:
-			15px/1.5 system-ui,
-			-apple-system,
-			'Segoe UI',
-			sans-serif;
-	}
-	:global(input, select, button) {
-		font: inherit;
-		color: inherit;
-		background: var(--bg);
-		border: 1px solid var(--line);
-		border-radius: 5px;
-		padding: 0.35rem 0.45rem;
-	}
-	:global(button) {
-		cursor: pointer;
-		background: var(--panel);
-	}
-	:global(button.primary) {
-		background: var(--accent);
-		border-color: var(--accent);
-		color: #fff;
-		font-weight: 600;
-		padding: 0.4rem 1.1rem;
-	}
-	:global(input:disabled, select:disabled) {
-		opacity: 0.5;
-		cursor: not-allowed;
-	}
-	:global(code) {
-		font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
-	}
-	:global(a) {
-		color: var(--accent);
-	}
+  :global(:root) {
+    --bg: #ffffff;
+    --panel: #f7f7f5;
+    --line: #d8d6d1;
+    --fg: #1b1a18;
+    --muted: #6a6862;
+    --accent: #3b6ea5;
+    --accent-soft: #dbe7f3;
+    color-scheme: light dark;
+  }
+  @media (prefers-color-scheme: dark) {
+    :global(:root) {
+      --bg: #16181a;
+      --panel: #1e2124;
+      --line: #34383d;
+      --fg: #e7e5e1;
+      --muted: #9a9891;
+      --accent: #7fb0e0;
+      --accent-soft: #26364a;
+    }
+  }
+  :global(*, *::before, *::after) {
+    box-sizing: border-box;
+  }
+  :global(body) {
+    margin: 0;
+    background: var(--bg);
+    color: var(--fg);
+    font:
+      15px/1.5 system-ui,
+      -apple-system,
+      "Segoe UI",
+      sans-serif;
+  }
+  :global(input, select, button) {
+    font: inherit;
+    color: inherit;
+    background: var(--bg);
+    border: 1px solid var(--line);
+    border-radius: 5px;
+    padding: 0.35rem 0.45rem;
+  }
+  :global(button) {
+    cursor: pointer;
+    background: var(--panel);
+  }
+  :global(button.primary) {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #fff;
+    font-weight: 600;
+    padding: 0.4rem 1.1rem;
+  }
+  :global(input:disabled, select:disabled) {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+  :global(code) {
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  }
+  :global(a) {
+    color: var(--accent);
+  }
 
-	/* Form primitives. The search form and its row components render one visual
+  /* Form primitives. The search form and its row components render one visual
 	   language; these lived identically in three style blocks. */
-	:global(.rows) {
-		display: flex;
-		flex-direction: column;
-		gap: 0.4rem;
-	}
-	:global(form label) {
-		display: flex;
-		flex-direction: column;
-		gap: 0.2rem;
-	}
-	:global(.row) {
-		display: flex;
-		gap: 0.6rem;
-		align-items: flex-end;
-		padding: 0.5rem;
-		border: 1px solid var(--line);
-		border-radius: 6px;
-		background: var(--panel);
-	}
-	:global(.grow) {
-		flex: 1;
-		min-width: 0;
-	}
-	:global(.lbl) {
-		font-size: 0.75rem;
-		color: var(--muted);
-	}
-	:global(.op) {
-		font-size: 0.72rem;
-		font-weight: 700;
-		color: var(--muted);
-		letter-spacing: 0.06em;
-		padding-left: 0.5rem;
-	}
-	:global(.rm) {
-		padding: 0.3rem 0.6rem;
-		line-height: 1;
-		font-size: 1.1rem;
-	}
-	:global(.add) {
-		align-self: flex-start;
-	}
-	:global(.note) {
-		margin: 0.5rem 0 0;
-		font-size: 0.8rem;
-		color: var(--muted);
-		max-width: 78ch;
-	}
-	header {
-		display: flex;
-		gap: 1.5rem;
-		align-items: baseline;
-		padding: 0.7rem 1.2rem;
-		border-bottom: 1px solid var(--line);
-	}
-	.brand {
-		font-weight: 700;
-		text-decoration: none;
-		color: var(--fg);
-	}
-	main {
-		max-width: 62rem;
-		margin: 0 auto;
-		padding: 1.2rem;
-	}
+  :global(.rows) {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+  }
+  :global(form label) {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+  }
+  :global(.row) {
+    display: flex;
+    gap: 0.6rem;
+    align-items: flex-end;
+    padding: 0.5rem;
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    background: var(--panel);
+  }
+  :global(.grow) {
+    flex: 1;
+    min-width: 0;
+  }
+  :global(.lbl) {
+    font-size: 0.75rem;
+    color: var(--muted);
+  }
+  :global(.op) {
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: var(--muted);
+    letter-spacing: 0.06em;
+    padding-left: 0.5rem;
+  }
+  :global(.rm) {
+    padding: 0.3rem 0.6rem;
+    line-height: 1;
+    font-size: 1.1rem;
+  }
+  :global(.add) {
+    align-self: flex-start;
+  }
+  :global(.note) {
+    margin: 0.5rem 0 0;
+    font-size: 0.8rem;
+    color: var(--muted);
+    max-width: 78ch;
+  }
+  header {
+    display: flex;
+    gap: 1.5rem;
+    align-items: baseline;
+    padding: 0.7rem 1.2rem;
+    border-bottom: 1px solid var(--line);
+  }
+  .brand {
+    font-weight: 700;
+    text-decoration: none;
+    color: var(--fg);
+  }
+  main {
+    max-width: 62rem;
+    margin: 0 auto;
+    padding: 1.2rem;
+  }
 </style>
