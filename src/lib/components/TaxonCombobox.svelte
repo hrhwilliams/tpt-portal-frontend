@@ -121,49 +121,5 @@
   {/if}
 </div>
 
-<style>
-  .combo {
-    position: relative;
-  }
-  /* an input sizes itself to ~20 characters otherwise, whatever the field allows */
-  .combo input {
-    width: 100%;
-  }
-  /* position/border/shadow come from :global(.floating-panel) — see +layout.svelte */
-  ul {
-    margin: 2px 0 0;
-    padding: 0;
-    list-style: none;
-    max-height: 15rem;
-    overflow-y: auto;
-  }
-  li button {
-    display: flex;
-    justify-content: space-between;
-    gap: 1rem;
-    width: 100%;
-    text-align: left;
-    border: 0;
-    background: none;
-    padding: 0.35rem 0.55rem;
-    cursor: pointer;
-    font: inherit;
-    color: inherit;
-  }
-  li button.active {
-    background: var(--accent-soft);
-  }
-  .name {
-    font-weight: 600;
-  }
-  .meta {
-    font-size: 0.78rem;
-    color: var(--muted);
-    white-space: nowrap;
-  }
-  .none {
-    padding: 0.45rem 0.55rem;
-    font-size: 0.82rem;
-    color: var(--muted);
-  }
-</style>
+<!-- .combo, the floating panel, and the option-list styling are all global —
+     see +layout.svelte. Shared with CollectorCombobox. -->

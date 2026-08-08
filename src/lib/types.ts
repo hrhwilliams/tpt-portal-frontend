@@ -38,6 +38,9 @@ export type Schema = {
   vocabularies: Record<string, VocabValue[]>;
   countries: CountedValue[];
   states: CountedValue[];
+  /** Every distinct collector name in the snapshot — tens of thousands, so this
+   *  feeds an autocomplete rather than a picklist. */
+  collectors: CountedValue[];
   /** `relations.relationship` — how a record relates to another cataloged item */
   relations: { value: string; description: string }[];
   guid_prefixes: GuidPrefix[];

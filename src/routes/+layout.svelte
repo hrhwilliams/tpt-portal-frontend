@@ -147,6 +147,52 @@
     border-radius: 6px;
     box-shadow: 0 6px 18px rgb(0 0 0 / 18%);
   }
+
+  /* The single-value "type and pick a suggestion" combobox: TaxonCombobox and
+	   CollectorCombobox render this identically, one fetching remotely and one
+	   filtering a local list — same visual language either way. */
+  :global(.combo) {
+    position: relative;
+  }
+  :global(.combo input) {
+    width: 100%;
+  }
+  :global(.combo ul) {
+    margin: 2px 0 0;
+    padding: 0;
+    list-style: none;
+    max-height: 15rem;
+    overflow-y: auto;
+  }
+  :global(.combo li button) {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    width: 100%;
+    text-align: left;
+    border: 0;
+    background: none;
+    padding: 0.35rem 0.55rem;
+    cursor: pointer;
+    font: inherit;
+    color: inherit;
+  }
+  :global(.combo li button.active) {
+    background: var(--accent-soft);
+  }
+  :global(.combo .name) {
+    font-weight: 600;
+  }
+  :global(.combo .meta) {
+    font-size: 0.78rem;
+    color: var(--muted);
+    white-space: nowrap;
+  }
+  :global(.combo .none) {
+    padding: 0.45rem 0.55rem;
+    font-size: 0.82rem;
+    color: var(--muted);
+  }
   header {
     display: flex;
     gap: 1.5rem;

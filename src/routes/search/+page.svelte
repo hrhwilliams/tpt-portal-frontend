@@ -2,6 +2,7 @@
   import { navigating, page } from "$app/state";
   import { resolve } from "$app/paths";
   import AttributeRows from "$lib/components/AttributeRows.svelte";
+  import CollectorCombobox from "$lib/components/CollectorCombobox.svelte";
   import MultiSelect from "$lib/components/MultiSelect.svelte";
   import TaxonRows from "$lib/components/TaxonRows.svelte";
   import { DETECTION_ATTRIBUTE_TYPE_IDS, hasNegatedRow, pageWindow, toParams } from "$lib/query";
@@ -84,10 +85,12 @@
           filterPlaceholder="Type to filter {data.schema.states.length} states…"
         />
       </div>
-      <label>
-        <span class="lbl">Collector</span>
-        <input type="text" autocomplete="off" bind:value={q.agent} placeholder="Any collector name" />
-      </label>
+      <div class="field">
+        <!-- `for`/`id` rather than wrapping: see TaxonRows for why a <label>
+             shouldn't wrap a combobox input. -->
+        <label class="lbl" for="collector">Collector</label>
+        <CollectorCombobox id="collector" bind:value={q.agent} options={data.schema.collectors} />
+      </div>
       <label>
         <span class="lbl">Collected from</span>
         <input type="date" bind:value={q.collected_from} />
