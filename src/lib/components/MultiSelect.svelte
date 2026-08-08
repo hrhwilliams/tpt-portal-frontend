@@ -1,10 +1,4 @@
 <script lang="ts">
-  /**
-   * Checkbox dropdown with type-to-filter. Selected values OR together.
-   *
-   * A real <button aria-expanded> and native checkboxes rather than a tabindex
-   * div, so keyboard and screen-readers work without extra handling.
-   */
   export type Option = { value: string; label: string; hint?: string };
 
   let {

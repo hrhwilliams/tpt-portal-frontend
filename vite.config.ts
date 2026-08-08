@@ -1,3 +1,4 @@
+/// <reference types="vitest/config" />
 import adapter from "@sveltejs/adapter-netlify";
 import { sveltekit } from "@sveltejs/kit/vite";
 import { defineConfig } from "vite";
@@ -18,4 +19,11 @@ export default defineConfig({
       adapter: adapter(),
     }),
   ],
+
+  test: {
+    environment: "jsdom",
+    include: ["src/**/*.test.ts"],
+  },
+
+  resolve: process.env.VITEST ? { conditions: ["browser"] } : undefined,
 });
