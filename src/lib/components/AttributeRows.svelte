@@ -117,9 +117,9 @@
   {#if rows.length > 1}
     <p class="note">
       {#if op === "and"}
-        Each row describes a separate attribute record on the specimen, and all must hold.
+        Returned specimens must match all rows
       {:else}
-        A specimen matching any one row is returned.
+        Returned specimen may match any one attribute.
       {/if}
     </p>
   {/if}

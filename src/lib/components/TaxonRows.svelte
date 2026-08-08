@@ -61,9 +61,7 @@
   <button type="button" class="add" onclick={add}>+ Add taxon</button>
 
   {#if rows.length > 1}
-    <p class="note">
-      Rows combine with <strong>OR</strong> — a specimen matching any one of them is returned. Rows may use different ranks.
-    </p>
+    <p class="note">Returned specimens may match any of these taxa.</p>
   {/if}
 </div>
 

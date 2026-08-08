@@ -107,7 +107,8 @@ export type SearchQuery = {
   states: string[];
   collected_from: string;
   collected_to: string;
-  collector_id: string;
+  /** collector's full name, matched as prose — not an Arctos agent ID */
+  agent: string;
   page: number;
   sort: string;
 };
@@ -124,7 +125,7 @@ export const EMPTY_QUERY: SearchQuery = {
   states: [],
   collected_from: "",
   collected_to: "",
-  collector_id: "",
+  agent: "",
   page: 1,
   sort: "guid_asc",
 };

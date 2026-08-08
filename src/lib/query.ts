@@ -100,7 +100,7 @@ export function toParams(q: SearchQuery): URLSearchParams {
   }
   put("from", q.collected_from);
   put("to", q.collected_to);
-  put("collector", q.collector_id);
+  put("collector", q.agent);
   if (q.page > 1) p.set("page", String(q.page));
   if (q.sort !== "guid_asc") p.set("sort", q.sort);
   return p;
@@ -140,7 +140,7 @@ export function fromParams(p: URLSearchParams): SearchQuery {
     states: p.getAll("state").filter(Boolean),
     collected_from: p.get("from") ?? "",
     collected_to: p.get("to") ?? "",
-    collector_id: p.get("collector") ?? "",
+    agent: p.get("collector") ?? "",
     page: Math.max(1, Number(p.get("page") ?? 1) || 1),
     sort: p.get("sort") ?? "guid_asc",
   };
@@ -175,7 +175,7 @@ export function isEmpty(q: SearchQuery): boolean {
     q.states.length > 0 ||
     q.collected_from ||
     q.collected_to ||
-    q.collector_id
+    q.agent
   );
 }
 

@@ -48,17 +48,78 @@
 <!-- Every edit already navigates; Enter must only be stopped from doing a native GET. -->
 <form onsubmit={(e) => e.preventDefault()}>
   <fieldset>
+    <legend>Global filters</legend>
+    <div class="grid two">
+      <div class="field">
+        <span class="lbl">Held by collection</span>
+        <MultiSelect
+          id="collections"
+          bind:selected={q.guid_prefixes}
+          options={collectionOptions}
+          placeholder="Any collection"
+          filterPlaceholder="Type to filter {data.schema.guid_prefixes.length} collections…"
+        />
+      </div>
+      <label>
+        <span class="lbl">Locality</span>
+        <input type="text" bind:value={q.locality} autocomplete="off" placeholder="Any locality string" />
+      </label>
+      <div class="field">
+        <span class="lbl">Country</span>
+        <MultiSelect
+          id="countries"
+          bind:selected={q.countries}
+          options={countryOptions}
+          placeholder="Any country"
+          filterPlaceholder="Type to filter {data.schema.countries.length} countries…"
+        />
+      </div>
+      <div class="field">
+        <span class="lbl">State / province</span>
+        <MultiSelect
+          id="states"
+          bind:selected={q.states}
+          options={stateOptions}
+          placeholder="Any state or province"
+          filterPlaceholder="Type to filter {data.schema.states.length} states…"
+        />
+      </div>
+      <label>
+        <span class="lbl">Collector</span>
+        <input type="text" autocomplete="off" bind:value={q.agent} placeholder="Any collector name" />
+      </label>
+      <label>
+        <span class="lbl">Collected from</span>
+        <input type="date" bind:value={q.collected_from} />
+      </label>
+      <label>
+        <span class="lbl">Collected to</span>
+        <input type="date" bind:value={q.collected_to} />
+      </label>
+    </div>
+    <!-- <p class="note">
+			Values within one dropdown <strong>OR</strong> together; separate filters
+			<strong>AND</strong>. Locality matches whole place names, and applies together with the date
+			to the
+			<strong>same collecting event</strong>. Country, state and collector are record-level, so they
+			are not tied to that event — a specimen collected in two countries can match a country-A
+			search with a date from its country-B visit. Some collection dates record only a year or a
+			month; a year-only date is read as 1 January, so a mid-year range will not match it.
+		</p> -->
+  </fieldset>
+
+  <fieldset>
     <legend>Search by taxonomy</legend>
     <TaxonRows bind:rows={q.taxa} schema={data.schema} />
     <!-- <p class="note">
 			Suggestions come from the current snapshot. A name that is not listed can still be searched
 			for.
 		</p> -->
-    <p class="note">
+    <!-- <p class="note">
       A relationship is the record's own side of the link: <em>parasite of</em> finds the parasites,
       <em>host of parasite</em> finds their hosts. Several on one row
       <strong>OR</strong> together.
-    </p>
+    </p> -->
   </fieldset>
 
   <fieldset>
@@ -74,7 +135,7 @@
     <label class="adv">
       <input type="checkbox" checked={advanced} onchange={(e) => state.toggleAdvanced(e.currentTarget.checked)} />
       <span>Advanced</span>
-      <em>negate a row, switch AND/OR, filter by method</em>
+      <em>negate a row, switch <strong>AND</strong>/<strong>OR</strong>, filter by method</em>
     </label>
 
     {#if advanced}
@@ -115,72 +176,6 @@
       schema={data.schema}
       types={otherTypes}
     />
-  </fieldset>
-
-  <fieldset>
-    <legend>3 · Global filters</legend>
-    <div class="grid two">
-      <div class="field">
-        <span class="lbl">Held by collection</span>
-        <MultiSelect
-          id="collections"
-          bind:selected={q.guid_prefixes}
-          options={collectionOptions}
-          placeholder="Any collection"
-          filterPlaceholder="Type to filter {data.schema.guid_prefixes.length} collections…"
-        />
-      </div>
-      <label>
-        <span class="lbl">Locality</span>
-        <input type="text" bind:value={q.locality} autocomplete="off" placeholder="Any locality string" />
-      </label>
-      <div class="field">
-        <span class="lbl">Country</span>
-        <MultiSelect
-          id="countries"
-          bind:selected={q.countries}
-          options={countryOptions}
-          placeholder="Any country"
-          filterPlaceholder="Type to filter {data.schema.countries.length} countries…"
-        />
-      </div>
-      <div class="field">
-        <span class="lbl">State / province</span>
-        <MultiSelect
-          id="states"
-          bind:selected={q.states}
-          options={stateOptions}
-          placeholder="Any state or province"
-          filterPlaceholder="Type to filter {data.schema.states.length} states…"
-        />
-      </div>
-      <!-- <label>
-				<span class="lbl">Collector (Arctos agent URL)</span>
-				<input
-					type="text"
-					autocomplete="off"
-					bind:value={q.collector_id}
-					placeholder="https://arctos…/agent/1010760"
-				/>
-			</label> -->
-      <label>
-        <span class="lbl">Collected from</span>
-        <input type="date" bind:value={q.collected_from} />
-      </label>
-      <label>
-        <span class="lbl">Collected to</span>
-        <input type="date" bind:value={q.collected_to} />
-      </label>
-    </div>
-    <!-- <p class="note">
-			Values within one dropdown <strong>OR</strong> together; separate filters
-			<strong>AND</strong>. Locality matches whole place names, and applies together with the date
-			to the
-			<strong>same collecting event</strong>. Country, state and collector are record-level, so they
-			are not tied to that event — a specimen collected in two countries can match a country-A
-			search with a date from its country-B visit. Some collection dates record only a year or a
-			month; a year-only date is read as 1 January, so a mid-year range will not match it.
-		</p> -->
   </fieldset>
 
   <div class="actions">

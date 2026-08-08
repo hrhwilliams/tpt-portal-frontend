@@ -1,6 +1,5 @@
 import { untrack } from "svelte";
 import { goto } from "$app/navigation";
-import { page } from "$app/state";
 import { resolve } from "$app/paths";
 import { hasNegatedRow, toParams } from "$lib/query";
 import { EMPTY_QUERY, type SearchQuery } from "$lib/types";
@@ -43,13 +42,18 @@ export class SearchQueryState {
     // on whole searches instead of every intermediate keystroke.
     $effect(() => {
       const params = toParams(this.#query);
-      if (params.toString() === page.url.searchParams.toString()) return;
-      // Only an edit gets past that early return — paging navigates directly
-      // via `goPage`, which this effect never sees because `#navigate` (see
-      // below) keeps `#query.page` matching whatever was last sent. Page 7 of
-      // the old search is not page 7 of the new one, so an edit starts over
-      // at the first: dropped from the target here rather than left for
-      // `#navigate` to pick up from `#query.page`.
+      // Compared against `#lastSent`, not `page.url.searchParams` — the URL
+      // only updates once a navigation's `load()` resolves, but `#query` can
+      // change (e.g. `#navigate` syncing `#query.page` after `goPage`) well
+      // before that lands. Comparing against the URL would misread our own
+      // still-in-flight navigation as an unsynced edit and schedule a stray
+      // corrective one; `#lastSent` is updated synchronously the instant we
+      // actually send something, so it doesn't have that race.
+      if (params.toString() === this.#lastSent) return;
+      // Only a real edit gets past that early return — paging goes through
+      // `goPage`, which already leaves `#query.page` matching what it sent.
+      // Page 7 of the old search is not page 7 of the new one, so an edit
+      // starts over at the first.
       params.delete("page");
       const timer = setTimeout(
         () => this.#navigate(params, { replaceState: true, keepFocus: true, noScroll: true }),
