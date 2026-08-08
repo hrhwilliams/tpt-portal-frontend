@@ -133,6 +133,20 @@
     color: var(--muted);
     max-width: 78ch;
   }
+
+  /* MultiSelect's dropdown and TaxonCombobox's suggestion list are the same
+	   floating panel recipe — this lived identically in two style blocks. */
+  :global(.floating-panel) {
+    position: absolute;
+    z-index: 20;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: var(--bg);
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    box-shadow: 0 6px 18px rgb(0 0 0 / 18%);
+  }
   header {
     display: flex;
     gap: 1.5rem;

@@ -81,7 +81,9 @@ export class SearchQueryState {
   toggleAdvanced(on: boolean) {
     this.#advanced = on;
     if (!on) {
-      this.#query.attributes = this.#query.attributes.map((a) => ({ ...a, negated: false }));
+      const clear = (attrs: SearchQuery["detectionAttributes"]) => attrs.map((a) => ({ ...a, negated: false }));
+      this.#query.detectionAttributes = clear(this.#query.detectionAttributes);
+      this.#query.otherAttributes = clear(this.#query.otherAttributes);
       this.#query.attr_op = "and";
       this.#query.method = "";
     }

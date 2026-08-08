@@ -97,7 +97,7 @@
   />
 
   {#if open && matches.length}
-    <ul id={listId} role="listbox">
+    <ul class="floating-panel" id={listId} role="listbox">
       {#each matches as t, i (t.rank + t.name)}
         <li role="option" aria-selected={i === active}>
           <button
@@ -115,7 +115,7 @@
       {/each}
     </ul>
   {:else if open && value.trim().length >= 2 && answered === value.trim()}
-    <ul id={listId} role="listbox">
+    <ul class="floating-panel" id={listId} role="listbox">
       <li class="none">No taxon matching that in this snapshot. You can still search for it.</li>
     </ul>
   {/if}
@@ -129,19 +129,11 @@
   .combo input {
     width: 100%;
   }
+  /* position/border/shadow come from :global(.floating-panel) — see +layout.svelte */
   ul {
-    position: absolute;
-    z-index: 20;
-    top: 100%;
-    left: 0;
-    right: 0;
     margin: 2px 0 0;
     padding: 0;
     list-style: none;
-    background: var(--bg);
-    border: 1px solid var(--line);
-    border-radius: 6px;
-    box-shadow: 0 6px 18px rgb(0 0 0 / 18%);
     max-height: 15rem;
     overflow-y: auto;
   }

@@ -13,20 +13,13 @@
     op: BoolOp;
     advanced?: boolean;
     schema: Schema;
-    /** Restricts the type dropdown to a subset — lets several fieldsets split
-     *  one shared `rows` array by attribute type while writing the same param. */
+    /** Restricts the type dropdown to a subset, e.g. detection types only. */
     types?: AttributeTypeDef[];
   } = $props();
 
   // Two instances render side by side (one per fieldset) — without this,
   // both would emit id="attr-type-0" and collide, breaking label association.
   const uid = $props.id();
-
-  const typeIds = $derived(new Set(types.map((t) => t.id)));
-  // A row with no type yet can't be placed by `typeIds` — track which instance's
-  // "+ Add attribute" created it so it renders in that fieldset until chosen.
-  let ownBlanks = $state(new Set<AttributePair>());
-  const shown = $derived(rows.filter((r) => typeIds.has(r.type) || (r.type === "" && ownBlanks.has(r))));
 
   function typeDef(id: string) {
     return schema.attribute_types.find((t) => t.id === id) ?? null;
@@ -40,19 +33,15 @@
 
   function add() {
     rows = [...rows, { type: "", values: [], negated: false }];
-    // `rows` now holds the $state-proxied copy, not the object literal above —
-    // track that one, since `shown` matches by its identity.
-    ownBlanks.add(rows[rows.length - 1]);
   }
 
   function remove(row: AttributePair) {
-    ownBlanks.delete(row);
     rows = rows.filter((r) => r !== row);
   }
 </script>
 
 <div class="rows">
-  {#if advanced && shown.length > 1}
+  {#if advanced && rows.length > 1}
     <fieldset class="opsel">
       <legend class="lbl">Combine rows with</legend>
       <label><input type="radio" bind:group={op} value="and" /> AND — all must hold</label>
@@ -62,7 +51,7 @@
 
   <!-- keyed by the row object, not `i`: an index key would hand a removed row's
 	     component instances (and their open dropdowns) to the row that survives it -->
-  {#each shown as row, i (row)}
+  {#each rows as row, i (row)}
     {@const def = typeDef(row.type)}
     {@const vocab = vocabFor(row.type)}
     {#if i > 0}<div class="op">{op.toUpperCase()}</div>{/if}
@@ -125,7 +114,7 @@
 
   <button type="button" class="add" onclick={add}>+ Add attribute</button>
 
-  {#if shown.length > 1}
+  {#if rows.length > 1}
     <p class="note">
       {#if op === "and"}
         Each row describes a separate attribute record on the specimen, and all must hold.

@@ -4,7 +4,7 @@
   import AttributeRows from "$lib/components/AttributeRows.svelte";
   import MultiSelect from "$lib/components/MultiSelect.svelte";
   import TaxonRows from "$lib/components/TaxonRows.svelte";
-  import { hasNegatedRow, toParams } from "$lib/query";
+  import { DETECTION_ATTRIBUTE_TYPE_IDS, hasNegatedRow, toParams } from "$lib/query";
   import { SearchQueryState } from "./query-state.svelte.ts";
   import type { PageData } from "./$types";
 
@@ -14,12 +14,8 @@
   const q = $derived(state.query);
   const advanced = $derived(state.advanced);
 
-  // Four types sharing one vocabulary ("ectoparasite", "endoparasite", ...);
-  // everything else in the schema is a plain record attribute. Both fieldsets
-  // write into the same q.attributes/attr_op — this only splits the dropdown.
-  const DETECTION_TYPE_IDS = new Set(["detected", "not detected", "examined for", "not examined for"]);
-  const detectionTypes = $derived(data.schema.attribute_types.filter((t) => DETECTION_TYPE_IDS.has(t.id)));
-  const otherTypes = $derived(data.schema.attribute_types.filter((t) => !DETECTION_TYPE_IDS.has(t.id)));
+  const detectionTypes = $derived(data.schema.attribute_types.filter((t) => DETECTION_ATTRIBUTE_TYPE_IDS.has(t.id)));
+  const otherTypes = $derived(data.schema.attribute_types.filter((t) => !DETECTION_ATTRIBUTE_TYPE_IDS.has(t.id)));
 
   const negated = $derived(hasNegatedRow(q));
   const opts = (vals: { value: string; count: number }[]) =>
@@ -72,7 +68,7 @@
   <fieldset>
     <legend>Examined for/detected attributes</legend>
     <AttributeRows
-      bind:rows={q.attributes}
+      bind:rows={q.detectionAttributes}
       bind:op={q.attr_op}
       {advanced}
       schema={data.schema}
@@ -116,7 +112,7 @@
 
   <fieldset>
     <legend>Other record attributes</legend>
-    <AttributeRows bind:rows={q.attributes} bind:op={q.attr_op} {advanced} schema={data.schema} types={otherTypes} />
+    <AttributeRows bind:rows={q.otherAttributes} bind:op={q.attr_op} {advanced} schema={data.schema} types={otherTypes} />
   </fieldset>
 
   <fieldset>

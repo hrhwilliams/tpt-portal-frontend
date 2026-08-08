@@ -1,5 +1,16 @@
 import { EMPTY_QUERY, type AttributePair, type BoolOp, type SearchQuery, type TaxonPair } from "./types.ts";
 
+/** Four types sharing one vocabulary ("ectoparasite", "endoparasite", ...);
+ *  every other attribute type is a plain record attribute. The only source of
+ *  truth for the split — both the search form's two fieldsets and `fromParams`
+ *  below classify a row by checking this set. */
+export const DETECTION_ATTRIBUTE_TYPE_IDS = new Set([
+  "detected",
+  "not detected",
+  "examined for",
+  "not examined for",
+]);
+
 /**
  * URL <-> query state. The URL is the state: nothing else drives a search.
  *
@@ -54,6 +65,12 @@ function decodeAttr(raw: string): AttributePair | null {
   return { type, values, negated };
 }
 
+/** Both attribute blocks flattened together — attr_op combines them as one
+ *  whole, and this is the only place that needs them as a single list. */
+function allAttributes(q: SearchQuery): AttributePair[] {
+  return [...q.detectionAttributes, ...q.otherAttributes];
+}
+
 export function toParams(q: SearchQuery): URLSearchParams {
   const p = new URLSearchParams();
   // empty inputs are absent, never `&locality=` — keeps a shared link canonical
@@ -65,7 +82,7 @@ export function toParams(q: SearchQuery): URLSearchParams {
     const rel = t.relations.filter(Boolean);
     p.append("taxon", `${t.rank}|${t.name}${rel.length ? `|${rel.join("; ")}` : ""}`);
   }
-  for (const a of q.attributes) {
+  for (const a of allAttributes(q)) {
     if (!a.type) continue;
     const v = a.values.map((x) => x.trim()).filter(Boolean);
     p.append("attr", `${a.negated ? "!" : ""}${a.type}${v.length ? `|${v.join("; ")}` : ""}`);
@@ -73,7 +90,7 @@ export function toParams(q: SearchQuery): URLSearchParams {
   // Rows without a type yet (just added, not chosen) don't count — otherwise
   // toggling OR before picking a type puts `attr_op=or` alone on the URL, which
   // reads as a submitted-but-empty search and gets rejected.
-  const typedAttrCount = q.attributes.filter((a) => a.type).length;
+  const typedAttrCount = allAttributes(q).filter((a) => a.type).length;
   if (q.attr_op === "or" && typedAttrCount > 1) p.set("attr_op", "or");
   if (!hasNegatedRow(q)) put("method", q.method);
   for (const gp of q.guid_prefixes) {
@@ -110,13 +127,16 @@ export function fromParams(p: URLSearchParams): SearchQuery {
     }
   }
 
+  const attrs = p
+    .getAll("attr")
+    .map(decodeAttr)
+    .filter((a): a is AttributePair => a !== null);
+
   const q: SearchQuery = {
     ...EMPTY_QUERY,
     taxa,
-    attributes: p
-      .getAll("attr")
-      .map(decodeAttr)
-      .filter((a): a is AttributePair => a !== null),
+    detectionAttributes: attrs.filter((a) => DETECTION_ATTRIBUTE_TYPE_IDS.has(a.type)),
+    otherAttributes: attrs.filter((a) => !DETECTION_ATTRIBUTE_TYPE_IDS.has(a.type)),
     attr_op: (p.get("attr_op") === "or" ? "or" : "and") as BoolOp,
     guid_prefixes: p.getAll("prefix").filter(Boolean),
     method: p.get("method") ?? "",
@@ -135,14 +155,14 @@ export function fromParams(p: URLSearchParams): SearchQuery {
 }
 
 export function hasNegatedRow(q: SearchQuery): boolean {
-  return q.attributes.some((a) => a.negated && a.type);
+  return allAttributes(q).some((a) => a.negated && a.type);
 }
 
 export function isEmpty(q: SearchQuery): boolean {
   return !(
     q.taxa.some((t) => t.name) ||
     q.guid_prefixes.length > 0 ||
-    q.attributes.some((a) => a.type) ||
+    allAttributes(q).some((a) => a.type) ||
     q.locality ||
     q.countries.length > 0 ||
     q.states.length > 0 ||

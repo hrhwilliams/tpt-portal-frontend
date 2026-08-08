@@ -80,7 +80,7 @@
   </button>
 
   {#if open}
-    <div class="panel" id={`${id}-list`}>
+    <div class="panel floating-panel" id={`${id}-list`}>
       <div class="bar">
         <input
           type="text"
@@ -150,17 +150,9 @@
     color: var(--muted);
     font-size: 0.7rem;
   }
+  /* position/border/shadow come from :global(.floating-panel) — see +layout.svelte */
   .panel {
-    position: absolute;
-    z-index: 20;
-    top: 100%;
-    left: 0;
-    right: 0;
     margin-top: 2px;
-    background: var(--bg);
-    border: 1px solid var(--line);
-    border-radius: 6px;
-    box-shadow: 0 6px 18px rgb(0 0 0 / 18%);
     padding: 0.4rem;
     max-height: 16rem;
     display: flex;

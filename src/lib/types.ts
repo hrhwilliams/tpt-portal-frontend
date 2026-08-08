@@ -92,8 +92,12 @@ export type SearchQuery = {
   /** block 3: which collections hold the record, not what it is.
    *  Values OR among themselves, and AND against everything else. */
   guid_prefixes: string[];
-  /** block 2 — assertions about the specimen */
-  attributes: AttributePair[];
+  /** block 2a — the four detection types (examined for/detected, negatable) */
+  detectionAttributes: AttributePair[];
+  /** block 2b — every other record attribute */
+  otherAttributes: AttributePair[];
+  /** combines detectionAttributes and otherAttributes together as one block —
+   *  whole-block, not per row, and not per array */
   attr_op: BoolOp;
   /** replicated into every non-negated attribute clause; refused when any row is negated */
   method: string;
@@ -111,7 +115,8 @@ export type SearchQuery = {
 export const EMPTY_QUERY: SearchQuery = {
   taxa: [],
   guid_prefixes: [],
-  attributes: [],
+  detectionAttributes: [],
+  otherAttributes: [],
   attr_op: "and",
   method: "",
   locality: "",
