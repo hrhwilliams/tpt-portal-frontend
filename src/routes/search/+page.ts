@@ -1,6 +1,6 @@
 import { error } from "@sveltejs/kit";
+import { getSchema, search } from "$lib/api";
 import { fromParams, isEmpty, validate } from "$lib/query";
-import type { Schema } from "$lib/types";
 import type { PageLoad } from "./$types";
 
 /**
@@ -14,7 +14,7 @@ import type { PageLoad } from "./$types";
 export const load: PageLoad = async ({ url, fetch }) => {
   // Issued before the search is awaited, so the two overlap. `Cache-Control:
   // max-age=900` means only the first navigation actually pays for it.
-  const schemaRes = fetch(`${__API_BASE__}/api/schema`).catch(() => null);
+  const schemaPromise = getSchema(fetch);
 
   const query = fromParams(url.searchParams);
   const submitted = url.searchParams.toString().length > 0;
@@ -29,24 +29,20 @@ export const load: PageLoad = async ({ url, fetch }) => {
   let matched = 0;
   if (submitted && !isEmpty(query) && errors.length === 0) {
     try {
-      const res = await fetch(`${__API_BASE__}/api/search?${url.searchParams}`);
-      const body = await res.json();
-      // errors come back as `{ error, message }`; ES detail is never forwarded
-      if (!res.ok) errors.push(body?.message ?? `Search failed (${res.status}).`);
-      else {
-        records = body.records;
-        matched = body.summary.matched;
-      }
-    } catch {
-      errors.push(`Could not reach the search service at ${__API_BASE__}.`);
+      ({ records, matched } = await search(fetch, url.searchParams));
+    } catch (e) {
+      errors.push(e instanceof Error ? e.message : "Search failed.");
     }
   }
 
   // A failed search degrades to an error message beside the form. A failed schema
   // cannot: it is the form — every dropdown's contents come from it.
-  const res = await schemaRes;
-  if (!res?.ok) error(503, `Could not load the search form from ${__API_BASE__}.`);
-  const schema = (await res.json()) as Schema;
+  let schema;
+  try {
+    schema = await schemaPromise;
+  } catch (e) {
+    error(503, e instanceof Error ? e.message : `Could not load the search form from ${__API_BASE__}.`);
+  }
 
   return { schema, query, submitted, errors, records, matched };
 };

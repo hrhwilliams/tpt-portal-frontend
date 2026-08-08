@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { getTaxa } from "$lib/api";
   import type { Taxon } from "$lib/types";
 
   let { value = $bindable(), rank, id }: { value: string; rank: string; id?: string } = $props();
@@ -25,15 +26,10 @@
     }
     const ctl = new AbortController();
     const timer = setTimeout(async () => {
-      const rankParam = r ? `&rank=${encodeURIComponent(r)}` : "";
       try {
-        const res = await fetch(`${__API_BASE__}/api/taxa?q=${encodeURIComponent(q)}&limit=10${rankParam}`, {
-          signal: ctl.signal,
-        });
-        if (!res.ok) return;
-        const body = await res.json();
+        const found = await getTaxa(fetch, q, { rank: r, signal: ctl.signal });
         // an exact hit is already in the box; suggesting it back is noise
-        matches = (body.matches as Taxon[]).filter((t) => t.name.toLowerCase() !== q.toLowerCase());
+        matches = found.filter((t) => t.name.toLowerCase() !== q.toLowerCase());
         // the highlighted index belonged to the previous list
         active = -1;
         answered = q;

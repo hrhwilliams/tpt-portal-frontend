@@ -1,6 +1,7 @@
 <script lang="ts">
   import { navigating, page } from "$app/state";
   import { resolve } from "$app/paths";
+  import { downloadUrl } from "$lib/api";
   import AttributeRows from "$lib/components/AttributeRows.svelte";
   import CollectorCombobox from "$lib/components/CollectorCombobox.svelte";
   import MultiSelect from "$lib/components/MultiSelect.svelte";
@@ -33,7 +34,7 @@
 
   // Same params as the search that produced the table, so the file matches what
   // is on screen.
-  const csvUrl = $derived(`${__API_BASE__}/api/download?${page.url.searchParams}`);
+  const csvUrl = $derived(downloadUrl(page.url.searchParams));
 
   const limits = $derived(data.schema.limits);
   const { pageCount, lastPage } = $derived(pageWindow(data.matched, limits));
