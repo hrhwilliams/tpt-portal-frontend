@@ -44,11 +44,12 @@ export class SearchQueryState {
     $effect(() => {
       const params = toParams(this.#query);
       if (params.toString() === page.url.searchParams.toString()) return;
-      // Only an edit gets past that early return — paging navigates directly,
-      // and the page number is adopted back from the URL before this runs.
-      // Page 7 of the old search is not page 7 of the new one, so the edit
-      // starts over at the first. Dropped from the target, not written back
-      // to `#query`: the URL owns the page.
+      // Only an edit gets past that early return — paging navigates directly
+      // via `goPage`, which this effect never sees because `#navigate` (see
+      // below) keeps `#query.page` matching whatever was last sent. Page 7 of
+      // the old search is not page 7 of the new one, so an edit starts over
+      // at the first: dropped from the target here rather than left for
+      // `#navigate` to pick up from `#query.page`.
       params.delete("page");
       const timer = setTimeout(
         () => this.#navigate(params, { replaceState: true, keepFocus: true, noScroll: true }),
@@ -65,6 +66,12 @@ export class SearchQueryState {
   }
 
   #navigate(params: URLSearchParams, opts?: Parameters<typeof goto>[1]) {
+    // Every outgoing navigation goes through here, so this is also the one
+    // place that keeps `#query.page` matching what was actually sent. Without
+    // it, `#query.page` stays stale after `goPage()`, the live-search effect
+    // above sees `toParams(#query)` disagree with the URL it just landed on,
+    // and "corrects" that by navigating straight back to page 1.
+    this.#query.page = Number(params.get("page") ?? 1) || 1;
     this.#lastSent = params.toString();
     goto(resolve(`/search?${this.#lastSent}`), opts);
   }

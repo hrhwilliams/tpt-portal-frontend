@@ -4,7 +4,7 @@
   import AttributeRows from "$lib/components/AttributeRows.svelte";
   import MultiSelect from "$lib/components/MultiSelect.svelte";
   import TaxonRows from "$lib/components/TaxonRows.svelte";
-  import { DETECTION_ATTRIBUTE_TYPE_IDS, hasNegatedRow, toParams } from "$lib/query";
+  import { DETECTION_ATTRIBUTE_TYPE_IDS, hasNegatedRow, pageWindow, toParams } from "$lib/query";
   import { SearchQueryState } from "./query-state.svelte.ts";
   import type { PageData } from "./$types";
 
@@ -34,12 +34,8 @@
   // is on screen.
   const csvUrl = $derived(`${__API_BASE__}/api/download?${page.url.searchParams}`);
 
-  // `matched` is exact and uncapped, so it can name more pages than the service
-  // will serve — past the window a request is refused. Browsing stops at the
-  // window and says so; the export is not capped by it.
   const limits = $derived(data.schema.limits);
-  const pageCount = $derived(Math.ceil(data.matched / limits.page_size));
-  const lastPage = $derived(Math.min(pageCount, Math.floor(limits.max_result_window / limits.page_size)));
+  const { pageCount, lastPage } = $derived(pageWindow(data.matched, limits));
 </script>
 
 <svelte:head><title>Search specimens — TPT portal</title></svelte:head>
@@ -112,7 +108,13 @@
 
   <fieldset>
     <legend>Other record attributes</legend>
-    <AttributeRows bind:rows={q.otherAttributes} bind:op={q.attr_op} {advanced} schema={data.schema} types={otherTypes} />
+    <AttributeRows
+      bind:rows={q.otherAttributes}
+      bind:op={q.attr_op}
+      {advanced}
+      schema={data.schema}
+      types={otherTypes}
+    />
   </fieldset>
 
   <fieldset>

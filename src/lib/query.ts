@@ -4,12 +4,7 @@ import { EMPTY_QUERY, type AttributePair, type BoolOp, type SearchQuery, type Ta
  *  every other attribute type is a plain record attribute. The only source of
  *  truth for the split — both the search form's two fieldsets and `fromParams`
  *  below classify a row by checking this set. */
-export const DETECTION_ATTRIBUTE_TYPE_IDS = new Set([
-  "detected",
-  "not detected",
-  "examined for",
-  "not examined for",
-]);
+export const DETECTION_ATTRIBUTE_TYPE_IDS = new Set(["detected", "not detected", "examined for", "not examined for"]);
 
 /**
  * URL <-> query state. The URL is the state: nothing else drives a search.
@@ -152,6 +147,18 @@ export function fromParams(p: URLSearchParams): SearchQuery {
   // a hand-edited link could carry both; the form cannot produce it
   if (hasNegatedRow(q)) q.method = "";
   return q;
+}
+
+/** `matched` is exact and uncapped, so it can name more pages than the service
+ *  will serve — past `max_result_window` a request is refused. Browsing stops
+ *  at that window; export is not capped by it. */
+export function pageWindow(
+  matched: number,
+  limits: { page_size: number; max_result_window: number },
+): { pageCount: number; lastPage: number } {
+  const pageCount = Math.ceil(matched / limits.page_size);
+  const lastPage = Math.min(pageCount, Math.floor(limits.max_result_window / limits.page_size));
+  return { pageCount, lastPage };
 }
 
 export function hasNegatedRow(q: SearchQuery): boolean {
