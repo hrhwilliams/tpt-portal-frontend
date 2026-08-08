@@ -18,6 +18,10 @@
   {@render children()}
 </main>
 
+<footer>
+  Created using Arctos data. Visit <a href="https://arctosdb.org/about/">https://arctosdb.org/about/</a> to learn more.
+</footer>
+
 <style>
   :global(:root) {
     --bg: #ffffff;
@@ -43,8 +47,14 @@
   :global(*, *::before, *::after) {
     box-sizing: border-box;
   }
+  :global(html, body) {
+    height: 100%;
+  }
   :global(body) {
     margin: 0;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
     background: var(--bg);
     color: var(--fg);
     font:
@@ -196,8 +206,17 @@
     color: var(--fg);
   }
   main {
+    flex: 1;
     max-width: 62rem;
     margin: 0 auto;
     padding: 1.2rem;
+  }
+  footer {
+    padding: 0.9rem 1.2rem;
+    border-top: 1px solid var(--line);
+    font-size: 0.82rem;
+  }
+  footer a {
+    color: var(--muted);
   }
 </style>
