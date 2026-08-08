@@ -1,81 +1,18 @@
 <script lang="ts">
-  import { untrack } from "svelte";
-  import { goto } from "$app/navigation";
   import { navigating, page } from "$app/state";
   import { resolve } from "$app/paths";
   import AttributeRows from "$lib/components/AttributeRows.svelte";
   import MultiSelect from "$lib/components/MultiSelect.svelte";
   import TaxonRows from "$lib/components/TaxonRows.svelte";
   import { hasNegatedRow, toParams } from "$lib/query";
-  import type { SearchQuery } from "$lib/types";
+  import { SearchQueryState } from "./query-state.svelte.ts";
   import type { PageData } from "./$types";
 
   let { data }: { data: PageData } = $props();
 
-  // Local edit buffer. Edits live only between keystroke and submit; the URL
-  // remains the state, and every navigation replaces this wholesale.
-  //
-  // This must be $state, not a writable $derived: $derived does not proxy its
-  // value, so `q.attributes` would be a plain array and pushing a row through
-  // `bind:` would not re-render. Deep reactivity is the whole requirement here.
-  let q = $state<SearchQuery>(untrack(() => structuredClone(data.query)));
-
-  // Opens itself when a shared link already uses one of these, so a pasted URL
-  // never hides part of its own query.
-  const usesAdvanced = (s: SearchQuery) => hasNegatedRow(s) || s.attr_op === "or" || s.method.trim() !== "";
-  let advanced = $state(untrack(() => usesAdvanced(data.query)));
-
-  // Params of the last navigation *we* sent, vs. one landing from outside (back/
-  // forward, a pasted link, paging). Comparing against the current `q` instead
-  // would misfire: two independently-debounced fieldsets (detection vs. other
-  // attributes) can each still have an edit in flight when the other's earlier
-  // navigation lands, and that stale response would wipe out the newer one.
-  let lastSent = $state(untrack(() => toParams(data.query).toString()));
-
-  function navigate(params: URLSearchParams, opts?: Parameters<typeof goto>[1]) {
-    lastSent = params.toString();
-    goto(resolve(`/search?${lastSent}`), opts);
-  }
-
-  // Adopt the URL's query whenever a navigation we did not send lands. Reads
-  // `lastSent` untracked: this must only react to `data.query` actually
-  // changing, not to `navigate()` writing `lastSent` the instant it fires —
-  // that write happens well before the navigation resolves, and reacting to
-  // it here would compare against the still-old `data.query` and wipe out
-  // the edit that hasn't landed yet.
-  $effect(() => {
-    const incoming = toParams(data.query).toString();
-    if (incoming === untrack(() => lastSent)) return;
-    q = structuredClone(data.query);
-    advanced = usesAdvanced(data.query);
-    lastSent = incoming;
-  });
-
-  // Live search: an edit navigates and `load` fetches. Debounced — typing a
-  // locality would otherwise be one Elasticsearch query per keystroke, against a
-  // 30 req/min per-IP limit. `replaceState` keeps the back button on whole
-  // searches instead of every intermediate keystroke.
-  $effect(() => {
-    const params = toParams(q);
-    if (params.toString() === page.url.searchParams.toString()) return;
-    // Only an edit gets past that early return — paging navigates directly, and
-    // `q.page` is adopted back from the URL before this runs. Page 7 of the old
-    // search is not page 7 of the new one, so the edit starts over at the first.
-    // Dropped from the target URL, not written back to `q`: the URL owns the page.
-    params.delete("page");
-    const timer = setTimeout(() => navigate(params, { replaceState: true, keepFocus: true, noScroll: true }), 500);
-    return () => clearTimeout(timer);
-  });
-
-  /** Hidden inputs must not keep filtering. Switching off discards them. */
-  function toggleAdvanced(on: boolean) {
-    advanced = on;
-    if (!on) {
-      q.attributes = q.attributes.map((a) => ({ ...a, negated: false }));
-      q.attr_op = "and";
-      q.method = "";
-    }
-  }
+  const state = new SearchQueryState(() => data.query);
+  const q = $derived(state.query);
+  const advanced = $derived(state.advanced);
 
   // Four types sharing one vocabulary ("ectoparasite", "endoparasite", ...);
   // everything else in the schema is a plain record attribute. Both fieldsets
@@ -107,16 +44,6 @@
   const limits = $derived(data.schema.limits);
   const pageCount = $derived(Math.ceil(data.matched / limits.page_size));
   const lastPage = $derived(Math.min(pageCount, Math.floor(limits.max_result_window / limits.page_size)));
-
-  function goPage(n: number) {
-    const params = toParams(q);
-    if (n > 1) params.set("page", String(n));
-    navigate(params);
-  }
-
-  function reset() {
-    navigate(new URLSearchParams());
-  }
 </script>
 
 <svelte:head><title>Search specimens — TPT portal</title></svelte:head>
@@ -153,7 +80,7 @@
     />
 
     <label class="adv">
-      <input type="checkbox" checked={advanced} onchange={(e) => toggleAdvanced(e.currentTarget.checked)} />
+      <input type="checkbox" checked={advanced} onchange={(e) => state.toggleAdvanced(e.currentTarget.checked)} />
       <span>Advanced</span>
       <em>negate a row, switch AND/OR, filter by method</em>
     </label>
@@ -260,7 +187,7 @@
 
   <div class="actions">
     <button type="submit" class="primary">Search</button>
-    <button type="button" onclick={reset}>Clear</button>
+    <button type="button" onclick={() => state.reset()}>Clear</button>
     <code class="url">{searchUrl}</code>
   </div>
 </form>
@@ -291,13 +218,13 @@
       </h2>
       {#if lastPage > 1}
         <nav class="pager">
-          <button type="button" disabled={data.query.page <= 1} onclick={() => goPage(data.query.page - 1)}
+          <button type="button" disabled={data.query.page <= 1} onclick={() => state.goPage(data.query.page - 1)}
             >← Previous</button
           >
           <span>
             Page {data.query.page.toLocaleString()} of {lastPage.toLocaleString()}
           </span>
-          <button type="button" disabled={data.query.page >= lastPage} onclick={() => goPage(data.query.page + 1)}
+          <button type="button" disabled={data.query.page >= lastPage} onclick={() => state.goPage(data.query.page + 1)}
             >Next →</button
           >
         </nav>
