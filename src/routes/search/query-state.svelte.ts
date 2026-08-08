@@ -97,8 +97,14 @@ export class SearchQueryState {
   }
 
   goPage(n: number) {
+    // toParams(#query) can already carry a page from the last goPage — #navigate
+    // keeps #query.page in sync with whatever was last sent, so it's never just
+    // the initial 1 here. Always decide the outgoing page explicitly instead of
+    // only overwriting it for n > 1: paging back to page 1 needs the param gone,
+    // not left over from wherever we were.
     const params = toParams(this.#query);
     if (n > 1) params.set("page", String(n));
+    else params.delete("page");
     this.#navigate(params);
   }
 
