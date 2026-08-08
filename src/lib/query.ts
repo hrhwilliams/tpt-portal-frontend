@@ -1,35 +1,20 @@
 import { EMPTY_QUERY, type AttributePair, type BoolOp, type SearchQuery, type TaxonPair } from "./types.ts";
 
-/** Four types sharing one vocabulary ("ectoparasite", "endoparasite", ...);
- *  every other attribute type is a plain record attribute. The only source of
- *  truth for the split — both the search form's two fieldsets and `fromParams`
- *  below classify a row by checking this set. */
+/** Types that are allowed in the detection attribute form */
 export const DETECTION_ATTRIBUTE_TYPE_IDS = new Set(["detected", "not detected", "examined for", "not examined for"]);
 
 /**
- * URL <-> query state. The URL is the state: nothing else drives a search.
- *
- * Both repeatable blocks serialise as repeated params:
- *
- *   taxon=species|Myodes gapperi
- *   taxon=species|Myodes rutilus     -> OR
- *   taxon=genus|Sorex|parasite of; host of parasite
- *                                    -> the row's relationships, OR within the row
- *   attr=examined for|ectoparasite
- *   attr=!detected|ectoparasite      -> `!` negates
- *   attr_op=or                       -> absent means AND
- *
- * Each decoder below documents how it splits its own `|`s.
- */
-
-/**
- * `rank|name` or `rank|name|relation; relation`. Three controlled-ish fields, so
- * a plain split: a taxon name containing a `|` is theoretical, and its tail would
- * only land in the relations slot and match no relationship.
+ * `rank|name` or `rank|name|relation; relation`
  */
 function decodeTaxon(raw: string): TaxonPair | null {
+  // split by `|` into rank, name, relations list
   const [rank = "", name = "", rel = ""] = raw.split("|").map((s) => s.trim());
-  if (!name) return null;
+
+  if (!name) {
+    return null;
+  }
+
+  // further split relations list separated by `;`
   const relations = rel
     .split(";")
     .map((r) => r.trim())
@@ -37,85 +22,105 @@ function decodeTaxon(raw: string): TaxonPair | null {
   return { rank, name, relations };
 }
 
+/**
+ * `type|value; value`
+ */
 function decodeAttr(raw: string): AttributePair | null {
   let s = raw;
   let negated = false;
+
   if (s.startsWith("!")) {
     negated = true;
     s = s.slice(1);
   }
-  // Split on the FIRST `|` only, and no `|` at all means no value: "carries this
-  // attribute type at all". Free-text values routinely contain one — `reproductive
-  // data` uses it as its own internal separator.
+
+  // split on first `|` only to avoid splitting value fields that contain
+  // their own pipes
   const cut = s.indexOf("|");
   const type = (cut < 0 ? s : s.slice(0, cut)).trim();
   const joined = cut < 0 ? "" : s.slice(cut + 1).trim();
-  if (!type) return null;
-  // Several values OR within the row. `;` is safe as the separator: controlled
-  // values never contain one, and free-text types are single-valued in the form.
+
+  if (!type) {
+    return null;
+  }
+
+  // split attribute value list separated by `;`
   const values = joined
     .split(";")
     .map((v) => v.trim())
     .filter(Boolean);
+
   return { type, values, negated };
 }
 
-/** Both attribute blocks flattened together — attr_op combines them as one
- *  whole, and this is the only place that needs them as a single list. */
+/** Flattens the attribute lists into one list */
 function allAttributes(q: SearchQuery): AttributePair[] {
   return [...q.detectionAttributes, ...q.otherAttributes];
 }
 
+/** Transform a query into a shareable URL parameter list */
 export function toParams(q: SearchQuery): URLSearchParams {
   const p = new URLSearchParams();
-  // empty inputs are absent, never `&locality=` — keeps a shared link canonical
+
   const put = (k: string, v: string) => {
     if (v && v.trim()) p.set(k, v.trim());
   };
+
   for (const t of q.taxa) {
     if (!t.name) continue;
     const rel = t.relations.filter(Boolean);
     p.append("taxon", `${t.rank}|${t.name}${rel.length ? `|${rel.join("; ")}` : ""}`);
   }
+
   for (const a of allAttributes(q)) {
     if (!a.type) continue;
     const v = a.values.map((x) => x.trim()).filter(Boolean);
     p.append("attr", `${a.negated ? "!" : ""}${a.type}${v.length ? `|${v.join("; ")}` : ""}`);
   }
-  // Rows without a type yet (just added, not chosen) don't count — otherwise
-  // toggling OR before picking a type puts `attr_op=or` alone on the URL, which
-  // reads as a submitted-but-empty search and gets rejected.
+
   const typedAttrCount = allAttributes(q).filter((a) => a.type).length;
-  if (q.attr_op === "or" && typedAttrCount > 1) p.set("attr_op", "or");
-  if (!hasNegatedRow(q)) put("method", q.method);
+
+  if (q.attr_op === "or" && typedAttrCount > 1) {
+    p.set("attr_op", "or");
+  }
+
+  if (!hasNegatedRow(q)) {
+    put("method", q.method);
+  }
+
   for (const gp of q.guid_prefixes) {
     if (gp) p.append("prefix", gp);
   }
+
   put("locality", q.locality);
+
   for (const c of q.countries) {
     if (c) p.append("country", c);
   }
+
   for (const st of q.states) {
     if (st) p.append("state", st);
   }
+
   put("from", q.collected_from);
   put("to", q.collected_to);
   put("collector", q.agent);
-  if (q.page > 1) p.set("page", String(q.page));
-  if (q.sort !== "guid_asc") p.set("sort", q.sort);
+
+  if (q.page > 1) {
+    p.set("page", String(q.page));
+  }
+
   return p;
 }
 
+/** Transform a URL parameter list into a search query for the search form */
 export function fromParams(p: URLSearchParams): SearchQuery {
   const taxa = p
     .getAll("taxon")
     .map(decodeTaxon)
     .filter((t): t is TaxonPair => t !== null);
 
-  // Links published before the taxon block became repeatable used a single
-  // `rank=` + `taxon=` pair. D17 makes shared URLs a public API, so they keep
-  // working: read the old form as one row.
-  if (!taxa.length) {
+  if (taxa.length === 0) {
     const legacyName = p.get("taxon");
     if (legacyName && !legacyName.includes("|")) {
       taxa.push({ rank: p.get("rank") ?? "", name: legacyName, relations: [] });
@@ -142,29 +147,19 @@ export function fromParams(p: URLSearchParams): SearchQuery {
     collected_to: p.get("to") ?? "",
     agent: p.get("collector") ?? "",
     page: Math.max(1, Number(p.get("page") ?? 1) || 1),
-    sort: p.get("sort") ?? "guid_asc",
   };
-  // a hand-edited link could carry both; the form cannot produce it
+
   if (hasNegatedRow(q)) q.method = "";
+
   return q;
 }
 
-/** `matched` is exact and uncapped, so it can name more pages than the service
- *  will serve — past `max_result_window` a request is refused. Browsing stops
- *  at that window; export is not capped by it. */
-export function pageWindow(
-  matched: number,
-  limits: { page_size: number; max_result_window: number },
-): { pageCount: number; lastPage: number } {
-  const pageCount = Math.ceil(matched / limits.page_size);
-  const lastPage = Math.min(pageCount, Math.floor(limits.max_result_window / limits.page_size));
-  return { pageCount, lastPage };
-}
-
+/** Check if one of the attribute rows has had `NOT` checked */
 export function hasNegatedRow(q: SearchQuery): boolean {
   return allAttributes(q).some((a) => a.negated && a.type);
 }
 
+/** Check if a search query is empty */
 export function isEmpty(q: SearchQuery): boolean {
   return !(
     q.taxa.some((t) => t.name) ||
@@ -177,18 +172,4 @@ export function isEmpty(q: SearchQuery): boolean {
     q.collected_to ||
     q.agent
   );
-}
-
-/** Client-side mirror of the API's validation. The backend stays authoritative. */
-export function validate(q: SearchQuery): string[] {
-  const errors: string[] = [];
-  if (isEmpty(q)) errors.push("Enter at least one filter — an unconstrained search is refused.");
-  if (q.collected_from && q.collected_to && q.collected_from > q.collected_to)
-    errors.push("Collection date range starts after it ends.");
-  for (const t of q.taxa) {
-    if (t.name && !t.rank) errors.push(`Taxon "${t.name}" has no rank.`);
-  }
-  // a row with no value is legal: "carries this attribute type at all"
-  if (q.method && hasNegatedRow(q)) errors.push("Method cannot be combined with a negated attribute row.");
-  return errors;
 }

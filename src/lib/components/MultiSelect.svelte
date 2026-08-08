@@ -3,15 +3,15 @@
    * Checkbox dropdown with type-to-filter. Selected values OR together.
    *
    * A real <button aria-expanded> and native checkboxes rather than a tabindex
-   * div, so keyboard and screen-reader use work without extra handling.
+   * div, so keyboard and screen-readers work without extra handling.
    */
   export type Option = { value: string; label: string; hint?: string };
 
   let {
     selected = $bindable(),
     options,
-    placeholder = "Select…",
-    filterPlaceholder = "Type to filter…",
+    placeholder = "Select...",
+    filterPlaceholder = "Type to filter...",
     id,
   }: {
     selected: string[];
@@ -31,8 +31,6 @@
     return options.filter((o) => o.label.toLowerCase().includes(f) || o.value.toLowerCase().includes(f));
   });
 
-  // checked first, so what you picked stays visible — the service decides how long
-  // these lists are, and states is currently ~1,900
   const checked = $derived(shown.filter((o) => selected.includes(o.value)));
   const unchecked = $derived(shown.filter((o) => !selected.includes(o.value)));
 
@@ -53,14 +51,15 @@
   }
 
   function onDocPointerDown(e: PointerEvent) {
-    if (open && root && !root.contains(e.target as Node)) close();
+    if (open && root && !root.contains(e.target as Node)) {
+      close();
+    }
   }
 
-  // Escape closes from anywhere inside: focus sits on an option checkbox for most
-  // of the panel's life, and a handler on the trigger never sees that key. The
-  // document is already listening for the outside click, so it takes this too.
   function onDocKeyDown(e: KeyboardEvent) {
-    if (open && e.key === "Escape") close();
+    if (open && e.key === "Escape") {
+      close();
+    }
   }
 </script>
 
@@ -111,7 +110,7 @@
         {/if}
         {#each unchecked as o (o.value)}{@render row(o)}{/each}
         {#if !shown.length}
-          <li class="none">No match for “{filter}”</li>
+          <li class="none">No match for "{filter}"</li>
         {/if}
       </ul>
     </div>
@@ -150,14 +149,12 @@
     color: var(--muted);
     font-size: 0.7rem;
   }
-  /* position/border/shadow come from :global(.floating-panel) — see +layout.svelte */
   .panel {
     margin-top: 2px;
     padding: 0.4rem;
     max-height: 16rem;
     display: flex;
     flex-direction: column;
-    /* wider than the trigger so long labels and the filter box aren't cramped */
     min-width: max(100%, 18rem);
   }
   .bar {
@@ -176,12 +173,10 @@
   ul {
     list-style: none;
     margin: 0;
-    padding: 0 0.4rem 0 0; /* keeps the scrollbar off the counts */
+    padding: 0 0.4rem 0 0;
     overflow-y: auto;
     scrollbar-gutter: stable;
   }
-  /* `.ms` is load-bearing: Svelte 5 scopes with :where(), so a bare `li label`
-	   ties with the global `form label` and loses to it. */
   .ms li label {
     display: flex;
     flex-direction: row;

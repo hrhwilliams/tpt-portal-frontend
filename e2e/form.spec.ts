@@ -198,7 +198,7 @@ test("AND/OR toggle reaches the URL", async ({ page }) => {
   await open(page, "/search?attr=detected%7Cectoparasite&attr=detected%7Cendoparasite");
 
   await detectionAttrs(page).getByRole("checkbox", { name: "Advanced" }).check();
-  await page.getByRole("radio", { name: /^OR/ }).check();
+  await detectionAttrs(page).locator('input[type="radio"][value="or"]').check();
   await page.getByRole("button", { name: "Search", exact: true }).click();
 
   await expect(page).toHaveURL(/attr_op=or/);

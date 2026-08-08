@@ -6,7 +6,7 @@
   import CollectorCombobox from "$lib/components/CollectorCombobox.svelte";
   import MultiSelect from "$lib/components/MultiSelect.svelte";
   import TaxonRows from "$lib/components/TaxonRows.svelte";
-  import { DETECTION_ATTRIBUTE_TYPE_IDS, hasNegatedRow, pageWindow, toParams } from "$lib/query";
+  import { DETECTION_ATTRIBUTE_TYPE_IDS, hasNegatedRow, toParams } from "$lib/query";
   import { SearchQueryState } from "./query-state.svelte.ts";
   import type { PageData } from "./$types";
 
@@ -15,10 +15,8 @@
   const state = new SearchQueryState(() => data.query);
   const q = $derived(state.query);
   const advanced = $derived(state.advanced);
-
   const detectionTypes = $derived(data.schema.attribute_types.filter((t) => DETECTION_ATTRIBUTE_TYPE_IDS.has(t.id)));
   const otherTypes = $derived(data.schema.attribute_types.filter((t) => !DETECTION_ATTRIBUTE_TYPE_IDS.has(t.id)));
-
   const negated = $derived(hasNegatedRow(q));
   const opts = (vals: { value: string; count: number }[]) =>
     vals.map((v) => ({ value: v.value, label: v.value, hint: v.count.toLocaleString() }));
@@ -27,17 +25,12 @@
   const stateOptions = $derived(opts(data.schema.states));
   const searchUrl = $derived(resolve(`/search?${toParams(q).toString()}`));
   const searching = $derived(navigating.to !== null);
-
-  // The service decides which fields come back, so the table follows it.
   const columns = $derived(data.records?.length ? Object.keys(data.records[0]) : []);
   const cell = (v: unknown) => (v == null ? "" : typeof v === "object" ? JSON.stringify(v) : String(v));
-
-  // Same params as the search that produced the table, so the file matches what
-  // is on screen.
   const csvUrl = $derived(downloadUrl(page.url.searchParams));
-
   const limits = $derived(data.schema.limits);
-  const { pageCount, lastPage } = $derived(pageWindow(data.matched, limits));
+  const pageCount = $derived(Math.ceil(data.matched / limits.page_size));
+  const lastPage = $derived(Math.min(pageCount, Math.floor(limits.max_result_window / limits.page_size)));
 </script>
 
 <svelte:head><title>Search specimens — TPT portal</title></svelte:head>
@@ -47,7 +40,6 @@
   Data current as of {data.schema.snapshot_date}.
 </p>
 
-<!-- Every edit already navigates; Enter must only be stopped from doing a native GET. -->
 <form onsubmit={(e) => e.preventDefault()}>
   <fieldset>
     <legend>Global filters</legend>
@@ -87,8 +79,6 @@
         />
       </div>
       <div class="field">
-        <!-- `for`/`id` rather than wrapping: see TaxonRows for why a <label>
-             shouldn't wrap a combobox input. -->
         <label class="lbl" for="collector">Collector</label>
         <CollectorCombobox id="collector" bind:value={q.agent} options={data.schema.collectors} />
       </div>
@@ -157,9 +147,9 @@
       {/if}
     {/if}
 
-    <!-- <p class="note honesty">
-			Results reflect what was recorded. A specimen with no result row is <strong>not</strong> a
-			negative — it may have been examined with the outcome unrecorded, or never examined.
+    <!-- <p class="note">
+			Results reflect what was recorded. A specimen with no result row is <strong>not</strong>
+			necessarily a negative — it may have been examined with the outcome unrecorded, or never examined.
 			<em>Not detected</em> returns only explicitly recorded negatives.
 			<a
 				href="https://handbook.arctosdb.org/best_practices/examined.html"
@@ -199,17 +189,11 @@
 {/if}
 
 {#if data.records}
-  <!-- dimmed while a newer search is in flight, so stale rows do not read as live -->
   <div class="panel" class:stale={searching}>
     <div class="head">
       <h2>
-        <!-- `matched` is an exhaustive aggregation, so the count is exact at any
-				     size. No "10,000+": that was `hits.total` hitting its counting cap. -->
         {data.matched.toLocaleString()} result{data.matched === 1 ? "" : "s"}
         {#if data.records.length}
-          <!-- The API origin, not a route, so `resolve()` does not apply. The service
-					     sends Content-Disposition: attachment, so a plain link downloads. -->
-          <!-- eslint-disable-next-line svelte/no-navigation-without-resolve -->
           <a class="csv" href={csvUrl}>Export as CSV</a>
         {/if}
       </h2>
@@ -233,8 +217,6 @@
       </p>
     {/if}
     {#if data.records.length}
-      <!-- ponytail: columns are whatever the service returns. Spec 05's real
-			     table — chosen columns, expandable events — replaces this. -->
       <div class="scroll">
         <table>
           <thead>

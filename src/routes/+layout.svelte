@@ -82,9 +82,6 @@
   :global(a) {
     color: var(--accent);
   }
-
-  /* Form primitives. The search form and its row components render one visual
-	   language; these lived identically in three style blocks. */
   :global(.rows) {
     display: flex;
     flex-direction: column;
@@ -133,9 +130,6 @@
     color: var(--muted);
     max-width: 78ch;
   }
-
-  /* MultiSelect's dropdown and TaxonCombobox's suggestion list are the same
-	   floating panel recipe — this lived identically in two style blocks. */
   :global(.floating-panel) {
     position: absolute;
     z-index: 20;
@@ -147,10 +141,6 @@
     border-radius: 6px;
     box-shadow: 0 6px 18px rgb(0 0 0 / 18%);
   }
-
-  /* The single-value "type and pick a suggestion" combobox: TaxonCombobox and
-	   CollectorCombobox render this identically, one fetching remotely and one
-	   filtering a local list — same visual language either way. */
   :global(.combo) {
     position: relative;
   }

@@ -7,12 +7,7 @@
   let open = $state(false);
   let active = $state(-1);
   let matches = $state<Taxon[]>([]);
-  // the query `matches` actually answers. "No taxon matching that" is a claim about
-  // the snapshot, so it must not be made while the lookup for what is typed is
-  // still in flight — otherwise it flashes on the way to every result.
   let answered = $state("");
-
-  // every taxon row renders one of these, so the list id has to be per-instance
   const listId = $derived(`${id ?? "taxon"}-list`);
 
   // GET /api/taxa. One request per keystroke is what the debounce and the abort
@@ -27,10 +22,7 @@
     const ctl = new AbortController();
     const timer = setTimeout(async () => {
       try {
-        const found = await getTaxa(fetch, q, { rank: r, signal: ctl.signal });
-        // an exact hit is already in the box; suggesting it back is noise
-        matches = found.filter((t) => t.name.toLowerCase() !== q.toLowerCase());
-        // the highlighted index belonged to the previous list
+        matches = await getTaxa(fetch, q, { rank: r, signal: ctl.signal });
         active = -1;
         answered = q;
       } catch {

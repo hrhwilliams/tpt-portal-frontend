@@ -6,16 +6,9 @@
 
 <h1>TPT specimen portal</h1>
 
-<p class="lede">
-  Search natural history specimen records by taxon, place, collection date, collector, and any recorded attribute. Every
-  search is addressable as a URL, so a query can be cited.
-</p>
-
-<h2>Proof of concept</h2>
 <p>
-  Searches run against the service. Vocabularies, collections and taxon suggestions come from it too — the form is built
-  from <code>/api/schema</code>, so its options are whatever the current snapshot and the Arctos code tables say they
-  are.
+  Search natural history specimen records by taxon, place, collection date, collector, and any recorded attribute for
+  parasite or pathogen detection.
 </p>
 
 <p>Worth trying:</p>
@@ -61,10 +54,6 @@
 <p><a class="cta" href={resolve("/search")}>Open the search form</a></p>
 
 <style>
-  .lede {
-    font-size: 1.05rem;
-    max-width: 60ch;
-  }
   li {
     margin-bottom: 0.5rem;
     max-width: 78ch;

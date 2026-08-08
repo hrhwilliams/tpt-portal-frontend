@@ -13,29 +13,26 @@
     op: BoolOp;
     advanced?: boolean;
     schema: Schema;
-    /** Restricts the type dropdown to a subset, e.g. detection types only. */
     types?: AttributeTypeDef[];
   } = $props();
 
-  // Two instances render side by side (one per fieldset) — without this,
-  // both would emit id="attr-type-0" and collide, breaking label association.
   const uid = $props.id();
 
   function typeDef(id: string) {
     return schema.attribute_types.find((t) => t.id === id) ?? null;
   }
 
-  /** The value input is a dropdown when the type declares a code table. */
+  /** The value input is a dropdown when the type uses a code table. */
   function vocabFor(id: string) {
     const table = typeDef(id)?.vocabulary;
     return table ? (schema.vocabularies[table] ?? null) : null;
   }
 
-  function add() {
+  function addRow() {
     rows = [...rows, { type: "", values: [], negated: false }];
   }
 
-  function remove(row: AttributePair) {
+  function removeRow(row: AttributePair) {
     rows = rows.filter((r) => r !== row);
   }
 </script>
@@ -44,13 +41,11 @@
   {#if advanced && rows.length > 1}
     <fieldset class="opsel">
       <legend class="lbl">Combine rows with</legend>
-      <label><input type="radio" bind:group={op} value="and" /> AND — all must hold</label>
-      <label><input type="radio" bind:group={op} value="or" /> OR — any may hold</label>
+      <label><input type="radio" bind:group={op} value="and" /> Record must have all attributes</label>
+      <label><input type="radio" bind:group={op} value="or" /> Record must have at least one of the attributes</label>
     </fieldset>
   {/if}
 
-  <!-- keyed by the row object, not `i`: an index key would hand a removed row's
-	     component instances (and their open dropdowns) to the row that survives it -->
   {#each rows as row, i (row)}
     {@const def = typeDef(row.type)}
     {@const vocab = vocabFor(row.type)}
@@ -58,7 +53,7 @@
     <div class="row" class:negated={row.negated}>
       <div class="controls">
         {#if advanced}
-          <label class="neg" title="Require that the specimen does NOT carry this">
+          <label class="neg" title="Require that the record does NOT have this attribute">
             <input type="checkbox" bind:checked={row.negated} />
             <span>NOT</span>
           </label>
@@ -76,13 +71,11 @@
 
         <div class="field grow">
           <label class="lbl" for="attr-value-{uid}-{i}">
-            Value <em class="hint">optional</em>
+            Value <em class="hint">(optional)</em>
             {#if vocab}<em class="hint">· pick any number</em>
             {:else if row.type}<em class="hint">· free text</em>{/if}
           </label>
           {#if vocab}
-            <!-- controlled vocabulary: pick several, they OR. Free-text types stay a
-						     single input — there is nothing to enumerate. -->
             <MultiSelect
               id="attr-value-{uid}-{i}"
               bind:selected={row.values}
@@ -103,7 +96,7 @@
           {/if}
         </div>
 
-        <button type="button" class="rm" onclick={() => remove(row)} aria-label="Remove this row"> × </button>
+        <button type="button" class="rm" onclick={() => removeRow(row)} aria-label="Remove this row"> × </button>
       </div>
 
       {#if def?.description}
@@ -112,7 +105,7 @@
     </div>
   {/each}
 
-  <button type="button" class="add" onclick={add}>+ Add attribute</button>
+  <button type="button" class="add" onclick={addRow}>+ Add attribute</button>
 
   {#if rows.length > 1}
     <p class="note">
@@ -126,7 +119,6 @@
 </div>
 
 <style>
-  /* shared row/label/op styles are global — see +layout.svelte */
   .opsel {
     display: flex;
     gap: 1rem;
@@ -146,9 +138,6 @@
     gap: 0.3rem;
     font-size: 0.82rem;
   }
-  /* Overrides the global `.row` for this component only: the description has to
-	   sit inside the box, so the box stacks and `.controls` carries the flex row.
-	   Scoped class beats `:global(.row)` on specificity. */
   .row {
     flex-direction: column;
     align-items: stretch;
@@ -163,8 +152,6 @@
     border-color: #b4544a;
     background: color-mix(in srgb, #b4544a 8%, var(--panel));
   }
-  /* `form label` stacks by default; keep the value hint on the caption's line so
-	   choosing a type doesn't grow the row. */
   .field label {
     flex-direction: row;
     align-items: baseline;
