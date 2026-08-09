@@ -12,9 +12,9 @@
 
   let { data }: { data: PageData } = $props();
 
-  const state = new SearchQueryState(() => data.query);
-  const q = $derived(state.query);
-  const advanced = $derived(state.advanced);
+  const queryState = new SearchQueryState(() => data.query);
+  const q = $derived(queryState.query);
+  const advanced = $derived(queryState.advanced);
   const detectionTypes = $derived(data.schema.attribute_types.filter((t) => DETECTION_ATTRIBUTE_TYPE_IDS.has(t.id)));
   const otherTypes = $derived(data.schema.attribute_types.filter((t) => !DETECTION_ATTRIBUTE_TYPE_IDS.has(t.id)));
   const negated = $derived(hasNegatedRow(q));
@@ -28,6 +28,11 @@
   const columns = $derived(data.records?.length ? Object.keys(data.records[0]) : []);
   const cell = (v: unknown) => (v == null ? "" : typeof v === "object" ? JSON.stringify(v) : String(v));
   const csvUrl = $derived(downloadUrl(page.url.searchParams));
+  let csvExported = $state(false);
+  $effect(() => {
+    csvUrl;
+    csvExported = false;
+  });
   const limits = $derived(data.schema.limits);
   const pageCount = $derived(Math.ceil(data.matched / limits.page_size));
   const lastPage = $derived(Math.min(pageCount, Math.floor(limits.max_result_window / limits.page_size)));
@@ -127,7 +132,7 @@
     />
 
     <label class="adv">
-      <input type="checkbox" checked={advanced} onchange={(e) => state.toggleAdvanced(e.currentTarget.checked)} />
+      <input type="checkbox" checked={advanced} onchange={(e) => queryState.toggleAdvanced(e.currentTarget.checked)} />
       <span>Advanced</span>
       <em>negate a row, switch <strong>AND</strong>/<strong>OR</strong>, filter by method</em>
     </label>
@@ -174,7 +179,7 @@
 
   <div class="actions">
     <button type="submit" class="primary">Search</button>
-    <button type="button" onclick={() => state.reset()}>Clear</button>
+    <button type="button" onclick={() => queryState.reset()}>Clear</button>
     <code class="url">{searchUrl}</code>
   </div>
 </form>
@@ -194,18 +199,26 @@
       <h2>
         {data.matched.toLocaleString()} result{data.matched === 1 ? "" : "s"}
         {#if data.records.length}
-          <a class="csv" href={csvUrl}>Export as CSV</a>
+          <a
+            class="csv"
+            class:disabled={csvExported}
+            aria-disabled={csvExported}
+            href={csvExported ? undefined : csvUrl}
+            onclick={() => (csvExported = true)}
+          >
+            Export as CSV
+          </a>
         {/if}
       </h2>
       {#if lastPage > 1}
         <nav class="pager">
-          <button type="button" disabled={data.query.page <= 1} onclick={() => state.goPage(data.query.page - 1)}
+          <button type="button" disabled={data.query.page <= 1} onclick={() => queryState.goPage(data.query.page - 1)}
             >← Previous</button
           >
           <span>
             Page {data.query.page.toLocaleString()} of {lastPage.toLocaleString()}
           </span>
-          <button type="button" disabled={data.query.page >= lastPage} onclick={() => state.goPage(data.query.page + 1)}
+          <button type="button" disabled={data.query.page >= lastPage} onclick={() => queryState.goPage(data.query.page + 1)}
             >Next →</button
           >
         </nav>
@@ -334,6 +347,10 @@
     font-weight: 400;
     font-size: 0.85rem;
     margin-left: 0.5rem;
+  }
+  .csv.disabled {
+    color: var(--muted);
+    pointer-events: none;
   }
   .pager {
     display: flex;
