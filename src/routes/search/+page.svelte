@@ -204,7 +204,13 @@
             class:disabled={csvExported}
             aria-disabled={csvExported}
             href={csvExported ? undefined : csvUrl}
-            onclick={() => (csvExported = true)}
+            onclick={(e) => {
+              if (csvExported) {
+                e.preventDefault();
+                return;
+              }
+              csvExported = true;
+            }}
           >
             Export as CSV
           </a>
