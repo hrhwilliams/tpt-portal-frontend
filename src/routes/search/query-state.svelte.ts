@@ -82,7 +82,7 @@ export class SearchQueryState {
       params.delete("page");
     }
 
-    this.#navigate(params);
+    this.#navigate(params, { noScroll: true });
   }
 
   reset() {
