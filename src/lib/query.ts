@@ -64,8 +64,9 @@ function decodeTaxon(raw: string): TaxonPair | null {
     }
   }
 
-  // a row with no name of its own is still a search when it names the other side
-  if (!name && !related.length) {
+  // a row with no name of its own is still a search when it names a
+  // relationship or the taxon on the other side
+  if (!name && !related.length && !relations.length) {
     return null;
   }
 
@@ -112,8 +113,9 @@ export function toParams(q: SearchQuery): URLSearchParams {
     const rel = t.relations.filter(Boolean);
     const related = t.related.filter((r) => r.name);
 
-    // a row with no name of its own is still a search when it names the other side
-    if (!t.name && !related.length) continue;
+    // a row with no name of its own is still a search when it names a
+    // relationship or the taxon on the other side
+    if (!t.name && !related.length && !rel.length) continue;
     const segments = [escapePipes(t.rank), escapePipes(t.name)];
 
     if (rel.length || related.length) {
@@ -213,7 +215,7 @@ export function hasNegatedRow(q: SearchQuery): boolean {
 /** Check if a search query is empty */
 export function isEmpty(q: SearchQuery): boolean {
   return !(
-    q.taxa.some((t) => t.name || t.related.some((r) => r.name)) ||
+    q.taxa.some((t) => t.name || t.relations.length > 0 || t.related.some((r) => r.name)) ||
     q.guid_prefixes.length > 0 ||
     allAttributes(q).some((a) => a.type) ||
     q.locality ||

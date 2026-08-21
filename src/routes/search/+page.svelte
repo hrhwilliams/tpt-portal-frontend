@@ -109,7 +109,7 @@
   </fieldset>
 
   <fieldset>
-    <legend>Search by taxonomy, relationship</legend>
+    <legend>Search by host or parasite taxonomy and relationship</legend>
     <TaxonRows bind:rows={q.taxa} schema={data.schema} />
     <!-- <p class="note">
 			Suggestions come from the current snapshot. A name that is not listed can still be searched

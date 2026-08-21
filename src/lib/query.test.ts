@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { escapePipes, fromParams, splitPipes, toParams } from "./query.ts";
+import { escapePipes, fromParams, isEmpty, splitPipes, toParams } from "./query.ts";
 import { EMPTY_QUERY, type SearchQuery } from "./types.ts";
 
 /** Names chosen to collide with the delimiter, the escape, or both. */
@@ -128,5 +128,18 @@ describe("taxon round trip", () => {
       ];
       expect(roundTrip(taxa), name).toEqual(taxa);
     }
+  });
+
+  it("carries a relationship with no taxon at all", () => {
+    const taxa = [{ rank: "", name: "", relations: ["host of parasite"], related: [] }];
+    expect(toParams({ ...EMPTY_QUERY, taxa }).get("taxon")).toBe("||host of parasite");
+    expect(roundTrip(taxa)).toEqual(taxa);
+    expect(isEmpty({ ...EMPTY_QUERY, taxa })).toBe(false);
+  });
+
+  it("drops a row that names nothing", () => {
+    const taxa = [{ rank: "genus", name: "", relations: [], related: [] }];
+    expect(toParams({ ...EMPTY_QUERY, taxa }).getAll("taxon")).toEqual([]);
+    expect(isEmpty({ ...EMPTY_QUERY, taxa })).toBe(true);
   });
 });
