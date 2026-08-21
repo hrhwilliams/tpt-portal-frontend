@@ -1,29 +1,79 @@
-import { EMPTY_QUERY, type AttributePair, type BoolOp, type SearchQuery, type TaxonPair } from "./types.ts";
+import {
+  EMPTY_QUERY,
+  type AttributePair,
+  type BoolOp,
+  type RelatedTaxon,
+  type SearchQuery,
+  type TaxonPair,
+} from "./types.ts";
 
 /** Types that are allowed in the detection attribute form */
 export const DETECTION_ATTRIBUTE_TYPE_IDS = new Set(["detected", "not detected", "examined for", "not examined for"]);
 
 /**
- * `rank|name` or `rank|name|relation; relation`
+ * A `|` typed by the user is written as `\|`, so that the number of segments
+ * always identifies the shape of the value. Doubling the pipe instead would be
+ * ambiguous: a delimiter followed by an escaped pipe is indistinguishable from
+ * an escaped pipe followed by a delimiter.
+ */
+export function escapePipes(s: string): string {
+  return s.replace(/[\\|]/g, (c) => `\\${c}`);
+}
+
+/** Splits on `|`, honouring backslash escapes. */
+export function splitPipes(raw: string): string[] {
+  const out: string[] = [];
+  let cur = "";
+
+  for (let i = 0; i < raw.length; i++) {
+    if (raw[i] === "\\") {
+      cur += raw[i + 1] ?? "";
+      i++;
+    } else if (raw[i] === "|") {
+      out.push(cur);
+      cur = "";
+    } else {
+      cur += raw[i];
+    }
+  }
+
+  out.push(cur);
+  return out;
+}
+
+/**
+ * `rank|name`, `rank|name|relation; relation`, or that followed by a related
+ * rank and name for each related taxon.
  */
 function decodeTaxon(raw: string): TaxonPair | null {
-  // split by `|` into rank, name, relations list
-  const [rank = "", name = "", rel = ""] = raw.split("|").map((s) => s.trim());
-
-  if (!name) {
-    return null;
-  }
+  // split by `|` into rank, name, relations list, then related rank/name pairs
+  const segments = splitPipes(raw).map((s) => s.trim());
+  const [rank = "", name = "", rel = ""] = segments;
 
   // further split relations list separated by `;`
   const relations = rel
     .split(";")
     .map((r) => r.trim())
     .filter(Boolean);
-  return { rank, name, relations };
+
+  const related: RelatedTaxon[] = [];
+
+  for (let i = 3; i + 1 < segments.length; i += 2) {
+    if (segments[i + 1]) {
+      related.push({ rank: segments[i], name: segments[i + 1] });
+    }
+  }
+
+  // a row with no name of its own is still a search when it names the other side
+  if (!name && !related.length) {
+    return null;
+  }
+
+  return { rank, name, relations, related };
 }
 
 /**
- * `type|value; value`
+ * `type|value|value`
  */
 function decodeAttr(raw: string): AttributePair | null {
   let s = raw;
@@ -34,21 +84,13 @@ function decodeAttr(raw: string): AttributePair | null {
     s = s.slice(1);
   }
 
-  // split on first `|` only to avoid splitting value fields that contain
-  // their own pipes
-  const cut = s.indexOf("|");
-  const type = (cut < 0 ? s : s.slice(0, cut)).trim();
-  const joined = cut < 0 ? "" : s.slice(cut + 1).trim();
+  const [type = "", ...rest] = splitPipes(s).map((v) => v.trim());
 
   if (!type) {
     return null;
   }
 
-  // split attribute value list separated by `;`
-  const values = joined
-    .split(";")
-    .map((v) => v.trim())
-    .filter(Boolean);
+  const values = rest.filter(Boolean);
 
   return { type, values, negated };
 }
@@ -67,15 +109,29 @@ export function toParams(q: SearchQuery): URLSearchParams {
   };
 
   for (const t of q.taxa) {
-    if (!t.name) continue;
     const rel = t.relations.filter(Boolean);
-    p.append("taxon", `${t.rank}|${t.name}${rel.length ? `|${rel.join("; ")}` : ""}`);
+    const related = t.related.filter((r) => r.name);
+
+    // a row with no name of its own is still a search when it names the other side
+    if (!t.name && !related.length) continue;
+    const segments = [escapePipes(t.rank), escapePipes(t.name)];
+
+    if (rel.length || related.length) {
+      segments.push(rel.map(escapePipes).join("; "));
+    }
+
+    for (const r of related) {
+      segments.push(escapePipes(r.rank), escapePipes(r.name));
+    }
+
+    p.append("taxon", segments.join("|"));
   }
 
   for (const a of allAttributes(q)) {
     if (!a.type) continue;
     const v = a.values.map((x) => x.trim()).filter(Boolean);
-    p.append("attr", `${a.negated ? "!" : ""}${a.type}${v.length ? `|${v.join("; ")}` : ""}`);
+    const head = `${a.negated ? "!" : ""}${escapePipes(a.type)}`;
+    p.append("attr", head + v.map((x) => `|${escapePipes(x)}`).join(""));
   }
 
   const typedAttrCount = allAttributes(q).filter((a) => a.type).length;
@@ -105,6 +161,7 @@ export function toParams(q: SearchQuery): URLSearchParams {
   put("from", q.collected_from);
   put("to", q.collected_to);
   put("collector", q.agent);
+  put("tab", q.tab);
 
   if (q.page > 1) {
     p.set("page", String(q.page));
@@ -119,13 +176,6 @@ export function fromParams(p: URLSearchParams): SearchQuery {
     .getAll("taxon")
     .map(decodeTaxon)
     .filter((t): t is TaxonPair => t !== null);
-
-  if (taxa.length === 0) {
-    const legacyName = p.get("taxon");
-    if (legacyName && !legacyName.includes("|")) {
-      taxa.push({ rank: p.get("rank") ?? "", name: legacyName, relations: [] });
-    }
-  }
 
   const attrs = p
     .getAll("attr")
@@ -146,6 +196,7 @@ export function fromParams(p: URLSearchParams): SearchQuery {
     collected_from: p.get("from") ?? "",
     collected_to: p.get("to") ?? "",
     agent: p.get("collector") ?? "",
+    tab: p.get("tab") ?? "",
     page: Math.max(1, Number(p.get("page") ?? 1) || 1),
   };
 
@@ -162,7 +213,7 @@ export function hasNegatedRow(q: SearchQuery): boolean {
 /** Check if a search query is empty */
 export function isEmpty(q: SearchQuery): boolean {
   return !(
-    q.taxa.some((t) => t.name) ||
+    q.taxa.some((t) => t.name || t.related.some((r) => r.name)) ||
     q.guid_prefixes.length > 0 ||
     allAttributes(q).some((a) => a.type) ||
     q.locality ||

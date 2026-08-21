@@ -76,6 +76,116 @@ test("a taxon row carries its own relationships", async ({ page }) => {
   await expect(page.locator('[aria-controls="taxon-relations-0-list"] .label')).toHaveText("ate");
 });
 
+test("a taxon row carries several related taxa", async ({ page }) => {
+  await open(page, "/search?taxon=genus%7CSorex%7Chost+of+parasite");
+
+  // the related taxa are hidden until the row has a relationship to hang them on
+  for (const [i, [rank, name]] of [
+    ["family", "Ixodidae"],
+    ["genus", "Aus"],
+  ].entries()) {
+    await page.getByRole("button", { name: "+ Add related taxon" }).click();
+    await page.locator(`#related-rank-0-${i}`).selectOption(rank);
+    await page.locator(`#related-name-0-${i}`).fill(name);
+  }
+
+  // rank and name per related taxon, appended after the relations segment
+  await expect(page).toHaveURL(/taxon=genus%7CSorex%7Chost\+of\+parasite%7Cfamily%7CIxodidae%7Cgenus%7CAus/);
+
+  // and a pasted link puts them back, expanded
+  await open(page, "/search?taxon=genus%7CSorex%7Cate%7Cfamily%7CIxodidae");
+  await expect(page.locator("#related-rank-0-0")).toHaveValue("family");
+  await expect(page.locator("#related-name-0-0")).toHaveValue("Ixodidae");
+});
+
+test("a relationship search gets a second tab, holding the records related to it", async ({ page }) => {
+  await open(page, "/search?taxon=genus%7CSorex%7Chost+of+parasite%7Cclass%7CCestoda");
+
+  const related = page.getByRole("tab", { name: /host of parasite/ });
+  await expect(related).toHaveAttribute("aria-selected", "false");
+
+  // tab 1 holds the hosts
+  const host = page.locator("tbody tr").first();
+  await expect(host).toContainText("Sorex");
+  const hostGuid = await host.getByRole("link").first().textContent();
+
+  await related.click();
+  await expect(related).toHaveAttribute("aria-selected", "true");
+  await expect(page).toHaveURL(/tab=host\+of\+parasite/);
+
+  // tab 2 holds their cestodes, as records of their own
+  const parasite = page.locator("tbody tr").first();
+  await expect(parasite).toContainText("Cestoda");
+  await expect(parasite.getByRole("link").first()).not.toHaveText(hostGuid ?? "");
+  await expect(parasite.getByRole("link").first()).toHaveAttribute("href", /arctos\.database\.museum/);
+});
+
+test("the export follows the open tab", async ({ page }) => {
+  await open(page, "/search?taxon=genus%7CSorex%7Chost+of+parasite%7Cclass%7CCestoda&page=2");
+
+  const csv = page.getByRole("link", { name: "Export as CSV" });
+  await expect(csv).toHaveAttribute("href", /api\/download/);
+  await expect(csv).not.toHaveAttribute("href", /tab=/);
+
+  await page.getByRole("tab", { name: /host of parasite/ }).click();
+  await expect(csv).toHaveAttribute("href", /tab=host\+of\+parasite/);
+
+  // an export covers the whole tab, not the page being looked at
+  await expect(csv).not.toHaveAttribute("href", /page=/);
+});
+
+test("each tab reports and pages its own count", async ({ page }) => {
+  await open(page, "/search?taxon=genus%7CSorex%7Chost+of+parasite%7Cclass%7CCestoda");
+
+  const records = page.getByRole("tab", { name: /^Records/ }).locator(".tally");
+  const related = page.getByRole("tab", { name: /host of parasite/ }).locator(".tally");
+  const hosts = Number((await records.textContent())?.replace(/[^\d]/g, ""));
+  const parasites = Number((await related.textContent())?.replace(/[^\d]/g, ""));
+
+  // no arithmetic ties the two: parasites are shared between hosts, and hosts carry several
+  expect(hosts).toBeGreaterThan(0);
+  expect(parasites).toBeGreaterThan(0);
+
+  // the heading follows the open tab
+  await expect(page.getByRole("heading", { level: 2 })).toContainText(hosts.toLocaleString());
+  await page.getByRole("tab", { name: /host of parasite/ }).click();
+  await expect(page.getByRole("heading", { level: 2 })).toContainText(parasites.toLocaleString());
+
+  // and paging the related tab does not repeat the first page
+  const firstOnPageOne = await page.locator("tbody tr").first().textContent();
+  await page.getByRole("button", { name: "Next" }).click();
+  await expect(page).toHaveURL(/page=2/);
+  await expect(page).toHaveURL(/tab=host\+of\+parasite/);
+  await expect(page.locator("tbody tr").first()).not.toHaveText(firstOnPageOne ?? "");
+});
+
+test("a filter narrows both tabs", async ({ page }) => {
+  const taxon = "taxon=genus%7CSorex%7Chost+of+parasite%7Cclass%7CCestoda";
+  const tally = page.getByRole("tab", { name: /host of parasite/ }).locator(".tally");
+
+  await open(page, `/search?${taxon}`);
+  const unfiltered = Number((await tally.textContent())?.replace(/[^\d]/g, ""));
+
+  // the related records come from the matched records, so narrowing those narrows these
+  await open(page, `/search?${taxon}&from=2000-01-01&to=2010-01-01`);
+  const filtered = Number((await tally.textContent())?.replace(/[^\d]/g, ""));
+
+  expect(filtered).toBeGreaterThan(0);
+  expect(filtered).toBeLessThan(unfiltered);
+});
+
+test("switching tabs starts the new one at page 1", async ({ page }) => {
+  await open(page, "/search?taxon=genus%7CSorex%7Chost+of+parasite&page=3");
+
+  await page.getByRole("tab", { name: /host of parasite/ }).click();
+  await expect(page).not.toHaveURL(/page=/);
+});
+
+test("a search with no relationship gets no second tab", async ({ page }) => {
+  await open(page, "/search?taxon=genus%7CSorex");
+  await expect(page.getByRole("tab")).toHaveCount(0);
+});
+
 test("paging: Next advances the page, and editing a filter returns to page 1", async ({ page }) => {
   await open(page, "/search?taxon=genus%7CSorex");
 
@@ -126,7 +236,7 @@ test("several values on one attribute row OR together", async ({ page }) => {
   await page.keyboard.press("Escape");
 
   await page.getByRole("button", { name: "Search", exact: true }).click();
-  await expect(page).toHaveURL(/ectoparasite%3A\+flea%3B\+ectoparasite%3A\+louse/);
+  await expect(page).toHaveURL(/ectoparasite%3A\+flea%7Cectoparasite%3A\+louse/);
 });
 
 test("a free-text attribute type keeps a single text input", async ({ page }) => {

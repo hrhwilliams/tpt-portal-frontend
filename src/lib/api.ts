@@ -20,10 +20,29 @@ export async function search(
   fetch: typeof globalThis.fetch,
   params: URLSearchParams,
 ): Promise<{ records: Record<string, unknown>[]; matched: number }> {
+  return searchPath(fetch, "search", params);
+}
+
+/**
+ * The records the matched records are related to. Same query, same envelope,
+ * paged on its own.
+ */
+export async function searchRelations(
+  fetch: typeof globalThis.fetch,
+  params: URLSearchParams,
+): Promise<{ records: Record<string, unknown>[]; matched: number }> {
+  return searchPath(fetch, "relations", params);
+}
+
+async function searchPath(
+  fetch: typeof globalThis.fetch,
+  path: string,
+  params: URLSearchParams,
+): Promise<{ records: Record<string, unknown>[]; matched: number }> {
   let res: Response;
 
   try {
-    res = await fetch(`${__API_BASE__}/api/search?${params}`);
+    res = await fetch(`${__API_BASE__}/api/${path}?${params}`);
   } catch {
     throw new Error(`Could not reach the search service at ${__API_BASE__}.`);
   }

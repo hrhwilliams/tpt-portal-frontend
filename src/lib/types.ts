@@ -50,10 +50,17 @@ export type Taxon = {
   parent_name: string | null;
 };
 
+/** The other party in a pairwise relationship search. */
+export type RelatedTaxon = {
+  rank: string;
+  name: string;
+};
+
 export type TaxonPair = {
   rank: string;
   name: string;
   relations: string[];
+  related: RelatedTaxon[];
 };
 
 export type AttributePair = {
@@ -78,6 +85,8 @@ export type SearchQuery = {
   collected_from: string;
   collected_to: string;
   agent: string;
+  /** The relationship whose tab is open, e.g. `parasite of`. Empty is the records tab. */
+  tab: string;
   page: number;
 };
 
@@ -94,5 +103,6 @@ export const EMPTY_QUERY: SearchQuery = {
   collected_from: "",
   collected_to: "",
   agent: "",
+  tab: "",
   page: 1,
 };

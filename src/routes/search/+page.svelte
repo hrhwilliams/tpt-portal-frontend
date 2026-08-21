@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { navigating, page } from "$app/state";
+  import { navigating } from "$app/state";
   import { resolve } from "$app/paths";
   import { downloadUrl } from "$lib/api";
   import AttributeRows from "$lib/components/AttributeRows.svelte";
@@ -12,9 +12,9 @@
 
   let { data }: { data: PageData } = $props();
 
-  const state = new SearchQueryState(() => data.query);
-  const q = $derived(state.query);
-  const advanced = $derived(state.advanced);
+  const queryState = new SearchQueryState(() => data.query);
+  const q = $derived(queryState.query);
+  const advanced = $derived(queryState.advanced);
   const detectionTypes = $derived(data.schema.attribute_types.filter((t) => DETECTION_ATTRIBUTE_TYPE_IDS.has(t.id)));
   const otherTypes = $derived(data.schema.attribute_types.filter((t) => !DETECTION_ATTRIBUTE_TYPE_IDS.has(t.id)));
   const negated = $derived(hasNegatedRow(q));
@@ -26,16 +26,22 @@
   const searchUrl = $derived(resolve(`/search?${toParams(q).toString()}`));
   const searching = $derived(navigating.to !== null);
   const columns = $derived(data.records?.length ? Object.keys(data.records[0]) : []);
+  const hasRelated = $derived(data.relatedTab !== "");
+  const relatedOpen = $derived(hasRelated && data.query.tab === data.relatedTab);
+  const relatedColumns = $derived(data.relatedRecords?.length ? Object.keys(data.relatedRecords[0]) : []);
   const cell = (v: unknown) => (v == null ? "" : typeof v === "object" ? JSON.stringify(v) : String(v));
-  const csvUrl = $derived(downloadUrl(page.url.searchParams));
+  // export follows the open tab, and covers every page of it
+  const csvUrl = $derived(downloadUrl(toParams({ ...data.query, page: 1 })));
   const limits = $derived(data.schema.limits);
-  const pageCount = $derived(Math.ceil(data.matched / limits.page_size));
+  // the pager drives whichever tab is open
+  const shownMatched = $derived(relatedOpen ? data.relatedMatched : data.matched);
+  const pageCount = $derived(Math.ceil(shownMatched / limits.page_size));
   const lastPage = $derived(Math.min(pageCount, Math.floor(limits.max_result_window / limits.page_size)));
 </script>
 
 <svelte:head><title>Search specimens — TPT portal</title></svelte:head>
 
-<h1>Search specimens</h1>
+<h1>Arctos parasite/pathogen search portal</h1>
 <p class="snapshot">
   Data current as of {data.schema.snapshot_date}.
 </p>
@@ -103,7 +109,7 @@
   </fieldset>
 
   <fieldset>
-    <legend>Search by taxonomy</legend>
+    <legend>Search by taxonomy, relationship</legend>
     <TaxonRows bind:rows={q.taxa} schema={data.schema} />
     <!-- <p class="note">
 			Suggestions come from the current snapshot. A name that is not listed can still be searched
@@ -127,7 +133,7 @@
     />
 
     <label class="adv">
-      <input type="checkbox" checked={advanced} onchange={(e) => state.toggleAdvanced(e.currentTarget.checked)} />
+      <input type="checkbox" checked={advanced} onchange={(e) => queryState.toggleAdvanced(e.currentTarget.checked)} />
       <span>Advanced</span>
       <em>negate a row, switch <strong>AND</strong>/<strong>OR</strong>, filter by method</em>
     </label>
@@ -174,7 +180,7 @@
 
   <div class="actions">
     <button type="submit" class="primary">Search</button>
-    <button type="button" onclick={() => state.reset()}>Clear</button>
+    <button type="button" onclick={() => queryState.reset()}>Clear</button>
     <code class="url">{searchUrl}</code>
   </div>
 </form>
@@ -188,25 +194,52 @@
   </div>
 {/if}
 
+{#snippet resultTable(rows: Record<string, unknown>[], cols: string[])}
+  <div class="scroll">
+    <table>
+      <thead>
+        <tr
+          >{#each cols as c (c)}<th>{c}</th>{/each}</tr
+        >
+      </thead>
+      <tbody>
+        {#each rows as hit, i (i)}
+          <tr
+            >{#each cols as c (c)}<td
+                >{#if (c === "guid" || c.endsWith("_guid")) && hit[c]}<a
+                    href="https://arctos.database.museum/guid/{cell(hit[c])}"
+                    target="_blank"
+                    rel="noreferrer">{cell(hit[c])}</a
+                  >{:else}{cell(hit[c])}{/if}</td
+              >{/each}</tr
+          >
+        {/each}
+      </tbody>
+    </table>
+  </div>
+{/snippet}
+
 {#if data.records}
   <div class="panel" class:stale={searching}>
     <div class="head">
       <h2>
-        {data.matched.toLocaleString()} result{data.matched === 1 ? "" : "s"}
+        {shownMatched.toLocaleString()} result{shownMatched === 1 ? "" : "s"}
         {#if data.records.length}
           <a class="csv" href={csvUrl}>Export as CSV</a>
         {/if}
       </h2>
       {#if lastPage > 1}
         <nav class="pager">
-          <button type="button" disabled={data.query.page <= 1} onclick={() => state.goPage(data.query.page - 1)}
+          <button type="button" disabled={data.query.page <= 1} onclick={() => queryState.goPage(data.query.page - 1)}
             >← Previous</button
           >
           <span>
             Page {data.query.page.toLocaleString()} of {lastPage.toLocaleString()}
           </span>
-          <button type="button" disabled={data.query.page >= lastPage} onclick={() => state.goPage(data.query.page + 1)}
-            >Next →</button
+          <button
+            type="button"
+            disabled={data.query.page >= lastPage}
+            onclick={() => queryState.goPage(data.query.page + 1)}>Next →</button
           >
         </nav>
       {/if}
@@ -216,29 +249,29 @@
         Only the first {limits.max_result_window.toLocaleString()} results can be browsed. Narrow the search, or export.
       </p>
     {/if}
-    {#if data.records.length}
-      <div class="scroll">
-        <table>
-          <thead>
-            <tr
-              >{#each columns as c (c)}<th>{c}</th>{/each}</tr
-            >
-          </thead>
-          <tbody>
-            {#each data.records as hit, i (i)}
-              <tr
-                >{#each columns as c (c)}<td
-                    >{#if c === "guid" && hit[c]}<a
-                        href="https://arctos.database.museum/guid/{cell(hit[c])}"
-                        target="_blank"
-                        rel="noreferrer">{cell(hit[c])}</a
-                      >{:else}{cell(hit[c])}{/if}</td
-                  >{/each}</tr
-              >
-            {/each}
-          </tbody>
-        </table>
+    {#if hasRelated}
+      <div class="tabs" role="tablist">
+        <button type="button" role="tab" aria-selected={!relatedOpen} onclick={() => queryState.setTab("")}>
+          Records
+          <span class="tally">{data.matched.toLocaleString()}</span>
+        </button>
+        <button type="button" role="tab" aria-selected={relatedOpen} onclick={() => queryState.setTab(data.relatedTab)}>
+          <em>{data.relatedTab} records</em>
+          <span class="tally">{data.relatedMatched.toLocaleString()}</span>
+        </button>
       </div>
+    {/if}
+
+    {#if !relatedOpen && data.records.length}
+      {@render resultTable(data.records, columns)}
+    {:else if relatedOpen}
+      {#if data.relatedError}
+        <p class="note warn">{data.relatedError}</p>
+      {:else if data.relatedRecords?.length}
+        {@render resultTable(data.relatedRecords, relatedColumns)}
+      {:else}
+        <p class="note">Nothing is related to these records by that relationship.</p>
+      {/if}
     {/if}
   </div>
 {:else if data.submitted && !data.errors.length}
@@ -343,6 +376,20 @@
   }
   .stale {
     opacity: 0.5;
+  }
+  .tabs {
+    display: flex;
+    gap: 0.3rem;
+    margin: 0.6rem 0 0.5rem;
+  }
+  .tabs button[aria-selected="true"] {
+    border-color: var(--fg);
+    font-weight: 600;
+  }
+  .tally {
+    color: var(--muted);
+    font-weight: 400;
+    font-size: 0.85em;
   }
   .scroll {
     overflow-x: auto;

@@ -73,6 +73,13 @@ export class SearchQueryState {
     }
   }
 
+  /** Each tab pages separately, so a page number from the other one is meaningless. */
+  setTab(tab: string) {
+    this.#query.tab = tab;
+    this.#query.page = 1;
+    this.#navigate(toParams(this.#query), { noScroll: true });
+  }
+
   goPage(n: number) {
     const params = toParams(this.#query);
 
