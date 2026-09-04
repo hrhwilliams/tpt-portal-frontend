@@ -1,7 +1,7 @@
 <script lang="ts">
   import { navigating } from "$app/state";
   import { resolve } from "$app/paths";
-  import { downloadUrl } from "$lib/api";
+  import { berkeleyMapperConfigUrl, downloadUrl } from "$lib/api";
   import AttributeRows from "$lib/components/AttributeRows.svelte";
   import CollectorCombobox from "$lib/components/CollectorCombobox.svelte";
   import MultiSelect from "$lib/components/MultiSelect.svelte";
@@ -30,8 +30,26 @@
   const relatedOpen = $derived(hasRelated && data.query.tab === data.relatedTab);
   const relatedColumns = $derived(data.relatedRecords?.length ? Object.keys(data.relatedRecords[0]) : []);
   const cell = (v: unknown) => (v == null ? "" : typeof v === "object" ? JSON.stringify(v) : String(v));
+  // The one cell currently showing its full, un-truncated content. Keyed by
+  // "row-column" rather than expanding the whole row: a table row's height
+  // already grows to fit its tallest cell, so wrapping just the clicked one
+  // is enough to expand the row — the rest stay single-line.
+  let expandedCell = $state<string | null>(null);
+  function toggleCell(key: string) {
+    expandedCell = expandedCell === key ? null : key;
+  }
   // export follows the open tab, and covers every page of it
-  const csvUrl = $derived(downloadUrl(toParams({ ...data.query, page: 1 })));
+  const mapOpen = $derived(data.query.tab === "map");
+  const csvUrl = $derived(downloadUrl(toParams({ ...data.query, tab: mapOpen ? "" : data.query.tab, page: 1 })));
+  // BerkeleyMapper's own server fetches both files, so these URLs have to be
+  // publicly reachable — a localhost API base maps nothing. The config names the
+  // export's columns, including which hold the coordinates. It maps the record
+  // export, not the relation one.
+  const mapUrl = $derived(
+    "https://berkeleymapper.berkeley.edu/index.html" +
+      `?tabfile=${encodeURIComponent(downloadUrl(toParams({ ...data.query, tab: "", page: 1 })))}` +
+      `&configfile=${encodeURIComponent(berkeleyMapperConfigUrl())}`,
+  );
   const limits = $derived(data.schema.limits);
   // the pager drives whichever tab is open
   const shownMatched = $derived(relatedOpen ? data.relatedMatched : data.matched);
@@ -205,7 +223,9 @@
       <tbody>
         {#each rows as hit, i (i)}
           <tr
-            >{#each cols as c (c)}<td
+            >{#each cols as c (c)}{@const key = `${i}-${c}`}<td
+                class:expanded={expandedCell === key}
+                onclick={() => toggleCell(key)}
                 >{#if (c === "guid" || c.endsWith("_guid")) && hit[c]}<a
                     href="https://arctos.database.museum/guid/{cell(hit[c])}"
                     target="_blank"
@@ -228,7 +248,7 @@
           <a class="csv" href={csvUrl}>Export as CSV</a>
         {/if}
       </h2>
-      {#if lastPage > 1}
+      {#if lastPage > 1 && !mapOpen}
         <nav class="pager">
           <button type="button" disabled={data.query.page <= 1} onclick={() => queryState.goPage(data.query.page - 1)}
             >← Previous</button
@@ -249,20 +269,30 @@
         Only the first {limits.max_result_window.toLocaleString()} results can be browsed. Narrow the search, or export.
       </p>
     {/if}
-    {#if hasRelated}
-      <div class="tabs" role="tablist">
-        <button type="button" role="tab" aria-selected={!relatedOpen} onclick={() => queryState.setTab("")}>
-          Records
-          <span class="tally">{data.matched.toLocaleString()}</span>
-        </button>
+    <div class="tabs" role="tablist">
+      <button type="button" role="tab" aria-selected={!relatedOpen && !mapOpen} onclick={() => queryState.setTab("")}>
+        Records
+        <span class="tally">{data.matched.toLocaleString()}</span>
+      </button>
+      {#if hasRelated}
         <button type="button" role="tab" aria-selected={relatedOpen} onclick={() => queryState.setTab(data.relatedTab)}>
           <em>{data.relatedTab} records</em>
           <span class="tally">{data.relatedMatched.toLocaleString()}</span>
         </button>
-      </div>
-    {/if}
+      {/if}
+      <button type="button" role="tab" aria-selected={mapOpen} onclick={() => queryState.setTab("map")}>Map</button>
+    </div>
 
-    {#if !relatedOpen && data.records.length}
+    {#if mapOpen}
+      <p class="note">
+        BerkeleyMapper maps the <strong>records</strong> of this search, up to the
+        {limits.max_export_rows.toLocaleString()} row export limit. It only plots records that carry coordinates.
+      </p>
+      <p>
+        <a href={mapUrl} target="_blank" rel="noreferrer">Open these results in BerkeleyMapper ↗</a>
+      </p>
+      <p class="note">Opens in a new tab — BerkeleyMapper does not allow itself to be embedded in another site.</p>
+    {:else if !relatedOpen && data.records.length}
       {@render resultTable(data.records, columns)}
     {:else if relatedOpen}
       {#if data.relatedError}
@@ -408,7 +438,16 @@
     overflow: hidden;
     text-overflow: ellipsis;
   }
+  /* wraps within the same column width — the row grows to fit, nothing else does */
+  td.expanded {
+    white-space: normal;
+    overflow: visible;
+    overflow-wrap: anywhere;
+  }
   th {
     background: var(--bg);
+  }
+  tbody tr:hover {
+    background: var(--accent-soft);
   }
 </style>

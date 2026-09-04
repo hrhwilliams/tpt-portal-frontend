@@ -4,7 +4,7 @@ import { sveltekit } from "@sveltejs/kit/vite";
 import { defineConfig } from "vite";
 
 export default defineConfig({
-  define: { __API_BASE__: JSON.stringify(process.env.API_BASE ?? "http://localhost:8080") },
+  define: { __API_BASE__: JSON.stringify(process.env.API_BASE ?? "https://tpt-portal.fiatlux.dev") },
 
   plugins: [
     sveltekit({

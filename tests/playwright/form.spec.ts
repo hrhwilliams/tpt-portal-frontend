@@ -181,9 +181,29 @@ test("switching tabs starts the new one at page 1", async ({ page }) => {
   await expect(page).not.toHaveURL(/page=/);
 });
 
-test("a search with no relationship gets no second tab", async ({ page }) => {
+test("a search with no relationship gets no relation tab", async ({ page }) => {
   await open(page, "/search?taxon=genus%7CSorex");
-  await expect(page.getByRole("tab")).toHaveCount(0);
+  // Records and Map are always there; the relation tab is not
+  await expect(page.getByRole("tab")).toHaveCount(2);
+  await expect(page.getByRole("tab", { name: /of parasite/ })).toHaveCount(0);
+});
+
+test("the Map tab links to BerkeleyMapper with the export as its tab file", async ({ page }) => {
+  await open(page, "/search?taxon=genus%7CSorex%7Chost+of+parasite");
+  await page.getByRole("tab", { name: "Map" }).click();
+
+  const href = await page.getByRole("link", { name: /BerkeleyMapper/ }).getAttribute("href");
+  const params = new URL(href ?? "").searchParams;
+  const tabfile = params.get("tabfile") ?? "";
+
+  expect(href).toContain("berkeleymapper.berkeley.edu");
+  // both files are served by the API, wherever it lives
+  expect(params.get("configfile")).toMatch(/^https?:\/\/.+\/api\/berkeleymapper\.xml$/);
+  expect(new URL(tabfile).origin).toBe(new URL(params.get("configfile") ?? "").origin);
+  // the whole export of the records tab, not one page and not the relation tab
+  expect(tabfile).toContain("/api/download?");
+  expect(tabfile).not.toContain("tab=");
+  expect(tabfile).not.toContain("page=");
 });
 
 test("paging: Next advances the page, and editing a filter returns to page 1", async ({ page }) => {

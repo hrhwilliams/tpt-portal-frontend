@@ -78,3 +78,8 @@ export async function getTaxa(
 export function downloadUrl(params: URLSearchParams): string {
   return `${__API_BASE__}/api/download?${params}`;
 }
+
+/** The BerkeleyMapper XML config describing the export's columns. */
+export function berkeleyMapperConfigUrl(): string {
+  return `${__API_BASE__}/api/berkeleymapper.xml`;
+}
