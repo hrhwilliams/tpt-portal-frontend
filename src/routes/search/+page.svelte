@@ -1,13 +1,12 @@
 <script lang="ts">
   import { navigating } from "$app/state";
-  import { resolve } from "$app/paths";
   import { berkeleyMapperConfigUrl, downloadUrl } from "$lib/api";
   import AttributeRows from "$lib/components/AttributeRows.svelte";
   import CollectorCombobox from "$lib/components/CollectorCombobox.svelte";
   import MultiSelect from "$lib/components/MultiSelect.svelte";
   import TaxonRows from "$lib/components/TaxonRows.svelte";
   import { DETECTION_ATTRIBUTE_TYPE_IDS, hasNegatedRow, toParams } from "$lib/query";
-  import SearchSummary, { type ExportLinks } from "./SearchSummary.svelte";
+  import SearchSummary, { type ExportLinks, type FacetFilter } from "./SearchSummary.svelte";
   import { SearchQueryState } from "./query-state.svelte.ts";
   import type { PageData } from "./$types";
 
@@ -24,7 +23,6 @@
   const collectionOptions = $derived(opts(data.schema.guid_prefixes));
   const countryOptions = $derived(opts(data.schema.countries));
   const stateOptions = $derived(opts(data.schema.states));
-  const searchUrl = $derived(resolve(`/search?${toParams(q).toString()}`));
   const searching = $derived(navigating.to !== null);
   // `tab` names a preview; anything else, including nothing, is the summary
   const openRelated = $derived(data.related.find((r) => r.relation === data.query.tab) ?? null);
@@ -47,6 +45,11 @@
     void data.related;
     expandedCell = null;
   });
+  // the live search picks the change up like any other filter edit
+  function toggleFilter(filter: FacetFilter, value: string) {
+    const cur = q[filter];
+    q[filter] = cur.includes(value) ? cur.filter((v) => v !== value) : [...cur, value];
+  }
   function toggleCell(key: string) {
     expandedCell = expandedCell === key ? null : key;
   }
@@ -87,7 +90,13 @@
   Data current as of {data.schema.snapshot_date}.
 </p>
 
-<form onsubmit={(e) => e.preventDefault()}>
+<form
+  onsubmit={async (e) => {
+    e.preventDefault();
+    await queryState.search();
+    document.getElementById("results")?.scrollIntoView({ behavior: "smooth" });
+  }}
+>
   <fieldset>
     <legend>Global filters</legend>
     <div class="grid two">
@@ -233,9 +242,10 @@
   <div class="actions">
     <button type="submit" class="primary">Search</button>
     <button type="button" onclick={() => queryState.reset()}>Clear</button>
-    <code class="url">{searchUrl}</code>
   </div>
 </form>
+
+<div id="results"></div>
 
 {#if data.errors.length}
   <div class="panel errors">
@@ -325,7 +335,13 @@
     </div>
 
     {#if summaryOpen}
-      <SearchSummary summary={data.summary} error={data.summaryError} exports={allExports} />
+      <SearchSummary
+        summary={data.summary}
+        error={data.summaryError}
+        exports={allExports}
+        query={q}
+        toggle={toggleFilter}
+      />
     {:else if recordsOpen && data.records.length}
       {@render resultTable(data.records, data.columns)}
     {:else if openRelated}
@@ -400,11 +416,6 @@
     align-items: center;
     flex-wrap: wrap;
     margin-bottom: 1.4rem;
-  }
-  .url {
-    font-size: 0.72rem;
-    color: var(--muted);
-    overflow-wrap: anywhere;
   }
   .panel {
     border: 1px solid var(--line);

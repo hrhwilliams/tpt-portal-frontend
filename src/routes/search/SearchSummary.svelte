@@ -1,11 +1,26 @@
 <script lang="ts">
   import { page } from "$app/state";
-  import type { CountedValue, Summary, SummaryBlock } from "$lib/types";
+  import type { CountedValue, SearchQuery, Summary, SummaryBlock } from "$lib/types";
 
   /** One whole table's export links, named after the tab it previews. */
   export type ExportLinks = { label: string; csv: string; map: string };
 
-  let { summary, error, exports }: { summary: Summary | null; error: string; exports: ExportLinks[] } = $props();
+  /** The query's filters that a facet value can be added to as is. */
+  export type FacetFilter = "countries" | "states" | "guid_prefixes";
+
+  let {
+    summary,
+    error,
+    exports,
+    query,
+    toggle,
+  }: {
+    summary: Summary | null;
+    error: string;
+    exports: ExportLinks[];
+    query: SearchQuery;
+    toggle: (filter: FacetFilter, value: string) => void;
+  } = $props();
 
   const related = $derived(summary?.related ?? []);
 
@@ -21,7 +36,9 @@
     b.years === null ? "—" : b.years.min === b.years.max ? String(b.years.min) : `${b.years.min}–${b.years.max}`;
 </script>
 
-{#snippet facet(title: string, rows: CountedValue[])}
+<!-- `filter` makes each value toggle in that filter; only the matched records'
+     facets get one, since the filters narrow those and not the related records -->
+{#snippet facet(title: string, rows: CountedValue[], filter?: FacetFilter)}
   <div class="facet">
     <h4>{title}</h4>
     {#if rows.length}
@@ -30,7 +47,22 @@
         <tbody>
           {#each rows as r (r.value)}
             <tr style="--pct: {(r.count / max) * 100}%">
-              <td>{r.value}</td>
+              <td>
+                {#if filter}
+                  {@const on = query[filter].includes(r.value)}
+                  <button
+                    type="button"
+                    class="pick"
+                    aria-pressed={on}
+                    title={on ? "Remove from the filter" : "Add to the filter"}
+                    onclick={() => toggle(filter, r.value)}
+                  >
+                    {r.value}
+                  </button>
+                {:else}
+                  {r.value}
+                {/if}
+              </td>
               <td class="n">{n(r.count)}</td>
             </tr>
           {/each}
@@ -42,7 +74,7 @@
   </div>
 {/snippet}
 
-{#snippet block(title: string, b: SummaryBlock)}
+{#snippet block(title: string, b: SummaryBlock, pickable = false)}
   <section>
     <h3>{title} <span class="tally">{n(b.matched)}</span></h3>
     <dl class="stats">
@@ -65,9 +97,9 @@
     </dl>
     <div class="facets">
       {@render facet("Taxa", b.facets.taxa)}
-      {@render facet("Countries", b.facets.countries)}
-      {@render facet("States / provinces", b.facets.states)}
-      {@render facet("Collections", b.facets.collections)}
+      {@render facet("Countries", b.facets.countries, pickable ? "countries" : undefined)}
+      {@render facet("States / provinces", b.facets.states, pickable ? "states" : undefined)}
+      {@render facet("Collections", b.facets.collections, pickable ? "guid_prefixes" : undefined)}
     </div>
   </section>
 {/snippet}
@@ -78,7 +110,7 @@
   {#if summary.description}
     <p class="echo">{summary.description}</p>
   {/if}
-  {@render block("Records", summary.records)}
+  {@render block("Records", summary.records, true)}
   {#each related as r (r.relation)}
     {@render block(`${r.relation} records`, r)}
   {/each}
@@ -153,6 +185,22 @@
   td {
     padding: 0.15rem 0.4rem;
     overflow-wrap: anywhere;
+  }
+  .pick {
+    all: unset;
+    cursor: pointer;
+  }
+  .pick:hover {
+    text-decoration: underline;
+  }
+  .pick:focus-visible {
+    outline: 2px solid var(--accent);
+  }
+  .pick[aria-pressed="true"] {
+    font-weight: 600;
+  }
+  .pick[aria-pressed="true"]::before {
+    content: "✓ ";
   }
   td.n {
     text-align: right;

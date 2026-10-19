@@ -143,6 +143,37 @@ test("a relationship search gets a third tab, holding the records related to it"
   await expect(parasite.getByRole("link").first()).toHaveAttribute("href", /arctos\.database\.museum/);
 });
 
+test("Search sends the query at once and scrolls to the results", async ({ page }) => {
+  await page.setViewportSize({ width: 1200, height: 600 });
+  await open(page);
+
+  await page.locator("#collected-from, input[type=date]").first().fill("2000-01-01");
+  await page.getByRole("button", { name: "Search", exact: true }).click();
+
+  await expect(page).toHaveURL(/from=2000-01-01/);
+  await expect(page.getByRole("tab", { name: "Summary" })).toBeInViewport();
+});
+
+test("clicking a summary value toggles it in the matching filter", async ({ page }) => {
+  await open(page, "/search?taxon=genus%7CSorex");
+
+  const records = page.getByRole("tab", { name: /^Records/ }).locator(".tally");
+  const count = async () => Number((await records.textContent())?.replace(/[^\d]/g, ""));
+  const before = await count();
+  const canada = page
+    .locator(".facet", { has: page.getByRole("heading", { name: "Countries" }) })
+    .getByRole("button", { name: "Canada" });
+
+  await canada.click();
+  await expect(page).toHaveURL(/country=Canada/);
+  await expect(page.getByRole("tab", { name: "Summary" })).toHaveAttribute("aria-selected", "true");
+  await expect(canada).toHaveAttribute("aria-pressed", "true");
+  await expect.poll(count).toBeLessThan(before);
+
+  await canada.click();
+  await expect(page).not.toHaveURL(/country=/);
+});
+
 test("each relationship gets a tab of its own", async ({ page }) => {
   await open(page, "/search?taxon=genus%7CSorex%7Ccollected+with%3B+host+of+parasite&tab=collected+with");
 

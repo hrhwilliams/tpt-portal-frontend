@@ -33,10 +33,12 @@ export class SearchQueryState {
 
       params.delete("page");
 
-      const timer = setTimeout(
-        () => this.#navigate(params, { replaceState: true, keepFocus: true, noScroll: true }),
-        500,
-      );
+      const timer = setTimeout(() => {
+        // the Search button may have sent it already
+        if (params.toString() !== this.#lastSent) {
+          this.#navigate(params, { replaceState: true, keepFocus: true, noScroll: true });
+        }
+      }, 500);
       return () => clearTimeout(timer);
     });
   }
@@ -50,7 +52,17 @@ export class SearchQueryState {
     this.#query.page = Number(params.get("page") ?? 1) || 1;
     this.#lastSent = params.toString();
 
-    goto(resolve(`/search?${this.#lastSent}`), opts);
+    return goto(resolve(`/search?${this.#lastSent}`), opts);
+  }
+
+  /** Sends the query now rather than after the live search's delay; resolves once the results are shown. */
+  async search() {
+    const params = toParams(this.#query);
+    params.delete("page");
+
+    if (params.toString() !== this.#lastSent) {
+      await this.#navigate(params, { keepFocus: true, noScroll: true });
+    }
   }
 
   get query() {

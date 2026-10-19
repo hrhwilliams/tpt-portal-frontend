@@ -40,16 +40,38 @@ export const load: PageLoad = async ({ url, fetch }) => {
     // the summary covers the whole result set, so it has no page
     const summaryParams = new URLSearchParams(params);
     summaryParams.delete("page");
-    const summaryPromise = getSummary(fetch, summaryParams);
+    // failures are caught as each request starts, or one that fails while
+    // `search` is still pending surfaces as an unhandled rejection
+    const summaryPromise = getSummary(fetch, summaryParams).then(
+      (s) => {
+        summary = s;
+      },
+      (e) => {
+        // the previews still work without it
+        summaryError = e instanceof Error ? e.message : "The summary failed to load.";
+      },
+    );
 
     // ponytail: fetches a full first page of every tab just for its count;
     // the service has no count-only request
-    const relatedPromises = relations.map((relation) => {
-      const relatedParams = new URLSearchParams(params);
-      relatedParams.set("tab", relation);
-      if (relation !== query.tab) relatedParams.delete("page");
-      return searchRelations(fetch, relatedParams);
-    });
+    // a failure here must not take the main results down with it
+    const relatedPromise = Promise.all(
+      relations.map((relation) => {
+        const relatedParams = new URLSearchParams(params);
+        relatedParams.set("tab", relation);
+        if (relation !== query.tab) relatedParams.delete("page");
+        return searchRelations(fetch, relatedParams).then(
+          (r): RelatedTable => ({ relation, ...r, error: "" }),
+          (e): RelatedTable => ({
+            relation,
+            records: null,
+            columns: [],
+            matched: 0,
+            error: e instanceof Error ? e.message : "Related records failed to load.",
+          }),
+        );
+      }),
+    );
 
     if (relatedOpen) {
       params.delete("page");
@@ -61,28 +83,8 @@ export const load: PageLoad = async ({ url, fetch }) => {
       errors.push(e instanceof Error ? e.message : "Search failed.");
     }
 
-    // a failure here must not take the main results down with it
-    related = await Promise.all(
-      relatedPromises.map((p, i) =>
-        p.then(
-          (r): RelatedTable => ({ relation: relations[i], ...r, error: "" }),
-          (e): RelatedTable => ({
-            relation: relations[i],
-            records: null,
-            columns: [],
-            matched: 0,
-            error: e instanceof Error ? e.message : "Related records failed to load.",
-          }),
-        ),
-      ),
-    );
-
-    try {
-      summary = await summaryPromise;
-    } catch (e) {
-      // the previews still work without it
-      summaryError = e instanceof Error ? e.message : "The summary failed to load.";
-    }
+    related = await relatedPromise;
+    await summaryPromise;
   }
 
   let schema;
