@@ -43,7 +43,7 @@ export class SearchQueryState {
 
   /** Whether the query uses advanced settings */
   #usesAdvanced(s: SearchQuery): boolean {
-    return hasNegatedRow(s) || s.attr_op === "or" || s.method.trim() !== "";
+    return hasNegatedRow(s) || s.parts.some((a) => a.negated) || s.attr_op === "or" || s.method.trim() !== "";
   }
 
   #navigate(params: URLSearchParams, opts?: Parameters<typeof goto>[1]) {
@@ -68,6 +68,7 @@ export class SearchQueryState {
       const clear = (attrs: SearchQuery["detectionAttributes"]) => attrs.map((a) => ({ ...a, negated: false }));
       this.#query.detectionAttributes = clear(this.#query.detectionAttributes);
       this.#query.otherAttributes = clear(this.#query.otherAttributes);
+      this.#query.parts = clear(this.#query.parts);
       this.#query.attr_op = "and";
       this.#query.method = "";
     }

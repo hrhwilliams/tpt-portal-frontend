@@ -8,18 +8,22 @@
     advanced = false,
     schema,
     types = schema.attribute_types,
+    noun = "attribute",
   }: {
     rows: AttributePair[];
-    op: BoolOp;
+    /** omit when rows always AND: no switch is shown */
+    op?: BoolOp;
     advanced?: boolean;
     schema: Schema;
     types?: AttributeTypeDef[];
+    /** singular, lowercase name of what a row picks */
+    noun?: string;
   } = $props();
 
   const uid = $props.id();
 
   function typeDef(id: string) {
-    return schema.attribute_types.find((t) => t.id === id) ?? null;
+    return types.find((t) => t.id === id) ?? null;
   }
 
   /** The value input is a dropdown when the type uses a code table. */
@@ -38,29 +42,29 @@
 </script>
 
 <div class="rows">
-  {#if advanced && rows.length > 1}
+  {#if advanced && rows.length > 1 && op}
     <fieldset class="opsel">
       <legend class="lbl">Combine rows with</legend>
-      <label><input type="radio" bind:group={op} value="and" /> Record must have all attributes</label>
-      <label><input type="radio" bind:group={op} value="or" /> Record must have at least one of the attributes</label>
+      <label><input type="radio" bind:group={op} value="and" /> Record must have all {noun}s</label>
+      <label><input type="radio" bind:group={op} value="or" /> Record must have at least one of the {noun}s</label>
     </fieldset>
   {/if}
 
   {#each rows as row, i (row)}
     {@const def = typeDef(row.type)}
     {@const vocab = vocabFor(row.type)}
-    {#if i > 0}<div class="op">{op.toUpperCase()}</div>{/if}
+    {#if i > 0}<div class="op">{(op ?? "and").toUpperCase()}</div>{/if}
     <div class="row" class:negated={row.negated}>
       <div class="controls">
         {#if advanced}
-          <label class="neg" title="Require that the record does NOT have this attribute">
+          <label class="neg" title="Require that the record does NOT have this {noun}">
             <input type="checkbox" bind:checked={row.negated} />
             <span>NOT</span>
           </label>
         {/if}
 
         <div class="field grow">
-          <label class="lbl" for="attr-type-{uid}-{i}">Attribute</label>
+          <label class="lbl" for="attr-type-{uid}-{i}">{noun[0].toUpperCase() + noun.slice(1)}</label>
           <select id="attr-type-{uid}-{i}" bind:value={row.type} onchange={() => (row.values = [])}>
             <option value="">— choose —</option>
             {#each types as t (t.id)}
@@ -91,7 +95,7 @@
               value={row.values[0] ?? ""}
               oninput={(e) => (row.values = [e.currentTarget.value])}
               disabled={!row.type}
-              placeholder={row.type ? "any value" : "choose an attribute first"}
+              placeholder={row.type ? "any value" : `choose ${noun === "attribute" ? "an" : "a"} ${noun} first`}
             />
           {/if}
         </div>
@@ -105,14 +109,14 @@
     </div>
   {/each}
 
-  <button type="button" class="add" onclick={addRow}>+ Add attribute</button>
+  <button type="button" class="add" onclick={addRow}>+ Add {noun}</button>
 
   {#if rows.length > 1}
     <p class="note">
-      {#if op === "and"}
+      {#if op !== "or"}
         Returned specimens must match all rows
       {:else}
-        Returned specimen may match any one attribute.
+        Returned specimen may match any one {noun}.
       {/if}
     </p>
   {/if}

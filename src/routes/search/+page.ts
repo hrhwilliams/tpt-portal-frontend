@@ -1,7 +1,17 @@
 import { error } from "@sveltejs/kit";
-import { getSchema, search, searchRelations } from "$lib/api";
+import { getSchema, getSummary, search, searchRelations } from "$lib/api";
 import { fromParams, isEmpty } from "$lib/query";
+import type { Summary } from "$lib/types";
 import type { PageLoad } from "./$types";
+
+/** One tab of records related to the matched ones by a single relationship. */
+export type RelatedTable = {
+  relation: string;
+  records: Record<string, unknown>[] | null;
+  columns: string[];
+  matched: number;
+  error: string;
+};
 
 export const load: PageLoad = async ({ url, fetch }) => {
   const schemaPromise = getSchema(fetch);
@@ -11,44 +21,67 @@ export const load: PageLoad = async ({ url, fetch }) => {
   const errors: string[] = [];
 
   let records: Record<string, unknown>[] | null = null;
+  let columns: string[] = [];
   let matched = 0;
-  let relatedRecords: Record<string, unknown>[] | null = null;
-  let relatedMatched = 0;
-  let relatedError = "";
-  // only a search naming a relationship has related records to show
-  const relatedTab = [...new Set(query.taxa.flatMap((t) => t.relations))].join("; ");
+  let related: RelatedTable[] = [];
+  let summary: Summary | null = null;
+  let summaryError = "";
+  // one tab per relationship the search names
+  const relations = [...new Set(query.taxa.flatMap((t) => t.relations))];
 
   if (submitted && !isEmpty(query) && errors.length === 0) {
-    // `page` belongs to whichever tab is open; the other one starts over
-    const relatedOpen = relatedTab !== "" && query.tab === relatedTab;
+    // `page` belongs to whichever tab is open; the others start over
+    const relatedOpen = relations.includes(query.tab);
 
-    // `tab` is ours, not the service's
+    // `tab` is ours, except that `/api/relations` reads it as the one relationship to follow
     const params = new URLSearchParams(url.searchParams);
     params.delete("tab");
 
-    const relatedParams = new URLSearchParams(params);
+    // the summary covers the whole result set, so it has no page
+    const summaryParams = new URLSearchParams(params);
+    summaryParams.delete("page");
+    const summaryPromise = getSummary(fetch, summaryParams);
+
+    // ponytail: fetches a full first page of every tab just for its count;
+    // the service has no count-only request
+    const relatedPromises = relations.map((relation) => {
+      const relatedParams = new URLSearchParams(params);
+      relatedParams.set("tab", relation);
+      if (relation !== query.tab) relatedParams.delete("page");
+      return searchRelations(fetch, relatedParams);
+    });
 
     if (relatedOpen) {
       params.delete("page");
-    } else {
-      relatedParams.delete("page");
     }
 
-    const relatedPromise = relatedTab ? searchRelations(fetch, relatedParams) : null;
-
     try {
-      ({ records, matched } = await search(fetch, params));
+      ({ records, columns, matched } = await search(fetch, params));
     } catch (e) {
       errors.push(e instanceof Error ? e.message : "Search failed.");
     }
 
-    if (relatedPromise) {
-      try {
-        ({ records: relatedRecords, matched: relatedMatched } = await relatedPromise);
-      } catch (e) {
-        // a failure here must not take the main results down with it
-        relatedError = e instanceof Error ? e.message : "Related records failed to load.";
-      }
+    // a failure here must not take the main results down with it
+    related = await Promise.all(
+      relatedPromises.map((p, i) =>
+        p.then(
+          (r): RelatedTable => ({ relation: relations[i], ...r, error: "" }),
+          (e): RelatedTable => ({
+            relation: relations[i],
+            records: null,
+            columns: [],
+            matched: 0,
+            error: e instanceof Error ? e.message : "Related records failed to load.",
+          }),
+        ),
+      ),
+    );
+
+    try {
+      summary = await summaryPromise;
+    } catch (e) {
+      // the previews still work without it
+      summaryError = e instanceof Error ? e.message : "The summary failed to load.";
     }
   }
 
@@ -65,10 +98,10 @@ export const load: PageLoad = async ({ url, fetch }) => {
     submitted,
     errors,
     records,
+    columns,
     matched,
-    relatedRecords,
-    relatedMatched,
-    relatedError,
-    relatedTab,
+    related,
+    summary,
+    summaryError,
   };
 };

@@ -6,6 +6,10 @@ import { defineConfig } from "vite";
 export default defineConfig({
   define: { __API_BASE__: JSON.stringify(process.env.API_BASE ?? "https://tpt-portal.fiatlux.dev") },
 
+  // listen on every interface, so other machines on the network can reach it
+  server: { host: true },
+  preview: { host: true },
+
   plugins: [
     sveltekit({
       compilerOptions: {

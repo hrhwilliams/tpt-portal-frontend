@@ -98,8 +98,31 @@ test("a taxon row carries several related taxa", async ({ page }) => {
   await expect(page.locator("#related-name-0-0")).toHaveValue("Ixodidae");
 });
 
-test("a relationship search gets a second tab, holding the records related to it", async ({ page }) => {
+test("the summary is the landing tab, and the previews are behind it", async ({ page }) => {
+  await open(page, "/search?taxon=genus%7CSorex");
+
+  await expect(page.getByRole("tab", { name: "Summary" })).toHaveAttribute("aria-selected", "true");
+  // the summary's facet tables have no header; the records preview does
+  await expect(page.locator("table:has(thead) tbody tr")).toHaveCount(0);
+  // every table's export lives on the summary, whether or not the service can summarise yet
+  await expect(page.getByRole("link", { name: "CSV", exact: true })).toHaveAttribute("href", /api\/es-download/);
+  await expect(page.getByRole("button", { name: "Copy search URL" })).toBeVisible();
+
+  await page.getByRole("tab", { name: /^Records/ }).click();
+  await expect(page).toHaveURL(/tab=records/);
+  await expect(page.locator("tbody tr").first()).toBeVisible();
+});
+
+test("the summary describes each relationship separately", async ({ page }) => {
   await open(page, "/search?taxon=genus%7CSorex%7Chost+of+parasite%7Cclass%7CCestoda");
+
+  // its own section, beside the matched records' one, not folded into it
+  await expect(page.getByRole("heading", { name: /^Records/ })).toBeVisible();
+  await expect(page.getByRole("heading", { name: /^host of parasite records/ })).toBeVisible();
+});
+
+test("a relationship search gets a third tab, holding the records related to it", async ({ page }) => {
+  await open(page, "/search?taxon=genus%7CSorex%7Chost+of+parasite%7Cclass%7CCestoda&tab=records");
 
   const related = page.getByRole("tab", { name: /host of parasite/ });
   await expect(related).toHaveAttribute("aria-selected", "false");
@@ -120,11 +143,28 @@ test("a relationship search gets a second tab, holding the records related to it
   await expect(parasite.getByRole("link").first()).toHaveAttribute("href", /arctos\.database\.museum/);
 });
 
+test("each relationship gets a tab of its own", async ({ page }) => {
+  await open(page, "/search?taxon=genus%7CSorex%7Ccollected+with%3B+host+of+parasite&tab=collected+with");
+
+  const collected = page.getByRole("tab", { name: /collected with/ });
+  const parasites = page.getByRole("tab", { name: /host of parasite/ });
+  await expect(page.getByRole("tab")).toHaveCount(4);
+  await expect(collected).toHaveAttribute("aria-selected", "true");
+  await expect(parasites).toHaveAttribute("aria-selected", "false");
+
+  const tally = async (tab: typeof collected) =>
+    Number((await tab.locator(".tally").textContent())?.replace(/[^\d]/g, ""));
+  expect(await tally(collected)).toBeGreaterThan(0);
+  expect(await tally(parasites)).toBeGreaterThan(await tally(collected));
+
+  await expect(page.getByRole("link", { name: "Export as CSV" })).toHaveAttribute("href", /tab=collected\+with/);
+});
+
 test("the export follows the open tab", async ({ page }) => {
-  await open(page, "/search?taxon=genus%7CSorex%7Chost+of+parasite%7Cclass%7CCestoda&page=2");
+  await open(page, "/search?taxon=genus%7CSorex%7Chost+of+parasite%7Cclass%7CCestoda&tab=records&page=2");
 
   const csv = page.getByRole("link", { name: "Export as CSV" });
-  await expect(csv).toHaveAttribute("href", /api\/download/);
+  await expect(csv).toHaveAttribute("href", /api\/es-download/);
   await expect(csv).not.toHaveAttribute("href", /tab=/);
 
   await page.getByRole("tab", { name: /host of parasite/ }).click();
@@ -181,33 +221,42 @@ test("switching tabs starts the new one at page 1", async ({ page }) => {
   await expect(page).not.toHaveURL(/page=/);
 });
 
-test("a search with no relationship gets no relation tab", async ({ page }) => {
+test("a search with no relationship gets no related tab", async ({ page }) => {
   await open(page, "/search?taxon=genus%7CSorex");
-  // Records and Map are always there; the relation tab is not
   await expect(page.getByRole("tab")).toHaveCount(2);
-  await expect(page.getByRole("tab", { name: /of parasite/ })).toHaveCount(0);
 });
 
-test("the Map tab links to BerkeleyMapper with the export as its tab file", async ({ page }) => {
-  await open(page, "/search?taxon=genus%7CSorex%7Chost+of+parasite");
-  await page.getByRole("tab", { name: "Map" }).click();
+test("the map link follows the open tab", async ({ page }) => {
+  await open(page, "/search?taxon=genus%7CSorex%7Chost+of+parasite%7Cclass%7CCestoda&tab=records&page=2");
 
-  const href = await page.getByRole("link", { name: /BerkeleyMapper/ }).getAttribute("href");
-  const params = new URL(href ?? "").searchParams;
-  const tabfile = params.get("tabfile") ?? "";
+  const mapLink = page.getByRole("link", { name: /BerkeleyMapper/ });
+  const tabfileOf = async () => {
+    const href = (await mapLink.getAttribute("href")) ?? "";
+    const params = new URL(href).searchParams;
 
-  expect(href).toContain("berkeleymapper.berkeley.edu");
-  // both files are served by the API, wherever it lives
-  expect(params.get("configfile")).toMatch(/^https?:\/\/.+\/api\/berkeleymapper\.xml$/);
-  expect(new URL(tabfile).origin).toBe(new URL(params.get("configfile") ?? "").origin);
-  // the whole export of the records tab, not one page and not the relation tab
-  expect(tabfile).toContain("/api/download?");
+    expect(href).toContain("berkeleymapper.berkeley.edu");
+    // both files are served by the API, wherever it lives
+    expect(params.get("configfile")).toMatch(/^https?:\/\/.+\/api\/berkeleymapper\.xml$/);
+    expect(new URL(params.get("tabfile") ?? "").origin).toBe(new URL(params.get("configfile") ?? "").origin);
+    return params.get("tabfile") ?? "";
+  };
+
+  let tabfile = await tabfileOf();
+  // the whole export of the open tab, in the mapper's column preset
+  expect(new URL(tabfile).searchParams.get("cols")).toBe("map");
+  expect(tabfile).toContain("/api/es-download?");
   expect(tabfile).not.toContain("tab=");
   expect(tabfile).not.toContain("page=");
+
+  await page.getByRole("tab", { name: /host of parasite/ }).click();
+  // the tab reaches the mapper through the encoded tab file URL
+  await expect(mapLink).toHaveAttribute("href", /tab%3Dhost%2Bof%2Bparasite/);
+  tabfile = await tabfileOf();
+  expect(tabfile).toContain("tab=host+of+parasite");
 });
 
 test("paging: Next advances the page, and editing a filter returns to page 1", async ({ page }) => {
-  await open(page, "/search?taxon=genus%7CSorex");
+  await open(page, "/search?taxon=genus%7CSorex&tab=records");
 
   const firstRow = page.locator("tbody tr").first();
   const rowOnPageOne = await firstRow.textContent();

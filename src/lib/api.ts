@@ -1,4 +1,4 @@
-import type { Schema, Taxon } from "./types.ts";
+import type { Schema, Summary, Taxon } from "./types.ts";
 
 export async function getSchema(fetch: typeof globalThis.fetch): Promise<Schema> {
   let res: Response;
@@ -16,10 +16,14 @@ export async function getSchema(fetch: typeof globalThis.fetch): Promise<Schema>
   return (await res.json()) as Schema;
 }
 
-export async function search(
-  fetch: typeof globalThis.fetch,
-  params: URLSearchParams,
-): Promise<{ records: Record<string, unknown>[]; matched: number }> {
+export type SearchResult = {
+  records: Record<string, unknown>[];
+  /** the order the records' columns should be shown in */
+  columns: string[];
+  matched: number;
+};
+
+export async function search(fetch: typeof globalThis.fetch, params: URLSearchParams): Promise<SearchResult> {
   return searchPath(fetch, "search", params);
 }
 
@@ -27,10 +31,7 @@ export async function search(
  * The records the matched records are related to. Same query, same envelope,
  * paged on its own.
  */
-export async function searchRelations(
-  fetch: typeof globalThis.fetch,
-  params: URLSearchParams,
-): Promise<{ records: Record<string, unknown>[]; matched: number }> {
+export async function searchRelations(fetch: typeof globalThis.fetch, params: URLSearchParams): Promise<SearchResult> {
   return searchPath(fetch, "relations", params);
 }
 
@@ -38,7 +39,7 @@ async function searchPath(
   fetch: typeof globalThis.fetch,
   path: string,
   params: URLSearchParams,
-): Promise<{ records: Record<string, unknown>[]; matched: number }> {
+): Promise<SearchResult> {
   let res: Response;
 
   try {
@@ -53,7 +54,36 @@ async function searchPath(
     throw new Error(body?.message ?? `Search failed (${res.status}).`);
   }
 
-  return { records: body.records, matched: body.summary.matched };
+  const records: Record<string, unknown>[] = body.records;
+
+  return {
+    records,
+    // older responses have no column_order; fall back to the record's own key order
+    columns: body.column_order ?? Object.keys(records[0] ?? {}),
+    matched: body.summary.matched,
+  };
+}
+
+/** Statistics over the whole result set; same query parameters as `/api/search`, no paging. */
+export async function getSummary(fetch: typeof globalThis.fetch, params: URLSearchParams): Promise<Summary> {
+  let res: Response;
+
+  try {
+    res = await fetch(`${__API_BASE__}/api/summary?${params}`);
+  } catch {
+    throw new Error(`Could not reach the search service at ${__API_BASE__}.`);
+  }
+
+  if (!res.ok) {
+    // an error body is JSON when the service answered, and not when a proxy did
+    const message = await res
+      .json()
+      .then((b) => b?.message)
+      .catch(() => undefined);
+    throw new Error(message ?? `Summary failed (${res.status}).`);
+  }
+
+  return (await res.json()) as Summary;
 }
 
 export async function getTaxa(
@@ -76,7 +106,7 @@ export async function getTaxa(
 }
 
 export function downloadUrl(params: URLSearchParams): string {
-  return `${__API_BASE__}/api/download?${params}`;
+  return `${__API_BASE__}/api/es-download?${params}`;
 }
 
 /** The BerkeleyMapper XML config describing the export's columns. */

@@ -26,6 +26,8 @@ export type Schema = {
   snapshot_date: string;
   ranks: Rank[];
   attribute_types: AttributeTypeDef[];
+  /** part fields searchable by `part=field|value`, e.g. `part_name`, `disposition` */
+  part_fields: AttributeTypeDef[];
   vocabularies: Record<string, VocabValue[]>;
   countries: CountedValue[];
   states: CountedValue[];
@@ -40,6 +42,40 @@ export type Schema = {
     max_export_rows: number;
   };
   nonpublic_types_dropped: string[];
+};
+
+/** Statistics over one whole result set: the matched records, or the records related to them. */
+export type SummaryBlock = {
+  matched: number;
+  distinct: { taxa: number; localities: number; collectors: number };
+  /** collecting years, null when nothing in the set is dated */
+  years: { min: number; max: number } | null;
+  /** top values by record count, descending */
+  facets: {
+    taxa: CountedValue[];
+    countries: CountedValue[];
+    states: CountedValue[];
+    collections: CountedValue[];
+  };
+};
+
+/** The records reached by one relationship, e.g. everything the matched records are a `host of parasite` to. */
+export type RelationSummary = SummaryBlock & {
+  relation: string;
+  /**
+   * Distinct (record, related record) links by this relationship. Not shown:
+   * the gap between it and `matched` is an artefact of one animal catalogued
+   * twice, which is a curation detail rather than something to act on.
+   */
+  pairings: number;
+};
+
+export type Summary = {
+  records: SummaryBlock;
+  /** one block per relationship the query names, empty when it names none */
+  related: RelationSummary[];
+  /** plain-English restatement of the query */
+  description: string | null;
 };
 
 export type Taxon = {
@@ -78,6 +114,8 @@ export type SearchQuery = {
   detectionAttributes: AttributePair[];
   otherAttributes: AttributePair[];
   attr_op: BoolOp;
+  /** `type` is a part field; rows always AND */
+  parts: AttributePair[];
   method: string;
   locality: string;
   countries: string[];
@@ -96,6 +134,7 @@ export const EMPTY_QUERY: SearchQuery = {
   detectionAttributes: [],
   otherAttributes: [],
   attr_op: "and",
+  parts: [],
   method: "",
   locality: "",
   countries: [],

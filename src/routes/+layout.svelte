@@ -1,8 +1,25 @@
 <script lang="ts">
   import favicon from "$lib/assets/favicon.svg";
+  import { browser } from "$app/environment";
   import { resolve } from "$app/paths";
 
   let { children } = $props();
+
+  // The inline script in app.html has already applied the stored choice, so the
+  // document is the source of truth here rather than a separate default.
+  let dark = $state(browser && document.documentElement.dataset.theme === "dark");
+
+  function toggleTheme() {
+    dark = !dark;
+    const theme = dark ? "dark" : "light";
+    document.documentElement.dataset.theme = theme;
+
+    try {
+      localStorage.setItem("theme", theme);
+    } catch {
+      // storage can be blocked; the choice still holds for this page
+    }
+  }
 </script>
 
 <svelte:head>
@@ -12,6 +29,9 @@
 <header>
   <a class="brand" href={resolve("/")}>TPT specimen portal</a>
   <nav><a href={resolve("/search")}>Search</a></nav>
+  <button type="button" class="theme" onclick={toggleTheme} aria-pressed={dark}>
+    {dark ? "Light" : "Dark"} mode
+  </button>
 </header>
 
 <main>
@@ -23,6 +43,7 @@
 </footer>
 
 <style>
+  /* The theme is the header toggle's choice alone, never the system's. */
   :global(:root) {
     --bg: #ffffff;
     --panel: #f7f7f5;
@@ -31,18 +52,17 @@
     --muted: #6a6862;
     --accent: #3b6ea5;
     --accent-soft: #dbe7f3;
-    color-scheme: light dark;
+    color-scheme: light;
   }
-  @media (prefers-color-scheme: dark) {
-    :global(:root) {
-      --bg: #16181a;
-      --panel: #1e2124;
-      --line: #34383d;
-      --fg: #e7e5e1;
-      --muted: #9a9891;
-      --accent: #7fb0e0;
-      --accent-soft: #26364a;
-    }
+  :global(:root[data-theme="dark"]) {
+    --bg: #16181a;
+    --panel: #1e2124;
+    --line: #34383d;
+    --fg: #e7e5e1;
+    --muted: #9a9891;
+    --accent: #7fb0e0;
+    --accent-soft: #26364a;
+    color-scheme: dark;
   }
   :global(*, *::before, *::after) {
     box-sizing: border-box;
@@ -204,6 +224,11 @@
     font-weight: 700;
     text-decoration: none;
     color: var(--fg);
+  }
+  .theme {
+    margin-left: auto;
+    font-size: 0.82rem;
+    padding: 0.25rem 0.6rem;
   }
   main {
     flex: 1;

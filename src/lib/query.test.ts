@@ -81,6 +81,19 @@ describe("attribute round trip", () => {
   });
 });
 
+describe("part round trip", () => {
+  it("keeps part rows apart from attribute rows", () => {
+    const parts = [
+      { type: "part_name", values: ["skull", "skin, study"], negated: false },
+      { type: "disposition", values: ["on loan"], negated: true },
+    ];
+    const q = fromParams(toParams({ ...EMPTY_QUERY, parts }));
+    expect(q.parts).toEqual(parts);
+    expect(q.otherAttributes).toEqual([]);
+    expect(isEmpty(q)).toBe(false);
+  });
+});
+
 describe("taxon round trip", () => {
   const roundTrip = (taxa: SearchQuery["taxa"]) => fromParams(toParams({ ...EMPTY_QUERY, taxa })).taxa;
 

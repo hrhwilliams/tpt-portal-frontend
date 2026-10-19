@@ -74,7 +74,7 @@ function decodeTaxon(raw: string): TaxonPair | null {
 }
 
 /**
- * `type|value|value`
+ * `type|value|value`, also used for `part=field|value`
  */
 function decodeAttr(raw: string): AttributePair | null {
   let s = raw;
@@ -99,6 +99,21 @@ function decodeAttr(raw: string): AttributePair | null {
 /** Flattens the attribute lists into one list */
 function allAttributes(q: SearchQuery): AttributePair[] {
   return [...q.detectionAttributes, ...q.otherAttributes];
+}
+
+/** `[!]type|value|value` per typed row, plus `<key>_op=or` when it changes anything */
+function putRows(p: URLSearchParams, key: string, rows: AttributePair[], op: BoolOp = "and") {
+  const typed = rows.filter((a) => a.type);
+
+  for (const a of typed) {
+    const v = a.values.map((x) => x.trim()).filter(Boolean);
+    const head = `${a.negated ? "!" : ""}${escapePipes(a.type)}`;
+    p.append(key, head + v.map((x) => `|${escapePipes(x)}`).join(""));
+  }
+
+  if (op === "or" && typed.length > 1) {
+    p.set(`${key}_op`, "or");
+  }
 }
 
 /** Transform a query into a shareable URL parameter list */
@@ -129,18 +144,8 @@ export function toParams(q: SearchQuery): URLSearchParams {
     p.append("taxon", segments.join("|"));
   }
 
-  for (const a of allAttributes(q)) {
-    if (!a.type) continue;
-    const v = a.values.map((x) => x.trim()).filter(Boolean);
-    const head = `${a.negated ? "!" : ""}${escapePipes(a.type)}`;
-    p.append("attr", head + v.map((x) => `|${escapePipes(x)}`).join(""));
-  }
-
-  const typedAttrCount = allAttributes(q).filter((a) => a.type).length;
-
-  if (q.attr_op === "or" && typedAttrCount > 1) {
-    p.set("attr_op", "or");
-  }
+  putRows(p, "attr", allAttributes(q), q.attr_op);
+  putRows(p, "part", q.parts);
 
   if (!hasNegatedRow(q)) {
     put("method", q.method);
@@ -190,6 +195,10 @@ export function fromParams(p: URLSearchParams): SearchQuery {
     detectionAttributes: attrs.filter((a) => DETECTION_ATTRIBUTE_TYPE_IDS.has(a.type)),
     otherAttributes: attrs.filter((a) => !DETECTION_ATTRIBUTE_TYPE_IDS.has(a.type)),
     attr_op: (p.get("attr_op") === "or" ? "or" : "and") as BoolOp,
+    parts: p
+      .getAll("part")
+      .map(decodeAttr)
+      .filter((a): a is AttributePair => a !== null),
     guid_prefixes: p.getAll("prefix").filter(Boolean),
     method: p.get("method") ?? "",
     locality: p.get("locality") ?? "",
@@ -218,6 +227,7 @@ export function isEmpty(q: SearchQuery): boolean {
     q.taxa.some((t) => t.name || t.relations.length > 0 || t.related.some((r) => r.name)) ||
     q.guid_prefixes.length > 0 ||
     allAttributes(q).some((a) => a.type) ||
+    q.parts.some((a) => a.type) ||
     q.locality ||
     q.countries.length > 0 ||
     q.states.length > 0 ||
