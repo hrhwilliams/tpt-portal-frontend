@@ -10,10 +10,4 @@
   }
 </script>
 
-<Combobox
-  {id}
-  bind:value
-  {search}
-  placeholder="e.g. Sorex"
-  noMatchText="No match."
-/>
+<Combobox {id} bind:value {search} placeholder="e.g. Sorex" noMatchText="No match." />

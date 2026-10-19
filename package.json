@@ -13,6 +13,7 @@
     "lint": "prettier --check . && eslint .",
     "format": "prettier --write .",
     "test:e2e": "playwright test",
+    "test:e2e:live": "LIVE=1 playwright test",
     "test:unit": "vitest run"
   },
   "devDependencies": {

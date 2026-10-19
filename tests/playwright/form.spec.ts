@@ -5,9 +5,9 @@ import { expect, test } from "@playwright/test";
  * these goes through a `bind:` path, and that path has broken once already.
  * The URL is the whole request, so these assert on the URL, not on hits.
  *
- * **The Rust service must be running.** Playwright starts the dev server but not
- * the backend, and the form is built from `GET /api/schema` — without it every
- * test fails on a 503, not just the ones that search.
+ * By default these run against tests/stub-api.ts, which serves a saved schema
+ * and empty results. Tests that need real records are tagged `@live` and are
+ * skipped unless `LIVE=1`, which runs everything against the real service.
  */
 
 /** There are several MultiSelects and the results box also uses `.panel`. */
@@ -98,7 +98,7 @@ test("a taxon row carries several related taxa", async ({ page }) => {
   await expect(page.locator("#related-name-0-0")).toHaveValue("Ixodidae");
 });
 
-test("the summary is the landing tab, and the previews are behind it", async ({ page }) => {
+test("the summary is the landing tab, and the previews are behind it", { tag: "@live" }, async ({ page }) => {
   await open(page, "/search?taxon=genus%7CSorex");
 
   await expect(page.getByRole("tab", { name: "Summary" })).toHaveAttribute("aria-selected", "true");
@@ -113,7 +113,7 @@ test("the summary is the landing tab, and the previews are behind it", async ({ 
   await expect(page.locator("tbody tr").first()).toBeVisible();
 });
 
-test("the summary describes each relationship separately", async ({ page }) => {
+test("the summary describes each relationship separately", { tag: "@live" }, async ({ page }) => {
   await open(page, "/search?taxon=genus%7CSorex%7Chost+of+parasite%7Cclass%7CCestoda");
 
   // its own section, beside the matched records' one, not folded into it
@@ -121,27 +121,31 @@ test("the summary describes each relationship separately", async ({ page }) => {
   await expect(page.getByRole("heading", { name: /^host of parasite records/ })).toBeVisible();
 });
 
-test("a relationship search gets a third tab, holding the records related to it", async ({ page }) => {
-  await open(page, "/search?taxon=genus%7CSorex%7Chost+of+parasite%7Cclass%7CCestoda&tab=records");
+test(
+  "a relationship search gets a third tab, holding the records related to it",
+  { tag: "@live" },
+  async ({ page }) => {
+    await open(page, "/search?taxon=genus%7CSorex%7Chost+of+parasite%7Cclass%7CCestoda&tab=records");
 
-  const related = page.getByRole("tab", { name: /host of parasite/ });
-  await expect(related).toHaveAttribute("aria-selected", "false");
+    const related = page.getByRole("tab", { name: /host of parasite/ });
+    await expect(related).toHaveAttribute("aria-selected", "false");
 
-  // tab 1 holds the hosts
-  const host = page.locator("tbody tr").first();
-  await expect(host).toContainText("Sorex");
-  const hostGuid = await host.getByRole("link").first().textContent();
+    // tab 1 holds the hosts
+    const host = page.locator("tbody tr").first();
+    await expect(host).toContainText("Sorex");
+    const hostGuid = await host.getByRole("link").first().textContent();
 
-  await related.click();
-  await expect(related).toHaveAttribute("aria-selected", "true");
-  await expect(page).toHaveURL(/tab=host\+of\+parasite/);
+    await related.click();
+    await expect(related).toHaveAttribute("aria-selected", "true");
+    await expect(page).toHaveURL(/tab=host\+of\+parasite/);
 
-  // tab 2 holds their cestodes, as records of their own
-  const parasite = page.locator("tbody tr").first();
-  await expect(parasite).toContainText("Cestoda");
-  await expect(parasite.getByRole("link").first()).not.toHaveText(hostGuid ?? "");
-  await expect(parasite.getByRole("link").first()).toHaveAttribute("href", /arctos\.database\.museum/);
-});
+    // tab 2 holds their cestodes, as records of their own
+    const parasite = page.locator("tbody tr").first();
+    await expect(parasite).toContainText("Cestoda");
+    await expect(parasite.getByRole("link").first()).not.toHaveText(hostGuid ?? "");
+    await expect(parasite.getByRole("link").first()).toHaveAttribute("href", /arctos\.database\.museum/);
+  },
+);
 
 test("Search sends the query at once and scrolls to the results", async ({ page }) => {
   await page.setViewportSize({ width: 1200, height: 600 });
@@ -154,7 +158,7 @@ test("Search sends the query at once and scrolls to the results", async ({ page 
   await expect(page.getByRole("tab", { name: "Summary" })).toBeInViewport();
 });
 
-test("clicking a summary value toggles it in the matching filter", async ({ page }) => {
+test("clicking a summary value toggles it in the matching filter", { tag: "@live" }, async ({ page }) => {
   await open(page, "/search?taxon=genus%7CSorex");
 
   const records = page.getByRole("tab", { name: /^Records/ }).locator(".tally");
@@ -174,7 +178,7 @@ test("clicking a summary value toggles it in the matching filter", async ({ page
   await expect(page).not.toHaveURL(/country=/);
 });
 
-test("each relationship gets a tab of its own", async ({ page }) => {
+test("each relationship gets a tab of its own", { tag: "@live" }, async ({ page }) => {
   await open(page, "/search?taxon=genus%7CSorex%7Ccollected+with%3B+host+of+parasite&tab=collected+with");
 
   const collected = page.getByRole("tab", { name: /collected with/ });
@@ -191,7 +195,7 @@ test("each relationship gets a tab of its own", async ({ page }) => {
   await expect(page.getByRole("link", { name: "Export as CSV" })).toHaveAttribute("href", /tab=collected\+with/);
 });
 
-test("the export follows the open tab", async ({ page }) => {
+test("the export follows the open tab", { tag: "@live" }, async ({ page }) => {
   await open(page, "/search?taxon=genus%7CSorex%7Chost+of+parasite%7Cclass%7CCestoda&tab=records&page=2");
 
   const csv = page.getByRole("link", { name: "Export as CSV" });
@@ -205,7 +209,7 @@ test("the export follows the open tab", async ({ page }) => {
   await expect(csv).not.toHaveAttribute("href", /page=/);
 });
 
-test("each tab reports and pages its own count", async ({ page }) => {
+test("each tab reports and pages its own count", { tag: "@live" }, async ({ page }) => {
   await open(page, "/search?taxon=genus%7CSorex%7Chost+of+parasite%7Cclass%7CCestoda");
 
   const records = page.getByRole("tab", { name: /^Records/ }).locator(".tally");
@@ -230,7 +234,7 @@ test("each tab reports and pages its own count", async ({ page }) => {
   await expect(page.locator("tbody tr").first()).not.toHaveText(firstOnPageOne ?? "");
 });
 
-test("a filter narrows both tabs", async ({ page }) => {
+test("a filter narrows both tabs", { tag: "@live" }, async ({ page }) => {
   const taxon = "taxon=genus%7CSorex%7Chost+of+parasite%7Cclass%7CCestoda";
   const tally = page.getByRole("tab", { name: /host of parasite/ }).locator(".tally");
 
@@ -257,7 +261,7 @@ test("a search with no relationship gets no related tab", async ({ page }) => {
   await expect(page.getByRole("tab")).toHaveCount(2);
 });
 
-test("the map link follows the open tab", async ({ page }) => {
+test("the map link follows the open tab", { tag: "@live" }, async ({ page }) => {
   await open(page, "/search?taxon=genus%7CSorex%7Chost+of+parasite%7Cclass%7CCestoda&tab=records&page=2");
 
   const mapLink = page.getByRole("link", { name: /BerkeleyMapper/ });
@@ -286,7 +290,7 @@ test("the map link follows the open tab", async ({ page }) => {
   expect(tabfile).toContain("tab=host+of+parasite");
 });
 
-test("paging: Next advances the page, and editing a filter returns to page 1", async ({ page }) => {
+test("paging: Next advances the page, and editing a filter returns to page 1", { tag: "@live" }, async ({ page }) => {
   await open(page, "/search?taxon=genus%7CSorex&tab=records");
 
   const firstRow = page.locator("tbody tr").first();

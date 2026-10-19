@@ -60,7 +60,7 @@
 
   function onkeydown(e: KeyboardEvent) {
     if (!matches.length) return;
-  
+
     if (e.key === "ArrowDown") {
       e.preventDefault();
       open = true;
