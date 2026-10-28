@@ -1,25 +1,26 @@
 <script lang="ts">
   import { page } from "$app/state";
-  import type { CountedValue, SearchQuery, Summary, SummaryBlock } from "$lib/types";
+  import { isPicked, type FacetValue, type PickableFacet } from "$lib/query";
+  import type { CountedValue, FacetName, SearchQuery, Summary, SummaryBlock } from "$lib/types";
 
   /** One whole table's export links, named after the tab it previews. */
   export type ExportLinks = { label: string; csv: string; map: string };
 
-  /** The query's filters that a facet value can be added to as is. */
-  export type FacetFilter = "countries" | "states" | "guid_prefixes";
-
   let {
     summary,
+    bases,
     error,
     exports,
     query,
     toggle,
   }: {
     summary: Summary | null;
+    /** Per facet, the summary from before its first pick; its values stay listed, grayed when no longer matched. */
+    bases: Partial<Record<PickableFacet, Summary | null>>;
     error: string;
     exports: ExportLinks[];
     query: SearchQuery;
-    toggle: (filter: FacetFilter, value: string) => void;
+    toggle: (facet: PickableFacet, v: FacetValue) => void;
   } = $props();
 
   const related = $derived(summary?.related ?? []);
@@ -31,43 +32,81 @@
     setTimeout(() => (copied = false), 1500);
   }
 
+  type FacetRow = CountedValue & { type?: string; gone?: boolean };
+
+  // the attribute and part facets hold values of several types
+  const key = (r: FacetRow) => (r.type ? `${r.type}|${r.value}` : r.value);
+  const label = (r: FacetRow) => (r.type ? `${r.type}: ${r.value}` : r.value);
+
+  // the base's values in its order, with the current count where still matched
+  // and the base's own count, grayed, where not; then any new ones
+  function withBase(cur: FacetRow[], prev: FacetRow[] | undefined): FacetRow[] {
+    if (!prev) return cur;
+    const counts = new Map(cur.map((r) => [key(r), r.count]));
+    const known = new Set(prev.map(key));
+    return [
+      ...prev.map((r) => {
+        const count = counts.get(key(r));
+        return count === undefined ? { ...r, gone: true } : { ...r, count };
+      }),
+      ...cur.filter((r) => !known.has(key(r))),
+    ];
+  }
+
+  // the attribute and part facets show only once the service sends them
+  const COLUMNS: [FacetName, string][] = [
+    ["taxa", "Taxa"],
+    ["countries", "Countries"],
+    ["states", "States / provinces"],
+    ["collections", "Collections"],
+    ["detections", "Examined for / detected"],
+    ["attributes", "Other attributes"],
+    ["parts", "Parts"],
+  ];
+
   const n = (v: number) => v.toLocaleString();
   const years = (b: SummaryBlock) =>
     b.years === null ? "—" : b.years.min === b.years.max ? String(b.years.min) : `${b.years.min}–${b.years.max}`;
 </script>
 
-<!-- `filter` makes each value toggle in that filter; only the matched records'
+<!-- `filter` makes each value toggle in the query; only the matched records'
      facets get one, since the filters narrow those and not the related records -->
-{#snippet facet(title: string, rows: CountedValue[], filter?: FacetFilter)}
+{#snippet facet(title: string, rows: FacetRow[], filter?: PickableFacet)}
   <div class="facet">
     <h4>{title}</h4>
     {#if rows.length}
-      {@const max = Math.max(...rows.map((r) => r.count))}
-      <table>
-        <tbody>
-          {#each rows as r (r.value)}
-            <tr style="--pct: {(r.count / max) * 100}%">
-              <td>
-                {#if filter}
-                  {@const on = query[filter].includes(r.value)}
-                  <button
-                    type="button"
-                    class="pick"
-                    aria-pressed={on}
-                    title={on ? "Remove from the filter" : "Add to the filter"}
-                    onclick={() => toggle(filter, r.value)}
-                  >
-                    {r.value}
-                  </button>
-                {:else}
-                  {r.value}
-                {/if}
-              </td>
-              <td class="n">{n(r.count)}</td>
-            </tr>
-          {/each}
-        </tbody>
-      </table>
+      <!-- scaled to the values still matched; the grayed ones get no bar -->
+      {@const max = Math.max(1, ...rows.filter((r) => !r.gone).map((r) => r.count))}
+      <!-- checked first, then still matched, then grayed; by count within each -->
+      {@const rank = (r: FacetRow) => (filter && isPicked(query, filter, r) ? 0 : r.gone ? 2 : 1)}
+      {@const sorted = [...rows].sort((a, b) => rank(a) - rank(b) || b.count - a.count)}
+      <div class="rows">
+        <table>
+          <tbody>
+            {#each sorted as r (key(r))}
+              <tr style="--pct: {r.gone ? 0 : (r.count / max) * 100}%" class:gone={r.gone}>
+                <td>
+                  {#if filter}
+                    {@const on = isPicked(query, filter, r)}
+                    <button
+                      type="button"
+                      class="pick"
+                      aria-pressed={on}
+                      title={on ? "Remove from the filter" : "Add to the filter"}
+                      onclick={() => toggle(filter, r)}
+                    >
+                      {label(r)}
+                    </button>
+                  {:else}
+                    {label(r)}
+                  {/if}
+                </td>
+                <td class="n">{n(r.count)}</td>
+              </tr>
+            {/each}
+          </tbody>
+        </table>
+      </div>
     {:else}
       <p class="note">None recorded.</p>
     {/if}
@@ -96,10 +135,14 @@
       </div>
     </dl>
     <div class="facets">
-      {@render facet("Taxa", b.facets.taxa)}
-      {@render facet("Countries", b.facets.countries, pickable ? "countries" : undefined)}
-      {@render facet("States / provinces", b.facets.states, pickable ? "states" : undefined)}
-      {@render facet("Collections", b.facets.collections, pickable ? "guid_prefixes" : undefined)}
+      {#each COLUMNS as [name, title] (name)}
+        {@const rows = b.facets[name]}
+        {#if rows && pickable && name !== "taxa"}
+          {@render facet(title, withBase(rows, bases[name]?.records.facets[name]), name)}
+        {:else if rows}
+          {@render facet(title, rows)}
+        {/if}
+      {/each}
     </div>
   </section>
 {/snippet}
@@ -173,10 +216,15 @@
     grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr));
     gap: 1rem;
   }
+  /* ten single-line rows (a line plus the cells' padding); the rest scroll */
+  .rows {
+    font-size: 0.8rem;
+    max-height: calc(10 * (1lh + 0.3rem));
+    overflow-y: auto;
+  }
   table {
     width: 100%;
     border-collapse: collapse;
-    font-size: 0.8rem;
   }
   /* the count as a bar behind the row, no chart library */
   tr {
@@ -201,6 +249,10 @@
   }
   .pick[aria-pressed="true"]::before {
     content: "✓ ";
+  }
+  /* listed from before the facet picks, but matched by none of the records now */
+  tr.gone {
+    opacity: 0.45;
   }
   td.n {
     text-align: right;

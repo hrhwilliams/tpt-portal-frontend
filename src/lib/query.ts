@@ -2,6 +2,7 @@ import {
   EMPTY_QUERY,
   type AttributePair,
   type BoolOp,
+  type FacetName,
   type RelatedTaxon,
   type SearchQuery,
   type TaxonPair,
@@ -214,6 +215,58 @@ export function fromParams(p: URLSearchParams): SearchQuery {
   if (hasNegatedRow(q)) q.method = "";
 
   return q;
+}
+
+/** The summary facets whose values can be picked into the query. */
+export type PickableFacet = Exclude<FacetName, "taxa">;
+
+/** A facet value; `type` is the attribute type or part field, for those facets. */
+export type FacetValue = { value: string; type?: string };
+
+const LIST_FILTERS = { countries: "countries", states: "states", collections: "guid_prefixes" } as const;
+
+function rowsKey(facet: PickableFacet, type: string): "detectionAttributes" | "otherAttributes" | "parts" {
+  if (facet === "parts") return "parts";
+  return DETECTION_ATTRIBUTE_TYPE_IDS.has(type) ? "detectionAttributes" : "otherAttributes";
+}
+
+/** Whether the query already filters on this facet value. */
+export function isPicked(q: SearchQuery, facet: PickableFacet, v: FacetValue): boolean {
+  if (facet in LIST_FILTERS) {
+    return q[LIST_FILTERS[facet as keyof typeof LIST_FILTERS]].includes(v.value);
+  }
+
+  const type = v.type ?? "";
+  return q[rowsKey(facet, type)].some((a) => a.type === type && !a.negated && a.values.includes(v.value));
+}
+
+/**
+ * Adds a facet value to the query, or takes it out if it is already there. An
+ * attribute or part value joins the row of its type as another OR'd value, and
+ * taking out a row's last value drops the row rather than leaving it matching
+ * any value of that type.
+ */
+export function togglePick(q: SearchQuery, facet: PickableFacet, v: FacetValue) {
+  if (facet in LIST_FILTERS) {
+    const key = LIST_FILTERS[facet as keyof typeof LIST_FILTERS];
+    const cur = q[key];
+    q[key] = cur.includes(v.value) ? cur.filter((x) => x !== v.value) : [...cur, v.value];
+    return;
+  }
+
+  const type = v.type ?? "";
+  const key = rowsKey(facet, type);
+  const rows = q[key];
+  const row = rows.find((a) => a.type === type && !a.negated);
+
+  if (!row) {
+    q[key] = [...rows, { type, values: [v.value], negated: false }];
+  } else if (row.values.includes(v.value)) {
+    const values = row.values.filter((x) => x !== v.value);
+    q[key] = values.length ? rows.map((a) => (a === row ? { ...a, values } : a)) : rows.filter((a) => a !== row);
+  } else {
+    q[key] = rows.map((a) => (a === row ? { ...a, values: [...a.values, v.value] } : a));
+  }
 }
 
 /** Check if one of the attribute rows has had `NOT` checked */

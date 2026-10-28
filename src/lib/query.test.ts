@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { escapePipes, fromParams, isEmpty, splitPipes, toParams } from "./query.ts";
+import { escapePipes, fromParams, isEmpty, isPicked, splitPipes, toParams, togglePick } from "./query.ts";
 import { EMPTY_QUERY, type SearchQuery } from "./types.ts";
 
 /** Names chosen to collide with the delimiter, the escape, or both. */
@@ -154,5 +154,51 @@ describe("taxon round trip", () => {
     const taxa = [{ rank: "genus", name: "", relations: [], related: [] }];
     expect(toParams({ ...EMPTY_QUERY, taxa }).getAll("taxon")).toEqual([]);
     expect(isEmpty({ ...EMPTY_QUERY, taxa })).toBe(true);
+  });
+});
+
+describe("togglePick", () => {
+  const fresh = (): SearchQuery => structuredClone(EMPTY_QUERY);
+
+  it("toggles a country in and out", () => {
+    const q = fresh();
+    togglePick(q, "countries", { value: "Canada" });
+    expect(q.countries).toEqual(["Canada"]);
+    expect(isPicked(q, "countries", { value: "Canada" })).toBe(true);
+    togglePick(q, "countries", { value: "Canada" });
+    expect(q.countries).toEqual([]);
+  });
+
+  it("maps collections onto guid prefixes", () => {
+    const q = fresh();
+    togglePick(q, "collections", { value: "MSB:Mamm" });
+    expect(q.guid_prefixes).toEqual(["MSB:Mamm"]);
+  });
+
+  it("ORs a second value into the row of its type, and drops the row with its last value", () => {
+    const q = fresh();
+    togglePick(q, "detections", { type: "detected", value: "Hantavirus" });
+    togglePick(q, "detections", { type: "detected", value: "Bartonella" });
+    expect(q.detectionAttributes).toEqual([{ type: "detected", values: ["Hantavirus", "Bartonella"], negated: false }]);
+    togglePick(q, "detections", { type: "detected", value: "Hantavirus" });
+    togglePick(q, "detections", { type: "detected", value: "Bartonella" });
+    expect(q.detectionAttributes).toEqual([]);
+  });
+
+  it("files other attributes and parts in their own lists", () => {
+    const q = fresh();
+    togglePick(q, "attributes", { type: "sex", value: "female" });
+    togglePick(q, "parts", { type: "part_name", value: "skull" });
+    expect(q.otherAttributes).toEqual([{ type: "sex", values: ["female"], negated: false }]);
+    expect(q.parts).toEqual([{ type: "part_name", values: ["skull"], negated: false }]);
+    expect(isPicked(q, "parts", { type: "part_name", value: "skull" })).toBe(true);
+  });
+
+  it("leaves a negated row alone", () => {
+    const q = fresh();
+    q.detectionAttributes = [{ type: "detected", values: ["Hantavirus"], negated: true }];
+    expect(isPicked(q, "detections", { type: "detected", value: "Hantavirus" })).toBe(false);
+    togglePick(q, "detections", { type: "detected", value: "Hantavirus" });
+    expect(q.detectionAttributes).toHaveLength(2);
   });
 });

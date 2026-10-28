@@ -5,9 +5,17 @@
   import CollectorCombobox from "$lib/components/CollectorCombobox.svelte";
   import MultiSelect from "$lib/components/MultiSelect.svelte";
   import TaxonRows from "$lib/components/TaxonRows.svelte";
-  import { DETECTION_ATTRIBUTE_TYPE_IDS, hasNegatedRow, toParams } from "$lib/query";
-  import SearchSummary, { type ExportLinks, type FacetFilter } from "./SearchSummary.svelte";
+  import {
+    DETECTION_ATTRIBUTE_TYPE_IDS,
+    hasNegatedRow,
+    toParams,
+    togglePick,
+    type FacetValue,
+    type PickableFacet,
+  } from "$lib/query";
+  import SearchSummary, { type ExportLinks } from "./SearchSummary.svelte";
   import { SearchQueryState } from "./query-state.svelte.ts";
+  import type { SearchQuery, Summary } from "$lib/types";
   import type { PageData } from "./$types";
 
   let { data }: { data: PageData } = $props();
@@ -45,10 +53,25 @@
     void data.related;
     expandedCell = null;
   });
+  // Per facet, the summary from before its first pick, so the values not picked
+  // there gray out rather than vanish. Facets not picked in follow the results.
+  // Any other change to the query drops them all.
+  let bases = $state<Partial<Record<PickableFacet, Summary | null>>>({});
+  let pickedKey = "";
+  const filterKey = (s: SearchQuery) => {
+    const p = toParams(s);
+    p.delete("tab");
+    p.delete("page");
+    return p.toString();
+  };
+  $effect(() => {
+    if (filterKey(q) !== pickedKey) bases = {};
+  });
   // the live search picks the change up like any other filter edit
-  function toggleFilter(filter: FacetFilter, value: string) {
-    const cur = q[filter];
-    q[filter] = cur.includes(value) ? cur.filter((v) => v !== value) : [...cur, value];
+  function toggleFilter(facet: PickableFacet, v: FacetValue) {
+    bases[facet] ??= data.summary;
+    togglePick(q, facet, v);
+    pickedKey = filterKey(q);
   }
   function toggleCell(key: string) {
     expandedCell = expandedCell === key ? null : key;
@@ -337,6 +360,7 @@
     {#if summaryOpen}
       <SearchSummary
         summary={data.summary}
+        {bases}
         error={data.summaryError}
         exports={allExports}
         query={q}

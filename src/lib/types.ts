@@ -17,6 +17,9 @@ export type VocabValue = {
 /** A value with its record count in the current snapshot. */
 export type CountedValue = { value: string; count: number };
 
+/** An attribute value or part field value, with the attribute type or part field it belongs to. */
+export type TypedCount = CountedValue & { type: string };
+
 export type GuidPrefix = CountedValue & {
   institution: string;
   collection_cde: string;
@@ -56,8 +59,16 @@ export type SummaryBlock = {
     countries: CountedValue[];
     states: CountedValue[];
     collections: CountedValue[];
+    /** pairs of the detection attribute types (`detected`, `examined for`, ...) */
+    detections?: TypedCount[];
+    /** pairs of every other attribute type */
+    attributes?: TypedCount[];
+    /** pairs of part field and value */
+    parts?: TypedCount[];
   };
 };
+
+export type FacetName = keyof SummaryBlock["facets"];
 
 /** The records reached by one relationship, e.g. everything the matched records are a `host of parasite` to. */
 export type RelationSummary = SummaryBlock & {
