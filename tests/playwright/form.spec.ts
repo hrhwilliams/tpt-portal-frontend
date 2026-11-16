@@ -105,7 +105,7 @@ test("the summary is the landing tab, and the previews are behind it", { tag: "@
   // the summary's facet tables have no header; the records preview does
   await expect(page.locator("table:has(thead) tbody tr")).toHaveCount(0);
   // every table's export lives on the summary, whether or not the service can summarise yet
-  await expect(page.getByRole("link", { name: "CSV", exact: true })).toHaveAttribute("href", /api\/es-download/);
+  await expect(page.getByRole("link", { name: "CSV", exact: true })).toHaveAttribute("href", /duckdb\/download/);
   await expect(page.getByRole("button", { name: "Copy search URL" })).toBeVisible();
 
   await page.getByRole("tab", { name: /^Records/ }).click();
@@ -199,7 +199,7 @@ test("the export follows the open tab", { tag: "@live" }, async ({ page }) => {
   await open(page, "/search?taxon=genus%7CSorex%7Chost+of+parasite%7Cclass%7CCestoda&tab=records&page=2");
 
   const csv = page.getByRole("link", { name: "Export as CSV" });
-  await expect(csv).toHaveAttribute("href", /api\/es-download/);
+  await expect(csv).toHaveAttribute("href", /duckdb\/download/);
   await expect(csv).not.toHaveAttribute("href", /tab=/);
 
   await page.getByRole("tab", { name: /host of parasite/ }).click();
@@ -279,7 +279,7 @@ test("the map link follows the open tab", { tag: "@live" }, async ({ page }) => 
   let tabfile = await tabfileOf();
   // the whole export of the open tab, in the mapper's column preset
   expect(new URL(tabfile).searchParams.get("cols")).toBe("map");
-  expect(tabfile).toContain("/api/duckdb/es-download?");
+  expect(tabfile).toContain("/api/duckdb/download?");
   expect(tabfile).not.toContain("tab=");
   expect(tabfile).not.toContain("page=");
 
