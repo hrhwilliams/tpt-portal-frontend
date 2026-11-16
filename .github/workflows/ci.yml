@@ -30,7 +30,7 @@ jobs:
           path: test-results/
           retention-days: 7
 
-  # Every Playwright test against the real service at tpt-portal.fiatlux.dev.
+  # Every Playwright test against the real service at ocellus.bnhm.berkeley.edu.
   # Reported, but never fails the build: an outage there says nothing about this code.
   live:
     runs-on: ubuntu-latest

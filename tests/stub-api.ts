@@ -1,7 +1,7 @@
 /**
  * A stand-in for the search service, so the Playwright tests that only exercise
  * the form run without the real backend. It serves a saved copy of
- * `/api/schema` and an empty result for every search. Tests needing real data
+ * `/api/duckdb/schema` and an empty result for every search. Tests needing real data
  * are tagged `@live` and run against the real service with `LIVE=1`.
  *
  * Refresh the fixture when the schema changes shape:
@@ -20,11 +20,11 @@ const taxa = [
 ];
 
 const routes: Record<string, (url: URL) => unknown> = {
-  "/api/schema": () => schema,
-  "/api/search": () => ({ records: [], column_order: [], summary: { matched: 0 } }),
-  "/api/relations": () => ({ records: [], column_order: [], summary: { context: 0, matched: 0 } }),
-  "/api/summary": () => ({ records: block, related: [], description: null }),
-  "/api/taxa": (url) => {
+  "/api/duckdb/schema": () => schema,
+  "/api/duckdb/search": () => ({ records: [], column_order: [], summary: { matched: 0 } }),
+  "/api/duckdb/relations": () => ({ records: [], column_order: [], summary: { context: 0, matched: 0 } }),
+  "/api/duckdb/summary": () => ({ records: block, related: [], description: null }),
+  "/api/duckdb/taxa": (url) => {
     const q = (url.searchParams.get("q") ?? "").toLowerCase();
     return { matches: taxa.filter((t) => t.name.toLowerCase().startsWith(q)) };
   },

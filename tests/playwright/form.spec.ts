@@ -279,7 +279,7 @@ test("the map link follows the open tab", { tag: "@live" }, async ({ page }) => 
   let tabfile = await tabfileOf();
   // the whole export of the open tab, in the mapper's column preset
   expect(new URL(tabfile).searchParams.get("cols")).toBe("map");
-  expect(tabfile).toContain("/api/es-download?");
+  expect(tabfile).toContain("/api/duckdb/es-download?");
   expect(tabfile).not.toContain("tab=");
   expect(tabfile).not.toContain("page=");
 
