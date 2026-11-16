@@ -17,7 +17,7 @@ export default defineConfig({
       command: `bun run dev -- --port ${port}`,
       port,
       reuseExistingServer: live,
-      env: live ? {} : { API_BASE: "http://localhost:5174" },
+      env: live ? {} : { API_BASE: "http://localhost:5174/api" },
     },
   ],
 });

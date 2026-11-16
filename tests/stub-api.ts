@@ -5,7 +5,7 @@
  * are tagged `@live` and run against the real service with `LIVE=1`.
  *
  * Refresh the fixture when the schema changes shape:
- *   curl https://tpt-portal.fiatlux.dev/api/schema > tests/fixtures/schema.json
+ *   curl https://ocellus.bnhm.berkeley.edu/arctos-reciprocal-relationship-portal/api/duckdb/schema > tests/fixtures/schema.json
  * (then trim `collectors`; the full list is ~2 MB)
  */
 import { createServer } from "node:http";

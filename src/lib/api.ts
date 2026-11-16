@@ -4,7 +4,7 @@ export async function getSchema(fetch: typeof globalThis.fetch): Promise<Schema>
   let res: Response;
 
   try {
-    res = await fetch(`${__API_BASE__}/api/schema`);
+    res = await fetch(`${__API_BASE__}/schema`);
   } catch {
     throw new Error(`Could not load the search form from ${__API_BASE__}.`);
   }
@@ -43,7 +43,7 @@ async function searchPath(
   let res: Response;
 
   try {
-    res = await fetch(`${__API_BASE__}/api/${path}?${params}`);
+    res = await fetch(`${__API_BASE__}/${path}?${params}`);
   } catch {
     throw new Error(`Could not reach the search service at ${__API_BASE__}.`);
   }
@@ -69,7 +69,7 @@ export async function getSummary(fetch: typeof globalThis.fetch, params: URLSear
   let res: Response;
 
   try {
-    res = await fetch(`${__API_BASE__}/api/summary?${params}`);
+    res = await fetch(`${__API_BASE__}/summary?${params}`);
   } catch {
     throw new Error(`Could not reach the search service at ${__API_BASE__}.`);
   }
@@ -93,7 +93,7 @@ export async function getTaxa(
 ): Promise<Taxon[]> {
   const rankParam = opts.rank ? `&rank=${encodeURIComponent(opts.rank)}` : "";
 
-  const res = await fetch(`${__API_BASE__}/api/taxa?q=${encodeURIComponent(q)}&limit=10${rankParam}`, {
+  const res = await fetch(`${__API_BASE__}/taxa?q=${encodeURIComponent(q)}&limit=10${rankParam}`, {
     signal: opts.signal,
   });
 
@@ -106,10 +106,10 @@ export async function getTaxa(
 }
 
 export function downloadUrl(params: URLSearchParams): string {
-  return `${__API_BASE__}/api/es-download?${params}`;
+  return `${__API_BASE__}/es-download?${params}`;
 }
 
 /** The BerkeleyMapper XML config describing the export's columns. */
 export function berkeleyMapperConfigUrl(): string {
-  return `${__API_BASE__}/api/berkeleymapper.xml`;
+  return `${__API_BASE__}/berkeleymapper.xml`;
 }
