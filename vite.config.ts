@@ -4,7 +4,11 @@ import { sveltekit } from "@sveltejs/kit/vite";
 import { defineConfig } from "vite";
 
 export default defineConfig({
-  define: { __API_BASE__: JSON.stringify(process.env.API_BASE ?? "https://ocellus.bnhm.berkeley.edu/arctos-reciprocal-relationship-portal/api/duckdb") },
+  define: {
+    __API_BASE__: JSON.stringify(
+      process.env.API_BASE ?? "https://ocellus.bnhm.berkeley.edu/arctos-reciprocal-relationship-portal/api/duckdb",
+    ),
+  },
 
   // listen on every interface, so other machines on the network can reach it
   server: { host: true },
