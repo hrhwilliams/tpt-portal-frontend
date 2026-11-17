@@ -8,7 +8,11 @@ import {
   type TaxonPair,
 } from "./types.ts";
 
-/** The row type that matches records with no attributes (`attr=null`) or no parts (`part=null`) at all */
+/**
+ * The row type that matches records with no attributes (`attr=null`) or no
+ * parts (`part=null`) at all, and the relationship for records related to
+ * nothing (`taxon=rank|name|null`)
+ */
 export const NULL_TYPE = "null";
 
 /** Types that are allowed in the detection attribute form */

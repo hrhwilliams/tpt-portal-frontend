@@ -231,3 +231,12 @@ describe("null rows", () => {
     expect(isEmpty(back)).toBe(false);
   });
 });
+
+describe("none relationship", () => {
+  it("sends rank|name|null and reads it back", () => {
+    const taxa = [{ rank: "genus", name: "Sorex", relations: ["null"], related: [] }];
+    const p = toParams({ ...EMPTY_QUERY, taxa });
+    expect(p.get("taxon")).toBe("genus|Sorex|null");
+    expect(fromParams(p).taxa).toEqual(taxa);
+  });
+});

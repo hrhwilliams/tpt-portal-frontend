@@ -1,11 +1,22 @@
 <script lang="ts">
   import MultiSelect from "./MultiSelect.svelte";
   import TaxonCombobox from "./TaxonCombobox.svelte";
+  import { NULL_TYPE } from "$lib/query";
   import type { RelatedTaxon, Schema, TaxonPair } from "$lib/types";
 
   let { rows = $bindable(), schema }: { rows: TaxonPair[]; schema: Schema } = $props();
 
-  const relationOptions = $derived(schema.relations.map((r) => ({ value: r.value, label: r.value })));
+  // "none" first: records related to nothing, so it excludes every other relationship
+  const relationOptions = $derived([
+    { value: NULL_TYPE, label: "none", italic: true, exclusive: true },
+    ...schema.relations.map((r) => ({ value: r.value, label: r.value })),
+  ]);
+
+  // related taxa make no sense for "none", and their section hides
+  function setRelations(row: TaxonPair, v: string[]) {
+    row.relations = v;
+    if (v.includes(NULL_TYPE)) row.related = [];
+  }
 
   function addRow() {
     const last = rows[rows.length - 1];
@@ -49,7 +60,7 @@
           <span class="lbl">Related to another record as</span>
           <MultiSelect
             id="taxon-relations-{i}"
-            bind:selected={row.relations}
+            bind:selected={() => row.relations, (v) => setRelations(row, v)}
             options={relationOptions}
             placeholder="Any relationship"
             filterPlaceholder="Type to filter {schema.relations.length} relationships…"
@@ -58,7 +69,7 @@
         <button type="button" class="rm" onclick={() => removeRow(i)} aria-label="Remove this taxon"> × </button>
       </div>
 
-      {#if row.relations.length}
+      {#if row.relations.length && !row.relations.includes(NULL_TYPE)}
         <div class="related">
           <span class="lbl">Restrict to specific related taxa</span>
 

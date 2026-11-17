@@ -1,6 +1,6 @@
 import { error } from "@sveltejs/kit";
 import { getSchema, getSummary, search, searchRelations } from "$lib/api";
-import { fromParams, isEmpty } from "$lib/query";
+import { NULL_TYPE, fromParams, isEmpty } from "$lib/query";
 import type { Summary } from "$lib/types";
 import type { PageLoad } from "./$types";
 
@@ -26,8 +26,8 @@ export const load: PageLoad = async ({ url, fetch }) => {
   let related: RelatedTable[] = [];
   let summary: Summary | null = null;
   let summaryError = "";
-  // one tab per relationship the search names
-  const relations = [...new Set(query.taxa.flatMap((t) => t.relations))];
+  // one tab per relationship the search names; "none" relates to nothing, so has no tab
+  const relations = [...new Set(query.taxa.flatMap((t) => t.relations))].filter((r) => r !== NULL_TYPE);
 
   if (submitted && !isEmpty(query) && errors.length === 0) {
     // `page` belongs to whichever tab is open; the others start over

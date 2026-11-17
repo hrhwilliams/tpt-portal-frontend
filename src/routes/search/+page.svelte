@@ -65,6 +65,7 @@
   const GUID_COLUMNS = new Set(["guid", "related_guid", "related_guids"]);
   const guidHref = (guid: string) => `https://arctos.database.museum/guid/${guid}`;
   const JSON_COLUMNS = new Set([
+    "relations",
     "events",
     "partdetail",
     "previousidentifications",

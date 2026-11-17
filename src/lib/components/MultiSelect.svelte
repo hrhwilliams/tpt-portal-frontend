@@ -1,5 +1,12 @@
 <script lang="ts">
-  export type Option = { value: string; label: string; hint?: string };
+  export type Option = {
+    value: string;
+    label: string;
+    hint?: string;
+    italic?: boolean;
+    /** picked alone: ticking it clears the others, which stay grayed out while it is picked */
+    exclusive?: boolean;
+  };
 
   let {
     selected = $bindable(),
@@ -28,15 +35,16 @@
   const checked = $derived(shown.filter((o) => selected.includes(o.value)));
   const unchecked = $derived(shown.filter((o) => !selected.includes(o.value)));
 
-  const labelOf = (v: string) => options.find((o) => o.value === v)?.label ?? v;
-  const label = $derived(
-    selected.length === 0
-      ? placeholder
-      : selected.slice(0, 2).map(labelOf).join(", ") + (selected.length > 2 ? ", …" : ""),
-  );
+  const optionOf = (v: string): Option => options.find((o) => o.value === v) ?? { value: v, label: v };
+
+  const exclusivePicked = $derived(selected.some((v) => optionOf(v).exclusive));
 
   function toggle(value: string) {
-    selected = selected.includes(value) ? selected.filter((v) => v !== value) : [...selected, value];
+    if (selected.includes(value)) {
+      selected = selected.filter((v) => v !== value);
+    } else {
+      selected = optionOf(value).exclusive ? [value] : [...selected, value];
+    }
   }
 
   function close() {
@@ -67,7 +75,12 @@
     aria-controls={`${id}-list`}
     onclick={() => (open = !open)}
   >
-    <span class="label" class:placeholder={selected.length === 0}>{label}</span>
+    <span class="label" class:placeholder={selected.length === 0}
+      >{#if !selected.length}{placeholder}{:else}{#each selected
+          .slice(0, 2)
+          .map(optionOf) as o, n (o.value)}{#if n > 0},
+          {/if}<span class:italic={o.italic}>{o.label}</span>{/each}{#if selected.length > 2}, …{/if}{/if}</span
+    >
     {#if selected.length > 1}<span class="badge">{selected.length}</span>{/if}
     <span class="caret" aria-hidden="true">▾</span>
   </button>
@@ -88,10 +101,11 @@
         {/if}
       </div>
       {#snippet row(o: Option)}
+        {@const disabled = exclusivePicked && !selected.includes(o.value)}
         <li>
-          <label>
-            <input type="checkbox" checked={selected.includes(o.value)} onchange={() => toggle(o.value)} />
-            <span class="txt">{o.label}</span>
+          <label class:disabled>
+            <input type="checkbox" checked={selected.includes(o.value)} {disabled} onchange={() => toggle(o.value)} />
+            <span class="txt" class:italic={o.italic}>{o.label}</span>
             {#if o.hint}<span class="hint">{o.hint}</span>{/if}
           </label>
         </li>
@@ -188,6 +202,16 @@
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+  }
+  .ms li label.disabled {
+    color: var(--muted);
+    cursor: default;
+  }
+  .ms li label.disabled:hover {
+    background: none;
+  }
+  .italic {
+    font-style: italic;
   }
   .hint {
     font-size: 0.75rem;
