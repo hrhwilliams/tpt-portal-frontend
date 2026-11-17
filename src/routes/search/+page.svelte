@@ -7,6 +7,7 @@
   import TaxonRows from "$lib/components/TaxonRows.svelte";
   import {
     DETECTION_ATTRIBUTE_TYPE_IDS,
+    NULL_TYPE,
     hasNegatedRow,
     toParams,
     togglePick,
@@ -24,7 +25,19 @@
   const q = $derived(queryState.query);
   const advanced = $derived(queryState.advanced);
   const detectionTypes = $derived(data.schema.attribute_types.filter((t) => DETECTION_ATTRIBUTE_TYPE_IDS.has(t.id)));
-  const otherTypes = $derived(data.schema.attribute_types.filter((t) => !DETECTION_ATTRIBUTE_TYPE_IDS.has(t.id)));
+  // a pseudo-type, first in the list, for records with none of these at all
+  const noneType = (noun: string) => ({
+    id: NULL_TYPE,
+    label: `(none — no ${noun})`,
+    description: `Records with no ${noun} at all. With NOT, records with at least one.`,
+    vocabulary: null,
+    units_table: null,
+  });
+  const otherTypes = $derived([
+    noneType("attributes"),
+    ...data.schema.attribute_types.filter((t) => !DETECTION_ATTRIBUTE_TYPE_IDS.has(t.id)),
+  ]);
+  const partTypes = $derived([noneType("parts"), ...data.schema.part_fields]);
   const negated = $derived(hasNegatedRow(q));
   const opts = (vals: { value: string; count: number }[]) =>
     vals.map((v) => ({ value: v.value, label: v.value, hint: v.count.toLocaleString() }));
@@ -32,6 +45,14 @@
   const countryOptions = $derived(opts(data.schema.countries));
   const stateOptions = $derived(opts(data.schema.states));
   const columnOptions = $derived(data.schema.columns.map((c) => ({ value: c, label: c })));
+  const defaultColumns = $derived(data.schema.default_columns);
+  // No `cols` means the defaults, so they show checked, and picking exactly
+  // them again sends nothing rather than spelling them out in the URL.
+  const getCols = () => (q.cols.length ? q.cols : defaultColumns);
+  const setCols = (v: string[]) => {
+    const isDefault = v.length === defaultColumns.length && v.every((c) => defaultColumns.includes(c));
+    q.cols = isDefault ? [] : v;
+  };
   const searching = $derived(navigating.to !== null);
   // `tab` names a preview; anything else, including nothing, is the summary
   const openRelated = $derived(data.related.find((r) => r.relation === data.query.tab) ?? null);
@@ -206,9 +227,8 @@
         <span class="lbl">Columns</span>
         <MultiSelect
           id="columns"
-          bind:selected={q.cols}
+          bind:selected={getCols, setCols}
           options={columnOptions}
-          placeholder="Default columns"
           filterPlaceholder="Type to filter {data.schema.columns.length} columns…"
         />
       </div>
@@ -296,13 +316,7 @@
 
   <fieldset>
     <legend>Parts</legend>
-    <AttributeRows
-      bind:rows={q.parts}
-      {advanced}
-      schema={data.schema}
-      types={data.schema.part_fields}
-      noun="part field"
-    />
+    <AttributeRows bind:rows={q.parts} {advanced} schema={data.schema} types={partTypes} noun="part field" />
   </fieldset>
 
   <div class="actions">

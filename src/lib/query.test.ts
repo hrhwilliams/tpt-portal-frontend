@@ -214,3 +214,20 @@ describe("cols", () => {
     expect(isEmpty({ ...EMPTY_QUERY, cols: ["guid"] })).toBe(true);
   });
 });
+
+describe("null rows", () => {
+  it("sends attr=null and part=!null, and reads them back as rows", () => {
+    const q = {
+      ...EMPTY_QUERY,
+      otherAttributes: [{ type: "null", values: [], negated: false }],
+      parts: [{ type: "null", values: [], negated: true }],
+    };
+    const p = toParams(q);
+    expect(p.get("attr")).toBe("null");
+    expect(p.get("part")).toBe("!null");
+    const back = fromParams(p);
+    expect(back.otherAttributes).toEqual(q.otherAttributes);
+    expect(back.parts).toEqual(q.parts);
+    expect(isEmpty(back)).toBe(false);
+  });
+});

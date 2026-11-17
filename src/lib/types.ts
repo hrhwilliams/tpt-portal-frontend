@@ -29,6 +29,8 @@ export type Schema = {
   snapshot_date: string;
   /** every column `cols` may name, in dump order */
   columns: string[];
+  /** the columns `/search` returns when no `cols` is sent */
+  default_columns: string[];
   ranks: Rank[];
   attribute_types: AttributeTypeDef[];
   /** part fields searchable by `part=field|value`, e.g. `part_name`, `disposition` */

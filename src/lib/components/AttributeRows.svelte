@@ -1,5 +1,6 @@
 <script lang="ts">
   import MultiSelect from "./MultiSelect.svelte";
+  import { NULL_TYPE } from "$lib/query";
   import type { AttributePair, AttributeTypeDef, BoolOp, Schema } from "$lib/types";
 
   let {
@@ -65,10 +66,15 @@
 
         <div class="field grow">
           <label class="lbl" for="attr-type-{uid}-{i}">{noun[0].toUpperCase() + noun.slice(1)}</label>
-          <select id="attr-type-{uid}-{i}" bind:value={row.type} onchange={() => (row.values = [])}>
+          <select
+            id="attr-type-{uid}-{i}"
+            class:none={row.type === NULL_TYPE}
+            bind:value={row.type}
+            onchange={() => (row.values = [])}
+          >
             <option value="">— choose —</option>
             {#each types as t (t.id)}
-              <option value={t.id} title={t.description}>{t.label}</option>
+              <option value={t.id} title={t.description} class:none={t.id === NULL_TYPE}>{t.label}</option>
             {/each}
           </select>
         </div>
@@ -94,8 +100,12 @@
               autocomplete="off"
               value={row.values[0] ?? ""}
               oninput={(e) => (row.values = [e.currentTarget.value])}
-              disabled={!row.type}
-              placeholder={row.type ? "any value" : `choose ${noun === "attribute" ? "an" : "a"} ${noun} first`}
+              disabled={!row.type || row.type === NULL_TYPE}
+              placeholder={row.type === NULL_TYPE
+                ? "takes no value"
+                : row.type
+                  ? "any value"
+                  : `choose ${noun === "attribute" ? "an" : "a"} ${noun} first`}
             />
           {/if}
         </div>
@@ -141,6 +151,14 @@
     align-items: center;
     gap: 0.3rem;
     font-size: 0.82rem;
+  }
+  /* "none" is not a real type; italics set it apart, in the list and once picked */
+  .none {
+    font-style: italic;
+  }
+  /* the picked select is italic, but its other options are not */
+  select.none option:not(.none) {
+    font-style: normal;
   }
   .row {
     flex-direction: column;
