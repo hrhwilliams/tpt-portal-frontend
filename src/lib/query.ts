@@ -152,6 +152,8 @@ export function toParams(q: SearchQuery): URLSearchParams {
     p.append("taxon", segments.join("|"));
   }
 
+  if (q.synonyms) p.set("synonyms", "yes");
+
   putRows(p, "attr", allAttributes(q), q.attr_op);
   putRows(p, "part", q.parts);
 
@@ -201,6 +203,7 @@ export function fromParams(p: URLSearchParams): SearchQuery {
   const q: SearchQuery = {
     ...EMPTY_QUERY,
     taxa,
+    synonyms: p.get("synonyms") === "yes",
     detectionAttributes: attrs.filter((a) => DETECTION_ATTRIBUTE_TYPE_IDS.has(a.type)),
     otherAttributes: attrs.filter((a) => !DETECTION_ATTRIBUTE_TYPE_IDS.has(a.type)),
     attr_op: (p.get("attr_op") === "or" ? "or" : "and") as BoolOp,

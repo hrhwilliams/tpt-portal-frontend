@@ -125,6 +125,8 @@ export type BoolOp = "and" | "or";
 
 export type SearchQuery = {
   taxa: TaxonPair[];
+  /** sent as `synonyms=yes` */
+  synonyms: boolean;
   guid_prefixes: string[];
   detectionAttributes: AttributePair[];
   otherAttributes: AttributePair[];
@@ -147,6 +149,7 @@ export type SearchQuery = {
 
 export const EMPTY_QUERY: SearchQuery = {
   taxa: [],
+  synonyms: false,
   guid_prefixes: [],
   detectionAttributes: [],
   otherAttributes: [],

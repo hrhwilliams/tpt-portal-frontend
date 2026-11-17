@@ -248,6 +248,10 @@
   <fieldset>
     <legend>Search by host or parasite taxonomy and relationship</legend>
     <TaxonRows bind:rows={q.taxa} schema={data.schema} />
+    <label class="adv">
+      <input type="checkbox" bind:checked={q.synonyms} />
+      <span>Include synonyms</span>
+    </label>
     <!-- <p class="note">
 			Suggestions come from the current snapshot. A name that is not listed can still be searched
 			for.
@@ -595,6 +599,7 @@
     border: 1px solid var(--line);
     padding: 0.25rem 0.5rem;
     text-align: left;
+    vertical-align: top;
     max-width: 40ch;
     overflow: hidden;
     text-overflow: ellipsis;
