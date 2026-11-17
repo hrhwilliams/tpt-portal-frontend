@@ -44,6 +44,7 @@
   const GUID_COLUMNS = new Set(["guid", "related_guid", "related_guids"]);
   const guidHref = (guid: string) => `https://arctos.database.museum/guid/${guid}`;
   const JSON_COLUMNS = new Set([
+    "events",
     "partdetail",
     "previousidentifications",
     "json_locality",
@@ -73,16 +74,16 @@
   }
   // every key any row has, in first-seen order
   const jsonCols = (rows: Record<string, unknown>[]) => [...new Set(rows.flatMap(Object.keys))];
-  // The one cell currently showing its full, un-truncated content. Keyed by
-  // "row-column" rather than expanding the whole row: a table row's height
-  // already grows to fit its tallest cell, so wrapping just the clicked one
-  // is enough to expand the row — the rest stay single-line.
-  let expandedCell = $state<string | null>(null);
-  // new results mean the expanded key points at a different row now
+  // The one results row showing its full, un-truncated content and its JSON
+  // tables, and within those the one nested row ("row-column-nestedRow").
+  let expandedRow = $state<number | null>(null);
+  let expandedNested = $state<string | null>(null);
+  // new results mean the expanded keys point at different rows now
   $effect(() => {
     void data.records;
     void data.related;
-    expandedCell = null;
+    expandedRow = null;
+    expandedNested = null;
   });
   // Per facet, the summary from before its first pick, so the values not picked
   // there gray out rather than vanish. Facets not picked in follow the results.
@@ -105,8 +106,8 @@
     togglePick(q, facet, v);
     pickedKey = filterKey(q);
   }
-  function toggleCell(key: string) {
-    expandedCell = expandedCell === key ? null : key;
+  function toggleRow(i: number) {
+    expandedRow = expandedRow === i ? null : i;
   }
   // An export covers every page of one table. The service knows the records
   // table as no `tab` at all. BerkeleyMapper's own server fetches both files,
@@ -321,7 +322,7 @@
   </div>
 {/if}
 
-{#snippet nestedTable(rows: Record<string, unknown>[])}
+{#snippet nestedTable(rows: Record<string, unknown>[], prefix: string)}
   {@const keys = jsonCols(rows)}
   <table class="nested">
     <thead
@@ -331,7 +332,14 @@
     >
     <tbody>
       {#each rows as n, i (i)}
+        {@const key = `${prefix}-${i}`}
+        <!-- its own row, so a click here must not also collapse the outer one -->
         <tr
+          class:expanded={expandedNested === key}
+          onclick={(e) => {
+            e.stopPropagation();
+            expandedNested = expandedNested === key ? null : key;
+          }}
           >{#each keys as k (k)}<td>{cell(n[k])}</td>{/each}</tr
         >
       {/each}
@@ -349,14 +357,15 @@
       </thead>
       <tbody>
         {#each rows as hit, i (i)}
-          <tr
-            >{#each cols as c (c)}{@const key = `${i}-${c}`}<td
-                class:expanded={expandedCell === key}
-                onclick={() => toggleCell(key)}
+          <tr class:expanded={expandedRow === i} onclick={() => toggleRow(i)}
+            >{#each cols as c (c)}<td
                 >{#if JSON_COLUMNS.has(c)}{@const nested = jsonRows(
                     hit[c],
-                  )}{#if !nested.length}{:else if expandedCell === key}{@render nestedTable(nested)}{:else}<span
-                      class="more">…(click to expand {nested.length} {nested.length === 1 ? "entry" : "entries"})</span
+                  )}{#if !nested.length}{:else if expandedRow === i}{@render nestedTable(
+                      nested,
+                      `${i}-${c}`,
+                    )}{:else}<span class="more"
+                      >…(click to expand {nested.length} {nested.length === 1 ? "entry" : "entries"})</span
                     >{/if}{:else if GUID_COLUMNS.has(c) && hit[c]}{#if Array.isArray(hit[c])}{#each hit[c] as g, gi (g)}{#if gi > 0},
                       {/if}<a href={guidHref(String(g))} target="_blank" rel="external noreferrer">{g}</a
                       >{/each}{:else}<a href={guidHref(String(hit[c]))} target="_blank" rel="external noreferrer"
@@ -572,7 +581,7 @@
     text-overflow: ellipsis;
   }
   /* wraps within the same column width — the row grows to fit, nothing else does */
-  td.expanded {
+  tr.expanded > td {
     white-space: normal;
     overflow: visible;
     overflow-wrap: anywhere;
@@ -580,12 +589,15 @@
   th {
     background: var(--bg);
   }
-  td.expanded:has(> .nested) {
+  /* the nested table fills the cell; its outer edges merge into the cell's border */
+  td:has(> .nested) {
     max-width: none;
+    padding: 0;
   }
   .nested {
     font-size: 0.75rem;
-    margin: 0.2rem 0;
+    width: 100%;
+    border-style: hidden;
   }
   .more {
     color: var(--muted);
