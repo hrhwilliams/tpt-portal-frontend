@@ -394,7 +394,7 @@
 {/snippet}
 
 {#if data.records}
-  <div class="panel" class:stale={searching}>
+  <div class="panel wide" class:stale={searching}>
     <div class="head">
       <h2>
         {shownMatched.toLocaleString()} result{shownMatched === 1 ? "" : "s"}
@@ -538,6 +538,10 @@
   .panel h2 {
     font-size: 1rem;
     margin: 0 0 0.3rem;
+  }
+  /* 80% of the window, centred past the page column; never narrower than the form */
+  .wide {
+    margin-inline: min(0px, calc(50% - 40vw));
   }
   .errors {
     border-color: #b4544a;
