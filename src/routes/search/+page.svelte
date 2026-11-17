@@ -31,6 +31,7 @@
   const collectionOptions = $derived(opts(data.schema.guid_prefixes));
   const countryOptions = $derived(opts(data.schema.countries));
   const stateOptions = $derived(opts(data.schema.states));
+  const columnOptions = $derived(data.schema.columns.map((c) => ({ value: c, label: c })));
   const searching = $derived(navigating.to !== null);
   // `tab` names a preview; anything else, including nothing, is the summary
   const openRelated = $derived(data.related.find((r) => r.relation === data.query.tab) ?? null);
@@ -42,6 +43,36 @@
   // way, never one link wrapping the whole list.
   const GUID_COLUMNS = new Set(["guid", "related_guid", "related_guids"]);
   const guidHref = (guid: string) => `https://arctos.database.museum/guid/${guid}`;
+  const JSON_COLUMNS = new Set([
+    "partdetail",
+    "previousidentifications",
+    "json_locality",
+    "attributedetail",
+    "media",
+    "identifiers",
+    "related_record_cache",
+    "rights",
+    "citations",
+    "media_tags",
+    "collector_agents",
+    "transactions",
+  ]);
+  // A JSON cell as table rows: an object is one row, a scalar in a list is a `value` row.
+  // Usually already parsed, but a string holding JSON is parsed too.
+  function jsonRows(v: unknown): Record<string, unknown>[] {
+    if (typeof v === "string") {
+      try {
+        v = JSON.parse(v);
+      } catch {
+        return [{ value: v }];
+      }
+    }
+    if (v == null) return [];
+    const items = Array.isArray(v) ? v : [v];
+    return items.map((x) => (x && typeof x === "object" && !Array.isArray(x) ? x : { value: x }));
+  }
+  // every key any row has, in first-seen order
+  const jsonCols = (rows: Record<string, unknown>[]) => [...new Set(rows.flatMap(Object.keys))];
   // The one cell currently showing its full, un-truncated content. Keyed by
   // "row-column" rather than expanding the whole row: a table row's height
   // already grows to fit its tallest cell, so wrapping just the clicked one
@@ -62,6 +93,7 @@
     const p = toParams(s);
     p.delete("tab");
     p.delete("page");
+    p.delete("cols");
     return p.toString();
   };
   $effect(() => {
@@ -169,6 +201,16 @@
         <span class="lbl">Collected to</span>
         <input type="date" bind:value={q.collected_to} />
       </label>
+      <div class="field">
+        <span class="lbl">Columns</span>
+        <MultiSelect
+          id="columns"
+          bind:selected={q.cols}
+          options={columnOptions}
+          placeholder="Default columns"
+          filterPlaceholder="Type to filter {data.schema.columns.length} columns…"
+        />
+      </div>
     </div>
     <!-- <p class="note">
 			Values within one dropdown <strong>OR</strong> together; separate filters
@@ -279,6 +321,24 @@
   </div>
 {/if}
 
+{#snippet nestedTable(rows: Record<string, unknown>[])}
+  {@const keys = jsonCols(rows)}
+  <table class="nested">
+    <thead
+      ><tr
+        >{#each keys as k (k)}<th>{k}</th>{/each}</tr
+      ></thead
+    >
+    <tbody>
+      {#each rows as n, i (i)}
+        <tr
+          >{#each keys as k (k)}<td>{cell(n[k])}</td>{/each}</tr
+        >
+      {/each}
+    </tbody>
+  </table>
+{/snippet}
+
 {#snippet resultTable(rows: Record<string, unknown>[], cols: string[])}
   <div class="scroll">
     <table>
@@ -293,7 +353,11 @@
             >{#each cols as c (c)}{@const key = `${i}-${c}`}<td
                 class:expanded={expandedCell === key}
                 onclick={() => toggleCell(key)}
-                >{#if GUID_COLUMNS.has(c) && hit[c]}{#if Array.isArray(hit[c])}{#each hit[c] as g, gi (g)}{#if gi > 0},
+                >{#if JSON_COLUMNS.has(c)}{@const nested = jsonRows(
+                    hit[c],
+                  )}{#if !nested.length}{:else if expandedCell === key}{@render nestedTable(nested)}{:else}<span
+                      class="more">…(click to expand {nested.length} {nested.length === 1 ? "entry" : "entries"})</span
+                    >{/if}{:else if GUID_COLUMNS.has(c) && hit[c]}{#if Array.isArray(hit[c])}{#each hit[c] as g, gi (g)}{#if gi > 0},
                       {/if}<a href={guidHref(String(g))} target="_blank" rel="external noreferrer">{g}</a
                       >{/each}{:else}<a href={guidHref(String(hit[c]))} target="_blank" rel="external noreferrer"
                       >{cell(hit[c])}</a
@@ -515,6 +579,17 @@
   }
   th {
     background: var(--bg);
+  }
+  td.expanded:has(> .nested) {
+    max-width: none;
+  }
+  .nested {
+    font-size: 0.75rem;
+    margin: 0.2rem 0;
+  }
+  .more {
+    color: var(--muted);
+    cursor: pointer;
   }
   tbody tr:hover {
     background: var(--accent-soft);

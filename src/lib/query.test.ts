@@ -202,3 +202,15 @@ describe("togglePick", () => {
     expect(q.detectionAttributes).toHaveLength(2);
   });
 });
+
+describe("cols", () => {
+  it("sends one comma-separated param and reads it back", () => {
+    const p = toParams({ ...EMPTY_QUERY, agent: "x", cols: ["guid", "country"] });
+    expect(p.get("cols")).toBe("guid,country");
+    expect(fromParams(p).cols).toEqual(["guid", "country"]);
+  });
+
+  it("is not a search on its own", () => {
+    expect(isEmpty({ ...EMPTY_QUERY, cols: ["guid"] })).toBe(true);
+  });
+});

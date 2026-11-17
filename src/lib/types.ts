@@ -27,6 +27,8 @@ export type GuidPrefix = CountedValue & {
 
 export type Schema = {
   snapshot_date: string;
+  /** every column `cols` may name, in dump order */
+  columns: string[];
   ranks: Rank[];
   attribute_types: AttributeTypeDef[];
   /** part fields searchable by `part=field|value`, e.g. `part_name`, `disposition` */
@@ -134,6 +136,8 @@ export type SearchQuery = {
   collected_from: string;
   collected_to: string;
   agent: string;
+  /** columns to return, sent as `cols=a,b`; empty is the service's default set */
+  cols: string[];
   /** The relationship whose tab is open, e.g. `parasite of`. Empty is the records tab. */
   tab: string;
   page: number;
@@ -153,6 +157,7 @@ export const EMPTY_QUERY: SearchQuery = {
   collected_from: "",
   collected_to: "",
   agent: "",
+  cols: [],
   tab: "",
   page: 1,
 };

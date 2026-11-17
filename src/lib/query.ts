@@ -169,6 +169,7 @@ export function toParams(q: SearchQuery): URLSearchParams {
   put("from", q.collected_from);
   put("to", q.collected_to);
   put("collector", q.agent);
+  put("cols", q.cols.join(","));
   put("tab", q.tab);
 
   if (q.page > 1) {
@@ -208,6 +209,7 @@ export function fromParams(p: URLSearchParams): SearchQuery {
     collected_from: p.get("from") ?? "",
     collected_to: p.get("to") ?? "",
     agent: p.get("collector") ?? "",
+    cols: (p.get("cols") ?? "").split(",").filter(Boolean),
     tab: p.get("tab") ?? "",
     page: Math.max(1, Number(p.get("page") ?? 1) || 1),
   };
