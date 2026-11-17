@@ -28,8 +28,8 @@
   // a pseudo-type, first in the list, for records with none of these at all
   const noneType = (noun: string) => ({
     id: NULL_TYPE,
-    label: `(none — no ${noun})`,
-    description: `Records with no ${noun} at all. With NOT, records with at least one.`,
+    label: "none",
+    description: `Records with no ${noun}`,
     vocabulary: null,
     units_table: null,
   });
