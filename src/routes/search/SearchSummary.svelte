@@ -1,6 +1,7 @@
 <script lang="ts">
   import { page } from "$app/state";
   import { isPicked, type FacetValue, type PickableFacet } from "$lib/query";
+  import { footnote } from "$lib/sources";
   import type { CountedValue, FacetName, SearchQuery, Summary, SummaryBlock } from "$lib/types";
 
   /** One whole table's export links, named after the tab it previews. */
@@ -151,16 +152,18 @@
   <p class="note warn">{error}</p>
 {:else if summary}
   {#if summary.description}
-    <p class="echo">{summary.description}</p>
+    <p class="echo">
+      {#each footnote(summary.description, summary.sources) as p, i (i)}{p.text}{#if p.refs}<sup>{p.refs.join(",")}</sup>{/if}{/each}
+    </p>
   {/if}
   {#if summary.sources.length}
     <div class="sources">
       <h4>Synonym sources</h4>
-      <ul>
+      <ol>
         {#each summary.sources as s (s.key)}
           <li>{s.title}</li>
         {/each}
-      </ul>
+      </ol>
     </div>
   {/if}
   {@render block("Records", summary.records, true)}
@@ -206,7 +209,7 @@
     font-style: italic;
     margin: 0.4rem 0;
   }
-  .sources ul {
+  .sources ol {
     margin: 0;
     padding-left: 1.2rem;
     font-size: 0.85rem;
