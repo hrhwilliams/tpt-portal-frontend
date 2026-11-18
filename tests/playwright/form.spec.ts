@@ -158,6 +158,23 @@ test("Search sends the query at once and scrolls to the results", async ({ page 
   await expect(page.getByRole("tab", { name: "Summary" })).toBeInViewport();
 });
 
+test("a search link opened from outside lands on its results, but a reload keeps its place", async ({ page }) => {
+  await page.setViewportSize({ width: 1200, height: 600 });
+  await open(page, "/search?taxon=genus%7CSorex");
+  await expect(page.getByRole("tab", { name: "Summary" })).toBeInViewport();
+
+  await page.evaluate(() => window.scrollTo(0, 0));
+  await page.reload();
+  await page.waitForLoadState("networkidle");
+  await expect(page.getByRole("heading", { level: 1 })).toBeInViewport();
+});
+
+test("the bare search page stays at the top", async ({ page }) => {
+  await page.setViewportSize({ width: 1200, height: 600 });
+  await open(page);
+  await expect(page.getByRole("heading", { level: 1 })).toBeInViewport();
+});
+
 test("clicking a summary value toggles it in the matching filter", { tag: "@live" }, async ({ page }) => {
   await open(page, "/search?taxon=genus%7CSorex");
 
@@ -178,7 +195,7 @@ test("clicking a summary value toggles it in the matching filter", { tag: "@live
   await expect(page).not.toHaveURL(/country=/);
 });
 
-test("clicking a taxon in the summary narrows the taxon row to it, and back", async ({ page }) => {
+test("clicking a taxon in the summary narrows the taxon row to it, and back", { tag: "@stub" }, async ({ page }) => {
   await open(page, "/search?taxon=genus%7CSorex%7Chost+of+parasite");
 
   const taxa = page.locator(".facet", { has: page.getByRole("heading", { name: "Taxa" }) });
@@ -199,40 +216,48 @@ test("clicking a taxon in the summary narrows the taxon row to it, and back", as
   await expect(page).toHaveURL(/taxon=genus%7CSorex%7Chost\+of\+parasite(&|$)/);
 });
 
-test("a long synonym list shows five names, expands to the rest, and collapses again", async ({ page }) => {
-  await open(page, "/search?taxon=genus%7CSorex&synonyms=yes");
+test(
+  "a long synonym list shows five names, expands to the rest, and collapses again",
+  { tag: "@stub" },
+  async ({ page }) => {
+    await open(page, "/search?taxon=genus%7CSorex&synonyms=yes");
 
-  const echo = page.locator(".echo");
-  const collapsed = "Genus Sorex (also Amphimygale, Amphiosorex, Amphisorex, Asorex, Atophyrax and 2 others…).";
-  await expect(echo).toHaveText(collapsed);
+    const echo = page.locator(".echo");
+    const collapsed = "Genus Sorex (also Amphimygale, Amphiosorex, Amphisorex, Asorex, Atophyrax and 2 others…).";
+    await expect(echo).toHaveText(collapsed);
 
-  await echo.getByRole("button", { name: "2 others…" }).click();
-  await expect(echo).toHaveText(
-    "Genus Sorex (also Amphimygale, Amphiosorex, Amphisorex, Asorex, Atophyrax, Corsira, Dolgovia collapse).",
-  );
+    await echo.getByRole("button", { name: "2 others…" }).click();
+    await expect(echo).toHaveText(
+      "Genus Sorex (also Amphimygale, Amphiosorex, Amphisorex, Asorex, Atophyrax, Corsira, Dolgovia collapse).",
+    );
 
-  await echo.getByRole("button", { name: "collapse" }).click();
-  await expect(echo).toHaveText(collapsed);
-});
+    await echo.getByRole("button", { name: "collapse" }).click();
+    await expect(echo).toHaveText(collapsed);
+  },
+);
 
-test("searching an accepted name credits its source, which links to its references", async ({ page }) => {
-  await open(page, "/search?taxon=genus%7CSorex&synonyms=yes");
+test(
+  "searching an accepted name credits its source, which links to its references",
+  { tag: "@stub" },
+  async ({ page }) => {
+    await open(page, "/search?taxon=genus%7CSorex&synonyms=yes");
 
-  const line = page.locator(".synonyms > div").first();
-  await expect(line).toHaveText(
-    "Sorex Linnaeus, 1758 is the accepted name in ITIS (click for references) and Catalogue of Life (2026-10-16 XR).",
-  );
-  await expect(line.getByRole("link", { name: "ITIS (click for references)", exact: true })).toHaveAttribute(
-    "href",
-    /itis\.gov/,
-  );
-  await expect(line.getByRole("link", { name: "Catalogue of Life (2026-10-16 XR)" })).toHaveAttribute(
-    "href",
-    "https://www.catalogueoflife.org/",
-  );
-});
+    const line = page.locator(".synonyms > div").first();
+    await expect(line).toHaveText(
+      "Sorex Linnaeus, 1758 is the accepted name in ITIS (click for references) and Catalogue of Life (2026-10-16 XR).",
+    );
+    await expect(line.getByRole("link", { name: "ITIS (click for references)", exact: true })).toHaveAttribute(
+      "href",
+      /itis\.gov/,
+    );
+    await expect(line.getByRole("link", { name: "Catalogue of Life (2026-10-16 XR)" })).toHaveAttribute(
+      "href",
+      "https://www.catalogueoflife.org/",
+    );
+  },
+);
 
-test("searching a synonym names its accepted name and source", async ({ page }) => {
+test("searching a synonym names its accepted name and source", { tag: "@stub" }, async ({ page }) => {
   await open(page, "/search?taxon=genus%7CCorsira&synonyms=yes");
 
   await expect(page.locator(".synonyms > div").first()).toHaveText(
@@ -240,7 +265,7 @@ test("searching a synonym names its accepted name and source", async ({ page }) 
   );
 });
 
-test("the taxa of a search on several taxon rows are not clickable", async ({ page }) => {
+test("the taxa of a search on several taxon rows are not clickable", { tag: "@stub" }, async ({ page }) => {
   await open(page, "/search?taxon=genus%7CSorex&taxon=genus%7CMyodes");
 
   const taxa = page.locator(".facet", { has: page.getByRole("heading", { name: "Taxa" }) });
@@ -291,7 +316,8 @@ test("each tab reports and pages its own count", { tag: "@live" }, async ({ page
   expect(hosts).toBeGreaterThan(0);
   expect(parasites).toBeGreaterThan(0);
 
-  // the heading follows the open tab
+  // the heading follows the open tab; the summary, open first, has none
+  await page.getByRole("tab", { name: /^Records/ }).click();
   await expect(page.getByRole("heading", { level: 2 })).toContainText(hosts.toLocaleString());
   await page.getByRole("tab", { name: /host of parasite/ }).click();
   await expect(page.getByRole("heading", { level: 2 })).toContainText(parasites.toLocaleString());
@@ -341,7 +367,7 @@ test("the map link follows the open tab", { tag: "@live" }, async ({ page }) => 
 
     expect(href).toContain("berkeleymapper.berkeley.edu");
     // both files are served by the API, wherever it lives
-    expect(params.get("configfile")).toMatch(/^https?:\/\/.+\/api\/berkeleymapper\.xml$/);
+    expect(params.get("configfile")).toMatch(/^https?:\/\/.+\/api\/duckdb\/berkeleymapper\.xml$/);
     expect(new URL(params.get("tabfile") ?? "").origin).toBe(new URL(params.get("configfile") ?? "").origin);
     return params.get("tabfile") ?? "";
   };

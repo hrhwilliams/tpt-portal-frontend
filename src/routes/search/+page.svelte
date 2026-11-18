@@ -1,5 +1,6 @@
 <script lang="ts">
   import { tick } from "svelte";
+  import { afterNavigate } from "$app/navigation";
   import { navigating, page } from "$app/state";
   import { berkeleyMapperConfigUrl, downloadUrl } from "$lib/api";
   import AttributeRows from "$lib/components/AttributeRows.svelte";
@@ -135,6 +136,14 @@
     }
     pickedKey = filterKey(q);
   }
+  // A search opened from outside the site (a link in a paper, a bookmark) lands
+  // on its results. A reload or Back keeps the scroll the browser restores.
+  afterNavigate(({ type }) => {
+    const load = performance.getEntriesByType("navigation")[0] as PerformanceNavigationTiming | undefined;
+    if (type === "enter" && load?.type === "navigate" && data.submitted) {
+      document.getElementById("results")?.scrollIntoView({ behavior: "smooth" });
+    }
+  });
   let copied = $state(false);
   async function copyUrl() {
     await navigator.clipboard.writeText(page.url.href);
