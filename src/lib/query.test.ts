@@ -12,7 +12,7 @@ import {
   togglePick,
   toggleTaxon,
 } from "./query.ts";
-import { EMPTY_QUERY, type SearchQuery } from "./types.ts";
+import { EMPTY_QUERY, type SearchQuery, type TaxonPair } from "./types.ts";
 
 /** Names chosen to collide with the delimiter, the escape, or both. */
 const HOSTILE = [
@@ -352,7 +352,7 @@ describe("toggleTaxon", () => {
 });
 
 describe("canPickTaxon", () => {
-  const row = (rank: string, name: string) => ({ rank, name, relations: [], related: [] });
+  const row = (rank: string, name: string): TaxonPair => ({ rank, name, relations: [], related: [] });
   const with_ = (...taxa: ReturnType<typeof row>[]): SearchQuery => ({ ...structuredClone(EMPTY_QUERY), taxa });
 
   it("allows narrowing one named row", () => {
@@ -361,6 +361,11 @@ describe("canPickTaxon", () => {
 
   it("refuses OR'd rows, a row already at the picked rank, and no taxon at all", () => {
     expect(canPickTaxon(with_(row("genus", "Myodes"), row("genus", "Sorex")))).toBe(false);
+    expect(canPickTaxon(with_(row("genus", "Myodes"), { ...row("", ""), relations: ["host of parasite"] }))).toBe(
+      false,
+    );
+    // a blank row, as "+ Add taxon" leaves, searches nothing
+    expect(canPickTaxon(with_(row("genus", "Myodes"), row("genus", "")))).toBe(true);
     expect(canPickTaxon(with_(row("scientific_name", "Myodes gapperi")))).toBe(false);
     expect(canPickTaxon(with_())).toBe(false);
   });

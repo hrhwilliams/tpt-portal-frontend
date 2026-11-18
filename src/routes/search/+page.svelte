@@ -129,7 +129,7 @@
   function toggleFilter(facet: FacetName, v: FacetValue) {
     bases[facet] ??= data.summary;
     if (facet === "taxa") {
-      taxonBase ??= $state.snapshot(q.taxa[0]);
+      taxonBase ??= $state.snapshot(q.taxa.find((t) => t.name) ?? q.taxa[0]);
       toggleTaxon(q, v.value, taxonBase);
     } else {
       togglePick(q, facet, v);
@@ -144,11 +144,14 @@
       document.getElementById("results")?.scrollIntoView({ behavior: "smooth" });
     }
   });
-  let copied = $state(false);
+  let copied = $state("");
+  // the clipboard is missing over plain http, e.g. the dev server reached by its LAN address
   async function copyUrl() {
-    await navigator.clipboard.writeText(page.url.href);
-    copied = true;
-    setTimeout(() => (copied = false), 1500);
+    copied = await (navigator.clipboard?.writeText(page.url.href) ?? Promise.reject()).then(
+      () => "Copied",
+      () => "Copy failed",
+    );
+    setTimeout(() => (copied = ""), 1500);
   }
   // Expanding widens the clicked cell, often past the right edge, so it is
   // scrolled to the middle; one wider than the table's view lines up on the left.
@@ -474,7 +477,7 @@
           >
         </nav>
       {:else if summaryOpen}
-        <button type="button" onclick={copyUrl}>{copied ? "Copied" : "Copy search URL"}</button>
+        <button type="button" onclick={copyUrl}>{copied || "Copy search URL"}</button>
       {/if}
     </div>
 

@@ -166,13 +166,16 @@ test("a search link opened from outside lands on its results, but a reload keeps
   await page.evaluate(() => window.scrollTo(0, 0));
   await page.reload();
   await page.waitForLoadState("networkidle");
-  await expect(page.getByRole("heading", { level: 1 })).toBeInViewport();
+  // long enough for a smooth scroll to have moved, had one started
+  await page.waitForTimeout(1000);
+  expect(await page.evaluate(() => window.scrollY)).toBe(0);
 });
 
 test("the bare search page stays at the top", async ({ page }) => {
   await page.setViewportSize({ width: 1200, height: 600 });
   await open(page);
-  await expect(page.getByRole("heading", { level: 1 })).toBeInViewport();
+  await page.waitForTimeout(1000);
+  expect(await page.evaluate(() => window.scrollY)).toBe(0);
 });
 
 test("clicking a summary value toggles it in the matching filter", { tag: "@live" }, async ({ page }) => {
@@ -199,8 +202,8 @@ test("clicking a taxon in the summary narrows the taxon row to it, and back", { 
   await open(page, "/search?taxon=genus%7CSorex%7Chost+of+parasite");
 
   const taxa = page.locator(".facet", { has: page.getByRole("heading", { name: "Taxa" }) });
-  const cinereus = taxa.getByRole("button", { name: "Sorex cinereus" });
-  const monticolus = taxa.getByRole("button", { name: "Sorex monticolus" });
+  const cinereus = taxa.getByRole("button", { name: "Sorex cinereus", exact: true });
+  const monticolus = taxa.getByRole("button", { name: "Sorex monticolus", exact: true });
 
   await cinereus.click();
   await expect(page).toHaveURL(/taxon=scientific_name%7CSorex\+cinereus%7Chost\+of\+parasite(&|$)/);

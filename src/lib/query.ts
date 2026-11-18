@@ -340,10 +340,10 @@ export function toggleTaxon(q: SearchQuery, name: string, original: TaxonPair) {
     : [structuredClone(original)];
 }
 
-/** Whether the taxa facet can narrow this query: it has one named taxon row, not already a picked name. */
+/** Whether the taxa facet can narrow this query: it searches one taxon row, named, and not already a picked name. */
 export function canPickTaxon(q: SearchQuery): boolean {
-  const named = q.taxa.filter((t) => t.name);
-  return named.length === 1 && q.taxa.length === 1 && named[0].rank !== PICKED_RANK;
+  const rows = q.taxa.filter((t) => t.name || t.relations.length || t.related.some((r) => r.name));
+  return rows.length === 1 && !!rows[0].name && rows[0].rank !== PICKED_RANK;
 }
 
 /** Check if one of the attribute rows has had `NOT` checked */
