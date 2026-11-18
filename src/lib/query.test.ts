@@ -1,5 +1,15 @@
 import { describe, expect, it } from "vitest";
-import { escapePipes, fromParams, isEmpty, isPicked, splitPipes, toParams, togglePick } from "./query.ts";
+import {
+  escapePipes,
+  exportParams,
+  fromParams,
+  isEmpty,
+  isPicked,
+  requestParams,
+  splitPipes,
+  toParams,
+  togglePick,
+} from "./query.ts";
 import { EMPTY_QUERY, type SearchQuery } from "./types.ts";
 
 /** Names chosen to collide with the delimiter, the escape, or both. */
@@ -238,5 +248,57 @@ describe("none relationship", () => {
     const p = toParams({ ...EMPTY_QUERY, taxa });
     expect(p.get("taxon")).toBe("genus|Sorex|null");
     expect(fromParams(p).taxa).toEqual(taxa);
+  });
+});
+
+describe("requestParams", () => {
+  const url = (s: string) => new URLSearchParams(s);
+  const rel = "host of parasite";
+
+  it("keeps tab from every request except as the relationship a related one follows", () => {
+    const r = requestParams(url(`taxon=a&tab=${encodeURIComponent(rel)}`), [rel, "parasite of"]);
+    expect(r.summary.has("tab")).toBe(false);
+    expect(r.records.has("tab")).toBe(false);
+    expect(r.related.map((x) => [x.relation, x.params.get("tab")])).toEqual([
+      [rel, rel],
+      ["parasite of", "parasite of"],
+    ]);
+  });
+
+  it("gives the page to the records table when it is open", () => {
+    const r = requestParams(url("taxon=a&tab=records&page=3"), [rel]);
+    expect(r.records.get("page")).toBe("3");
+    expect(r.related[0].params.has("page")).toBe(false);
+    expect(r.summary.has("page")).toBe(false);
+  });
+
+  it("gives the page only to the related table that is open", () => {
+    const r = requestParams(url(`taxon=a&tab=${encodeURIComponent(rel)}&page=3`), [rel, "parasite of"]);
+    expect(r.related.map((x) => x.params.get("page"))).toEqual(["3", null]);
+    expect(r.records.has("page")).toBe(false);
+  });
+
+  it("passes every other param through", () => {
+    const r = requestParams(url("taxon=a&sort=year&tab=records"), []);
+    expect(r.records.toString()).toBe("taxon=a&sort=year");
+  });
+});
+
+describe("exportParams", () => {
+  const q: SearchQuery = { ...EMPTY_QUERY, agent: "x", tab: "parasite of", page: 4, cols: ["guid"] };
+
+  it("covers every page of the records table, which the service knows as no tab", () => {
+    const p = exportParams({ ...q, tab: "" }, "records");
+    expect(p.has("tab")).toBe(false);
+    expect(p.has("page")).toBe(false);
+    expect(p.get("cols")).toBe("guid");
+  });
+
+  it("names a related table, whichever tab is open", () => {
+    expect(exportParams(q, "host of parasite").get("tab")).toBe("host of parasite");
+  });
+
+  it("takes a column preset in place of the chosen columns", () => {
+    expect(exportParams(q, "records", ["map"]).get("cols")).toBe("map");
   });
 });

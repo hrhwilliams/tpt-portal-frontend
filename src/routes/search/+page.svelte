@@ -5,18 +5,18 @@
   import CollectorCombobox from "$lib/components/CollectorCombobox.svelte";
   import MultiSelect from "$lib/components/MultiSelect.svelte";
   import TaxonRows from "$lib/components/TaxonRows.svelte";
+  import { filterKey, type Bases } from "$lib/facets";
   import {
     DETECTION_ATTRIBUTE_TYPE_IDS,
     NULL_TYPE,
+    exportParams,
     hasNegatedRow,
-    toParams,
     togglePick,
     type FacetValue,
     type PickableFacet,
   } from "$lib/query";
   import SearchSummary, { type ExportLinks } from "./SearchSummary.svelte";
   import { SearchQueryState } from "./query-state.svelte.ts";
-  import type { SearchQuery, Summary } from "$lib/types";
   import type { PageData } from "./$types";
 
   let { data }: { data: PageData } = $props();
@@ -110,15 +110,8 @@
   // Per facet, the summary from before its first pick, so the values not picked
   // there gray out rather than vanish. Facets not picked in follow the results.
   // Any other change to the query drops them all.
-  let bases = $state<Partial<Record<PickableFacet, Summary | null>>>({});
+  let bases = $state<Bases>({});
   let pickedKey = "";
-  const filterKey = (s: SearchQuery) => {
-    const p = toParams(s);
-    p.delete("tab");
-    p.delete("page");
-    p.delete("cols");
-    return p.toString();
-  };
   $effect(() => {
     if (filterKey(q) !== pickedKey) bases = {};
   });
@@ -131,18 +124,14 @@
   function toggleRow(i: number) {
     expandedRow = expandedRow === i ? null : i;
   }
-  // An export covers every page of one table. The service knows the records
-  // table as no `tab` at all. BerkeleyMapper's own server fetches both files,
-  // so these URLs have to be publicly reachable — a localhost API base maps
-  // nothing. The config names the columns of the `map` export preset,
-  // including which hold the coordinates.
+  // BerkeleyMapper's own server fetches both files, so these URLs have to be
+  // publicly reachable — a localhost API base maps nothing. The config names
+  // the columns of the `map` export preset, including which hold the coordinates.
   function exportLinks(label: string, tab: string): ExportLinks {
-    const params = toParams({ ...data.query, tab: tab === "records" ? "" : tab, page: 1 });
-    const csv = downloadUrl(params);
-    params.set("cols", "map");
+    const csv = downloadUrl(exportParams(data.query, tab));
     const map =
       "https://berkeleymapper.berkeley.edu/index.html" +
-      `?tabfile=${encodeURIComponent(downloadUrl(params))}` +
+      `?tabfile=${encodeURIComponent(downloadUrl(exportParams(data.query, tab, ["map"])))}` +
       `&configfile=${encodeURIComponent(berkeleyMapperConfigUrl())}`;
 
     return { label, csv, map };

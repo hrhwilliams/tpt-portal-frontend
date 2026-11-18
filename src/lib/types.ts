@@ -160,7 +160,7 @@ export type SearchQuery = {
   agent: string;
   /** columns to return, sent as `cols=a,b`; empty is the service's default set */
   cols: string[];
-  /** The relationship whose tab is open, e.g. `parasite of`. Empty is the records tab. */
+  /** The open tab: empty is the summary, `records` the records, anything else the relationship, e.g. `parasite of`. */
   tab: string;
   page: number;
 };

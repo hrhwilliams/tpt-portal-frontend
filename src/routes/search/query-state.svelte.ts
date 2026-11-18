@@ -31,12 +31,13 @@ export class SearchQueryState {
         return;
       }
 
-      params.delete("page");
+      // an edited search starts over at page 1
+      const sent = toParams({ ...this.#query, page: 1 });
 
       const timer = setTimeout(() => {
         // the Search button may have sent it already
-        if (params.toString() !== this.#lastSent) {
-          this.#navigate(params, { replaceState: true, keepFocus: true, noScroll: true });
+        if (sent.toString() !== this.#lastSent) {
+          this.#navigate(sent, { replaceState: true, keepFocus: true, noScroll: true });
         }
       }, 500);
       return () => clearTimeout(timer);
@@ -57,8 +58,7 @@ export class SearchQueryState {
 
   /** Sends the query now rather than after the live search's delay; resolves once the results are shown. */
   async search() {
-    const params = toParams(this.#query);
-    params.delete("page");
+    const params = toParams({ ...this.#query, page: 1 });
 
     if (params.toString() !== this.#lastSent) {
       await this.#navigate(params, { keepFocus: true, noScroll: true });
@@ -94,15 +94,7 @@ export class SearchQueryState {
   }
 
   goPage(n: number) {
-    const params = toParams(this.#query);
-
-    if (n > 1) {
-      params.set("page", String(n));
-    } else {
-      params.delete("page");
-    }
-
-    this.#navigate(params, { noScroll: true });
+    this.#navigate(toParams({ ...this.#query, page: n }), { noScroll: true });
   }
 
   reset() {

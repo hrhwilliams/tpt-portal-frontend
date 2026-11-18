@@ -188,6 +188,38 @@ export function toParams(q: SearchQuery): URLSearchParams {
   return p;
 }
 
+const without = (p: URLSearchParams, key: string) => {
+  const copy = new URLSearchParams(p);
+  copy.delete(key);
+  return copy;
+};
+
+/**
+ * The service requests behind a search URL, one per table. `tab` is the page's,
+ * except that the relations endpoint reads it as the one relationship to
+ * follow. `page` belongs to whichever table is open; the summary has none.
+ */
+export function requestParams(url: URLSearchParams, relations: string[]) {
+  const tab = url.get("tab") ?? "";
+  const base = without(url, "tab");
+
+  return {
+    summary: without(base, "page"),
+    records: relations.includes(tab) ? without(base, "page") : base,
+    related: relations.map((relation) => {
+      const params = relation === tab ? new URLSearchParams(base) : without(base, "page");
+      params.set("tab", relation);
+      return { relation, params };
+    }),
+  };
+}
+
+/** Every page of one table, for export; `cols` takes a preset such as `map` in place of the chosen columns. */
+export function exportParams(q: SearchQuery, tab: string, cols = q.cols): URLSearchParams {
+  // the service knows the records table as no `tab` at all
+  return toParams({ ...q, tab: tab === "records" ? "" : tab, page: 1, cols });
+}
+
 /** Transform a URL parameter list into a search query for the search form */
 export function fromParams(p: URLSearchParams): SearchQuery {
   const taxa = p

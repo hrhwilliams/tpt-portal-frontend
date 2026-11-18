@@ -1,6 +1,6 @@
 import { error } from "@sveltejs/kit";
 import { getSchema, getSummary, search, searchRelations } from "$lib/api";
-import { NULL_TYPE, fromParams, isEmpty } from "$lib/query";
+import { NULL_TYPE, fromParams, isEmpty, requestParams } from "$lib/query";
 import type { Summary } from "$lib/types";
 import type { PageLoad } from "./$types";
 
@@ -29,20 +29,11 @@ export const load: PageLoad = async ({ url, fetch }) => {
   // one tab per relationship the search names; "none" relates to nothing, so has no tab
   const relations = [...new Set(query.taxa.flatMap((t) => t.relations))].filter((r) => r !== NULL_TYPE);
 
-  if (submitted && !isEmpty(query) && errors.length === 0) {
-    // `page` belongs to whichever tab is open; the others start over
-    const relatedOpen = relations.includes(query.tab);
-
-    // `tab` is ours, except that `/api/relations` reads it as the one relationship to follow
-    const params = new URLSearchParams(url.searchParams);
-    params.delete("tab");
-
-    // the summary covers the whole result set, so it has no page
-    const summaryParams = new URLSearchParams(params);
-    summaryParams.delete("page");
+  if (submitted && !isEmpty(query)) {
+    const requests = requestParams(url.searchParams, relations);
     // failures are caught as each request starts, or one that fails while
     // `search` is still pending surfaces as an unhandled rejection
-    const summaryPromise = getSummary(fetch, summaryParams).then(
+    const summaryPromise = getSummary(fetch, requests.summary).then(
       (s) => {
         summary = s;
       },
@@ -56,11 +47,8 @@ export const load: PageLoad = async ({ url, fetch }) => {
     // the service has no count-only request
     // a failure here must not take the main results down with it
     const relatedPromise = Promise.all(
-      relations.map((relation) => {
-        const relatedParams = new URLSearchParams(params);
-        relatedParams.set("tab", relation);
-        if (relation !== query.tab) relatedParams.delete("page");
-        return searchRelations(fetch, relatedParams).then(
+      requests.related.map(({ relation, params }) =>
+        searchRelations(fetch, params).then(
           (r): RelatedTable => ({ relation, ...r, error: "" }),
           (e): RelatedTable => ({
             relation,
@@ -69,16 +57,12 @@ export const load: PageLoad = async ({ url, fetch }) => {
             matched: 0,
             error: e instanceof Error ? e.message : "Related records failed to load.",
           }),
-        );
-      }),
+        ),
+      ),
     );
 
-    if (relatedOpen) {
-      params.delete("page");
-    }
-
     try {
-      ({ records, columns, matched } = await search(fetch, params));
+      ({ records, columns, matched } = await search(fetch, requests.records));
     } catch (e) {
       errors.push(e instanceof Error ? e.message : "Search failed.");
     }

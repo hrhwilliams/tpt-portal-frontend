@@ -1,7 +1,8 @@
 <script lang="ts">
   import { page } from "$app/state";
-  import { isPicked, type FacetValue, type PickableFacet } from "$lib/query";
-  import type { CountedValue, FacetName, SearchQuery, Summary, SummaryBlock } from "$lib/types";
+  import { facetRows, rowKey, type Bases, type FacetRow } from "$lib/facets";
+  import type { FacetValue, PickableFacet } from "$lib/query";
+  import type { FacetName, SearchQuery, Summary, SummaryBlock } from "$lib/types";
 
   /** One whole table's export links, named after the tab it previews. */
   export type ExportLinks = { label: string; csv: string; map: string };
@@ -16,7 +17,7 @@
   }: {
     summary: Summary | null;
     /** Per facet, the summary from before its first pick; its values stay listed, grayed when no longer matched. */
-    bases: Partial<Record<PickableFacet, Summary | null>>;
+    bases: Bases;
     error: string;
     exports: ExportLinks[];
     query: SearchQuery;
@@ -32,26 +33,7 @@
     setTimeout(() => (copied = false), 1500);
   }
 
-  type FacetRow = CountedValue & { type?: string; gone?: boolean };
-
-  // the attribute and part facets hold values of several types
-  const key = (r: FacetRow) => (r.type ? `${r.type}|${r.value}` : r.value);
   const label = (r: FacetRow) => (r.type ? `${r.type}: ${r.value}` : r.value);
-
-  // the base's values in its order, with the current count where still matched
-  // and the base's own count, grayed, where not; then any new ones
-  function withBase(cur: FacetRow[], prev: FacetRow[] | undefined): FacetRow[] {
-    if (!prev) return cur;
-    const counts = new Map(cur.map((r) => [key(r), r.count]));
-    const known = new Set(prev.map(key));
-    return [
-      ...prev.map((r) => {
-        const count = counts.get(key(r));
-        return count === undefined ? { ...r, gone: true } : { ...r, count };
-      }),
-      ...cur.filter((r) => !known.has(key(r))),
-    ];
-  }
 
   // the attribute and part facets show only once the service sends them
   const COLUMNS: [FacetName, string][] = [
@@ -77,22 +59,18 @@
     {#if rows.length}
       <!-- scaled to the values still matched; the grayed ones get no bar -->
       {@const max = Math.max(1, ...rows.filter((r) => !r.gone).map((r) => r.count))}
-      <!-- checked first, then still matched, then grayed; by count within each -->
-      {@const rank = (r: FacetRow) => (filter && isPicked(query, filter, r) ? 0 : r.gone ? 2 : 1)}
-      {@const sorted = [...rows].sort((a, b) => rank(a) - rank(b) || b.count - a.count)}
       <div class="rows">
         <table>
           <tbody>
-            {#each sorted as r (key(r))}
+            {#each rows as r (rowKey(r))}
               <tr style="--pct: {r.gone ? 0 : (r.count / max) * 100}%" class:gone={r.gone}>
                 <td>
                   {#if filter}
-                    {@const on = isPicked(query, filter, r)}
                     <button
                       type="button"
                       class="pick"
-                      aria-pressed={on}
-                      title={on ? "Remove from the filter" : "Add to the filter"}
+                      aria-pressed={!!r.picked}
+                      title={r.picked ? "Remove from the filter" : "Add to the filter"}
                       onclick={() => toggle(filter, r)}
                     >
                       {label(r)}
@@ -138,9 +116,10 @@
       {#each COLUMNS as [name, title] (name)}
         {@const rows = b.facets[name]}
         {#if rows && pickable && name !== "taxa"}
-          {@render facet(title, withBase(rows, bases[name]?.records.facets[name]), name)}
+          {@const base = bases[name]?.records.facets[name]}
+          {@render facet(title, facetRows(rows, { query, facet: name, base }), name)}
         {:else if rows}
-          {@render facet(title, rows)}
+          {@render facet(title, facetRows(rows))}
         {/if}
       {/each}
     </div>
