@@ -153,6 +153,16 @@
   {#if summary.description}
     <p class="echo">{summary.description}</p>
   {/if}
+  {#if summary.sources.length}
+    <div class="sources">
+      <h4>Synonym sources</h4>
+      <ul>
+        {#each summary.sources as s (s.key)}
+          <li>{s.title}</li>
+        {/each}
+      </ul>
+    </div>
+  {/if}
   {@render block("Records", summary.records, true)}
   {#each related as r (r.relation)}
     {@render block(`${r.relation} records`, r)}
@@ -195,6 +205,11 @@
   .echo {
     font-style: italic;
     margin: 0.4rem 0;
+  }
+  .sources ul {
+    margin: 0;
+    padding-left: 1.2rem;
+    font-size: 0.85rem;
   }
   .stats {
     display: flex;

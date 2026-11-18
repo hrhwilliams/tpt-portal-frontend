@@ -91,6 +91,8 @@ export type Summary = {
   related: RelationSummary[];
   /** plain-English restatement of the query */
   description: string | null;
+  /** where the added synonyms came from: the checklist release first, then each dataset; empty when none were added */
+  sources: { key: number; title: string }[];
 };
 
 export type Taxon = {
