@@ -63,12 +63,14 @@ export type SummaryBlock = {
     countries: CountedValue[];
     states: CountedValue[];
     collections: CountedValue[];
+    /** by the names `collector=` matches */
+    collectors: CountedValue[];
     /** pairs of the detection attribute types (`detected`, `examined for`, ...) */
-    detections?: TypedCount[];
+    detections: TypedCount[];
     /** pairs of every other attribute type */
-    attributes?: TypedCount[];
+    attributes: TypedCount[];
     /** pairs of part field and value */
-    parts?: TypedCount[];
+    parts: TypedCount[];
   };
 };
 
@@ -95,7 +97,7 @@ export type Summary = {
   synonyms: Synonymy | null;
 };
 
-/** A name as ChecklistBank reports it; `source` keys into `Synonymy.sources`. */
+/** A name as ChecklistBank reports it; `source` is the `key` of one of `Synonymy.sources`. */
 export type TaxonName = { name: string; authorship: string | null; link: string | null; source: number | null };
 
 export type Synonymy = {
@@ -106,9 +108,19 @@ export type Synonymy = {
     accepted: (TaxonName & { references: string[] }) | null;
     synonyms: TaxonName[];
   }[];
-  sources: Record<number, { alias: string; title: string }>;
+  sources: Dataset[];
   /** the COL release every name was read through */
-  release: { title: string; version: string };
+  release: Dataset;
+};
+
+/** A ChecklistBank dataset, cited by `citation`; `alias` is its short name, e.g. `ITIS`. */
+export type Dataset = {
+  key: number;
+  alias: string;
+  title: string;
+  version: string;
+  doi: string | null;
+  citation: string;
 };
 
 export type Taxon = {

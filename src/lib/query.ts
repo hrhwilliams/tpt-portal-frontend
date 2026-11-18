@@ -261,21 +261,27 @@ export function fromParams(p: URLSearchParams): SearchQuery {
   return q;
 }
 
-/** The summary facets whose values can be picked into the query. */
-export type PickableFacet = Exclude<FacetName, "taxa">;
-
 /** A facet value; `type` is the attribute type or part field, for those facets. */
 export type FacetValue = { value: string; type?: string };
 
+/** The taxa facet lists records by this rank, so a picked taxon becomes a row of it. */
+const PICKED_RANK = "scientific_name";
+
 const LIST_FILTERS = { countries: "countries", states: "states", collections: "guid_prefixes" } as const;
 
-function rowsKey(facet: PickableFacet, type: string): "detectionAttributes" | "otherAttributes" | "parts" {
+function rowsKey(facet: FacetName, type: string): "detectionAttributes" | "otherAttributes" | "parts" {
   if (facet === "parts") return "parts";
   return DETECTION_ATTRIBUTE_TYPE_IDS.has(type) ? "detectionAttributes" : "otherAttributes";
 }
 
 /** Whether the query already filters on this facet value. */
-export function isPicked(q: SearchQuery, facet: PickableFacet, v: FacetValue): boolean {
+export function isPicked(q: SearchQuery, facet: FacetName, v: FacetValue): boolean {
+  if (facet === "taxa") {
+    return q.taxa.some((t) => t.rank === PICKED_RANK && t.name === v.value);
+  }
+
+  if (facet === "collectors") return q.agent === v.value;
+
   if (facet in LIST_FILTERS) {
     return q[LIST_FILTERS[facet as keyof typeof LIST_FILTERS]].includes(v.value);
   }
@@ -288,9 +294,15 @@ export function isPicked(q: SearchQuery, facet: PickableFacet, v: FacetValue): b
  * Adds a facet value to the query, or takes it out if it is already there. An
  * attribute or part value joins the row of its type as another OR'd value, and
  * taking out a row's last value drops the row rather than leaving it matching
- * any value of that type.
+ * any value of that type. The collector filter holds one name, so a picked
+ * collector replaces any other.
  */
-export function togglePick(q: SearchQuery, facet: PickableFacet, v: FacetValue) {
+export function togglePick(q: SearchQuery, facet: Exclude<FacetName, "taxa">, v: FacetValue) {
+  if (facet === "collectors") {
+    q.agent = q.agent === v.value ? "" : v.value;
+    return;
+  }
+
   if (facet in LIST_FILTERS) {
     const key = LIST_FILTERS[facet as keyof typeof LIST_FILTERS];
     const cur = q[key];
@@ -311,6 +323,27 @@ export function togglePick(q: SearchQuery, facet: PickableFacet, v: FacetValue) 
   } else {
     q[key] = rows.map((a) => (a === row ? { ...a, values: [...a.values, v.value] } : a));
   }
+}
+
+/**
+ * Narrows a one-row taxon search to a picked name, or widens it back. `original`
+ * is the row from before the first pick; each picked name becomes a row of its
+ * own with the original's relationships and related taxa, the rows OR'd, and
+ * taking out the last restores the original.
+ */
+export function toggleTaxon(q: SearchQuery, name: string, original: TaxonPair) {
+  const picked = q.taxa.filter((t) => t.rank === PICKED_RANK).map((t) => t.name);
+  const names = picked.includes(name) ? picked.filter((n) => n !== name) : [...picked, name];
+
+  q.taxa = names.length
+    ? names.map((n) => ({ ...structuredClone(original), rank: PICKED_RANK, name: n }))
+    : [structuredClone(original)];
+}
+
+/** Whether the taxa facet can narrow this query: it has one named taxon row, not already a picked name. */
+export function canPickTaxon(q: SearchQuery): boolean {
+  const named = q.taxa.filter((t) => t.name);
+  return named.length === 1 && q.taxa.length === 1 && named[0].rank !== PICKED_RANK;
 }
 
 /** Check if one of the attribute rows has had `NOT` checked */

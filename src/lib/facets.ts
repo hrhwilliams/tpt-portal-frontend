@@ -1,8 +1,8 @@
-import { isPicked, toParams, type PickableFacet } from "$lib/query";
-import type { CountedValue, SearchQuery, Summary } from "$lib/types";
+import { isPicked, toParams } from "$lib/query";
+import type { CountedValue, FacetName, SearchQuery, Summary } from "$lib/types";
 
 /** Per facet, the summary from before its first pick. */
-export type Bases = Partial<Record<PickableFacet, Summary | null>>;
+export type Bases = Partial<Record<FacetName, Summary | null>>;
 
 /** A listed facet value; `picked` when the query filters on it, `gone` when only the base still has it. */
 export type FacetRow = CountedValue & { type?: string; picked?: boolean; gone?: boolean };
@@ -20,7 +20,7 @@ export const rowKey = (r: FacetRow) => (r.type ? `${r.type}|${r.value}` : r.valu
  */
 export function facetRows(
   rows: FacetRow[],
-  pick?: { query: SearchQuery; facet: PickableFacet; base?: FacetRow[] },
+  pick?: { query: SearchQuery; facet: FacetName; base?: FacetRow[] },
 ): FacetRow[] {
   let listed = rows;
 

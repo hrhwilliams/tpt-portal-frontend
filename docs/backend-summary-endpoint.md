@@ -60,8 +60,11 @@ same number `/api/search` reports in `summary.matched`.
   `taxa` by `scientific_name`, `countries` and `states` by the same fields the filters use,
   `collections` by `guid_prefix`. A record holding several values (a locality in two
   states) counts once under each. An empty list is fine; the portal shows "None recorded".
-- **`facets.detections`, `facets.attributes`, `facets.parts`** — optional; the portal
-  shows each column once it is present. Items are `{ "type": "...", "value": "...", "count": n }`,
+- **`facets.collectors`** — required. Items are `{ "value": "...", "count": n }`, the top
+  collector names by record count, same limit as the lists above. `value` must be exactly
+  what `collector=` matches, since clicking one sets that filter; a record with several
+  collectors counts once under each.
+- **`facets.detections`, `facets.attributes`, `facets.parts`** — required. Items are `{ "type": "...", "value": "...", "count": n }`,
   the top `(type, value)` pairs by record count, same limit as the lists above.
   `detections` covers the attribute types `detected`, `not detected`, `examined for` and
   `not examined for`; `attributes` every other categorical attribute type (skip free-text

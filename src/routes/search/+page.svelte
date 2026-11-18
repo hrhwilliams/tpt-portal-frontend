@@ -1,5 +1,6 @@
 <script lang="ts">
-  import { navigating } from "$app/state";
+  import { tick } from "svelte";
+  import { navigating, page } from "$app/state";
   import { berkeleyMapperConfigUrl, downloadUrl } from "$lib/api";
   import AttributeRows from "$lib/components/AttributeRows.svelte";
   import CollectorCombobox from "$lib/components/CollectorCombobox.svelte";
@@ -9,14 +10,16 @@
   import {
     DETECTION_ATTRIBUTE_TYPE_IDS,
     NULL_TYPE,
+    canPickTaxon,
     exportParams,
     hasNegatedRow,
     togglePick,
+    toggleTaxon,
     type FacetValue,
-    type PickableFacet,
   } from "$lib/query";
   import SearchSummary, { type ExportLinks } from "./SearchSummary.svelte";
   import { SearchQueryState } from "./query-state.svelte.ts";
+  import type { FacetName, TaxonPair } from "$lib/types";
   import type { PageData } from "./$types";
 
   let { data }: { data: PageData } = $props();
@@ -111,18 +114,55 @@
   // there gray out rather than vanish. Facets not picked in follow the results.
   // Any other change to the query drops them all.
   let bases = $state<Bases>({});
+  // the taxon row from before the first taxa pick, restored when the last is taken out
+  let taxonBase = $state.raw<TaxonPair | null>(null);
   let pickedKey = "";
   $effect(() => {
-    if (filterKey(q) !== pickedKey) bases = {};
+    if (filterKey(q) !== pickedKey) {
+      bases = {};
+      taxonBase = null;
+    }
   });
+  const taxaPickable = $derived(taxonBase !== null || canPickTaxon(q));
   // the live search picks the change up like any other filter edit
-  function toggleFilter(facet: PickableFacet, v: FacetValue) {
+  function toggleFilter(facet: FacetName, v: FacetValue) {
     bases[facet] ??= data.summary;
-    togglePick(q, facet, v);
+    if (facet === "taxa") {
+      taxonBase ??= $state.snapshot(q.taxa[0]);
+      toggleTaxon(q, v.value, taxonBase);
+    } else {
+      togglePick(q, facet, v);
+    }
     pickedKey = filterKey(q);
   }
-  function toggleRow(i: number) {
+  let copied = $state(false);
+  async function copyUrl() {
+    await navigator.clipboard.writeText(page.url.href);
+    copied = true;
+    setTimeout(() => (copied = false), 1500);
+  }
+  // Expanding widens the clicked cell, often past the right edge, so it is
+  // scrolled to the middle; one wider than the table's view lines up on the left.
+  // Collapsing returns the table to where it was scrolled before any row expanded.
+  let leftBeforeExpand = 0;
+  async function toggleRow(i: number, e: MouseEvent) {
+    const cell = (e.target as Element).closest("td");
+    const scroller = cell?.closest(".scroll");
+    if (expandedRow === null && scroller) leftBeforeExpand = scroller.scrollLeft;
     expandedRow = expandedRow === i ? null : i;
+    if (!cell || !scroller) return;
+
+    await tick();
+    if (expandedRow === null) {
+      scroller.scrollTo({ left: leftBeforeExpand, behavior: "smooth" });
+      return;
+    }
+
+    const c = cell.getBoundingClientRect();
+    const s = scroller.getBoundingClientRect();
+    const start = scroller.scrollLeft + c.left - s.left;
+    const left = c.width > s.width ? start : start + c.width / 2 - s.width / 2;
+    scroller.scrollTo({ left, behavior: "smooth" });
   }
   // BerkeleyMapper's own server fetches both files, so these URLs have to be
   // publicly reachable — a localhost API base maps nothing. The config names
@@ -365,7 +405,7 @@
       </thead>
       <tbody>
         {#each rows as hit, i (i)}
-          <tr class:expanded={expandedRow === i} onclick={() => toggleRow(i)}
+          <tr class:expanded={expandedRow === i} onclick={(e) => toggleRow(i, e)}
             >{#each cols as c (c)}<td
                 >{#if JSON_COLUMNS.has(c)}{@const nested = jsonRows(
                     hit[c],
@@ -389,14 +429,27 @@
 
 {#if data.records}
   <div class="panel wide" class:stale={searching}>
-    <div class="head">
-      <h2>
-        {shownMatched.toLocaleString()} result{shownMatched === 1 ? "" : "s"}
-        {#if !summaryOpen && data.records.length}
-          <a class="csv" href={preview.csv}>Export as CSV</a>
-          <a class="csv" href={preview.map} target="_blank" rel="noreferrer">Map in BerkeleyMapper ↗</a>
-        {/if}
-      </h2>
+    <div class="tabbar">
+      <div class="tabs" role="tablist">
+        <button type="button" role="tab" aria-selected={summaryOpen} onclick={() => queryState.setTab("")}
+          >Summary</button
+        >
+        <button type="button" role="tab" aria-selected={recordsOpen} onclick={() => queryState.setTab("records")}>
+          Records
+          <span class="tally">{data.matched.toLocaleString()}</span>
+        </button>
+        {#each data.related as r (r.relation)}
+          <button
+            type="button"
+            role="tab"
+            aria-selected={openRelated === r}
+            onclick={() => queryState.setTab(r.relation)}
+          >
+            <em>{r.relation} records</em>
+            <span class="tally">{r.matched.toLocaleString()}</span>
+          </button>
+        {/each}
+      </div>
       {#if !summaryOpen && lastPage > 1}
         <nav class="pager">
           <button type="button" disabled={data.query.page <= 1} onclick={() => queryState.goPage(data.query.page - 1)}
@@ -411,32 +464,26 @@
             onclick={() => queryState.goPage(data.query.page + 1)}>Next →</button
           >
         </nav>
+      {:else if summaryOpen}
+        <button type="button" onclick={copyUrl}>{copied ? "Copied" : "Copy search URL"}</button>
       {/if}
     </div>
-    {#if !summaryOpen && pageCount > lastPage}
-      <p class="note">
-        Only the first {limits.max_result_window.toLocaleString()} results can be browsed. Narrow the search, or export.
-      </p>
+
+    <!-- the summary states its own counts -->
+    {#if !summaryOpen}
+      <h2>
+        {shownMatched.toLocaleString()} result{shownMatched === 1 ? "" : "s"}
+        {#if data.records.length}
+          <a class="csv" href={preview.csv}>Export as CSV</a>
+          <a class="csv" href={preview.map} target="_blank" rel="noreferrer">Map in BerkeleyMapper ↗</a>
+        {/if}
+      </h2>
+      {#if pageCount > lastPage}
+        <p class="note">
+          Only the first {limits.max_result_window.toLocaleString()} results can be browsed. Narrow the search, or export.
+        </p>
+      {/if}
     {/if}
-    <div class="tabs" role="tablist">
-      <button type="button" role="tab" aria-selected={summaryOpen} onclick={() => queryState.setTab("")}>Summary</button
-      >
-      <button type="button" role="tab" aria-selected={recordsOpen} onclick={() => queryState.setTab("records")}>
-        Records
-        <span class="tally">{data.matched.toLocaleString()}</span>
-      </button>
-      {#each data.related as r (r.relation)}
-        <button
-          type="button"
-          role="tab"
-          aria-selected={openRelated === r}
-          onclick={() => queryState.setTab(r.relation)}
-        >
-          <em>{r.relation} records</em>
-          <span class="tally">{r.matched.toLocaleString()}</span>
-        </button>
-      {/each}
-    </div>
 
     {#if summaryOpen}
       <SearchSummary
@@ -445,6 +492,7 @@
         error={data.summaryError}
         exports={allExports}
         query={q}
+        {taxaPickable}
         toggle={toggleFilter}
       />
     {:else if recordsOpen && data.records.length}
@@ -540,12 +588,13 @@
   .errors {
     border-color: #b4544a;
   }
-  .head {
+  .tabbar {
     display: flex;
     justify-content: space-between;
-    align-items: baseline;
+    align-items: center;
     gap: 0.6rem;
     flex-wrap: wrap;
+    margin-bottom: 0.6rem;
   }
   .csv {
     font-weight: 400;
@@ -564,7 +613,6 @@
   .tabs {
     display: flex;
     gap: 0.3rem;
-    margin: 0.6rem 0 0.5rem;
   }
   .tabs button[aria-selected="true"] {
     border-color: var(--fg);

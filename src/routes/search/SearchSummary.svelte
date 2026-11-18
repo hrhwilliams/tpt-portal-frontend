@@ -1,7 +1,8 @@
 <script lang="ts">
-  import { page } from "$app/state";
+  import { SvelteSet } from "svelte/reactivity";
+  import { abbreviate } from "$lib/description";
   import { facetRows, rowKey, type Bases, type FacetRow } from "$lib/facets";
-  import type { FacetValue, PickableFacet } from "$lib/query";
+  import type { FacetValue } from "$lib/query";
   import type { FacetName, SearchQuery, Summary, SummaryBlock } from "$lib/types";
 
   /** One whole table's export links, named after the tab it previews. */
@@ -13,6 +14,7 @@
     error,
     exports,
     query,
+    taxaPickable,
     toggle,
   }: {
     summary: Summary | null;
@@ -21,26 +23,23 @@
     error: string;
     exports: ExportLinks[];
     query: SearchQuery;
-    toggle: (facet: PickableFacet, v: FacetValue) => void;
+    /** whether a taxon value narrows the taxon row; only a search on one taxon row can be */
+    taxaPickable: boolean;
+    toggle: (facet: FacetName, v: FacetValue) => void;
   } = $props();
 
   const related = $derived(summary?.related ?? []);
-
-  let copied = $state(false);
-  async function copyUrl() {
-    await navigator.clipboard.writeText(page.url.href);
-    copied = true;
-    setTimeout(() => (copied = false), 1500);
-  }
+  // synonym lists opened, by their first hidden name
+  const expanded = new SvelteSet<string>();
 
   const label = (r: FacetRow) => (r.type ? `${r.type}: ${r.value}` : r.value);
 
-  // the attribute and part facets show only once the service sends them
   const COLUMNS: [FacetName, string][] = [
     ["taxa", "Taxa"],
     ["countries", "Countries"],
     ["states", "States / provinces"],
     ["collections", "Collections"],
+    ["collectors", "Collectors"],
     ["detections", "Examined for / detected"],
     ["attributes", "Other attributes"],
     ["parts", "Parts"],
@@ -53,7 +52,7 @@
 
 <!-- `filter` makes each value toggle in the query; only the matched records'
      facets get one, since the filters narrow those and not the related records -->
-{#snippet facet(title: string, rows: FacetRow[], filter?: PickableFacet)}
+{#snippet facet(title: string, rows: FacetRow[], filter?: FacetName)}
   <div class="facet">
     <h4>{title}</h4>
     {#if rows.length}
@@ -92,8 +91,15 @@
 {/snippet}
 
 {#snippet block(title: string, b: SummaryBlock, pickable = false)}
+  {@const links = exports.find((x) => x.label === title)}
   <section>
-    <h3>{title} <span class="tally">{n(b.matched)}</span></h3>
+    <h3>
+      {title} <span class="tally">{n(b.matched)}</span>
+      {#if links}
+        <a class="link" href={links.csv} rel="external">Export as CSV</a>
+        <a class="link" href={links.map} target="_blank" rel="external noreferrer">Map in BerkeleyMapper ↗</a>
+      {/if}
+    </h3>
     <dl class="stats">
       <div>
         <dt>Distinct taxa</dt>
@@ -115,10 +121,10 @@
     <div class="facets">
       {#each COLUMNS as [name, title] (name)}
         {@const rows = b.facets[name]}
-        {#if rows && pickable && name !== "taxa"}
+        {#if pickable && (name !== "taxa" || taxaPickable)}
           {@const base = bases[name]?.records.facets[name]}
           {@render facet(title, facetRows(rows, { query, facet: name, base }), name)}
-        {:else if rows}
+        {:else}
           {@render facet(title, facetRows(rows))}
         {/if}
       {/each}
@@ -130,33 +136,45 @@
   <p class="note warn">{error}</p>
 {:else if summary}
   {#if summary.description}
-    <p class="echo">{summary.description}</p>
+    <p class="echo">
+      <!-- &nbsp;: Svelte trims plain spaces at a block's edges -->
+      {#each abbreviate(summary.description, summary.synonyms) as p, i (i)}{#if "text" in p}{p.text}{:else if expanded.has(p.hidden[0])}{`, ${p.hidden.join(", ")}`}&nbsp;<button
+            type="button"
+            class="more"
+            onclick={() => expanded.delete(p.hidden[0])}>collapse</button
+          >{:else}&nbsp;and <button type="button" class="more" onclick={() => expanded.add(p.hidden[0])}
+            >{p.hidden.length} {p.hidden.length === 1 ? "other" : "others"}…</button
+          >{/if}{/each}
+    </p>
   {/if}
   {#if summary.synonyms}
     {@const syn = summary.synonyms}
     <div class="synonyms">
       {#each syn.taxa as t (t.name)}
-        {#if t.status === "synonym" && t.accepted}
+        {#if (t.status === "synonym" || t.status === "accepted") && t.accepted}
           {@const a = t.accepted}
-          {@const src = a.source === null ? undefined : syn.sources[a.source]}
+          {@const src = syn.sources.find((s) => s.key === a.source)}
+          {@const authorship = a.authorship ? ` ${a.authorship}` : ""}
           <div>
-            <i>{t.name}</i> is a synonym of <i>{a.name}</i>{a.authorship ? ` ${a.authorship}` : ""}{#if src}, according
-              to
-              {#if a.link}<a href={a.link} target="_blank" rel="external noreferrer" title={src.title}>{src.alias}</a
-                >{:else}<span title={src.title}>{src.alias}</span>{/if}{/if}.
-            {#if a.references.length}
-              <details>
-                <summary>References</summary>
-                <ul>
-                  {#each a.references as r (r)}<li>{r}</li>{/each}
-                </ul>
-              </details>
-            {/if}
+            {#if t.status === "synonym"}<i>{t.name}</i> is a synonym of <i>{a.name}</i>{authorship}{:else}<i>{a.name}</i
+              >{authorship} is the accepted name{/if}{#if src}{t.status === "synonym"
+                ? " according to "
+                : " in "}{#if a.link}<a href={a.link} target="_blank" rel="external noreferrer" title={src.title}
+                  >{src.alias} (click for references)</a
+                >{:else}<span title={src.title}>{src.alias}</span>{/if}{/if}{src
+              ? " and "
+              : t.status === "synonym"
+                ? " according to "
+                : " in "}<a href="https://www.catalogueoflife.org/" target="_blank" rel="external noreferrer"
+              >{syn.release.title} ({syn.release.version})</a
+            >.
           </div>
         {/if}
       {/each}
-      <p class="note">Synonymy via {syn.release.title} ({syn.release.version})</p>
     </div>
+  {/if}
+  {#if summary.description || summary.synonyms}
+    <hr />
   {/if}
   {@render block("Records", summary.records, true)}
   {#each related as r (r.relation)}
@@ -164,25 +182,16 @@
   {/each}
 {/if}
 
-<section class="exports">
-  <h3>Export</h3>
-  <ul>
-    {#each exports as x (x.label)}
-      <li>
-        <span>{x.label}</span>
-        <a href={x.csv} rel="external">CSV</a>
-        <a href={x.map} target="_blank" rel="external noreferrer">Map in BerkeleyMapper ↗</a>
-      </li>
-    {/each}
-    <li><button type="button" onclick={copyUrl}>{copied ? "Copied" : "Copy search URL"}</button></li>
-  </ul>
-</section>
-
 <style>
-  /* separates neighbouring summaries, and the last one from the exports */
+  /* separates neighbouring summaries */
   section + section {
     border-top: 1px solid var(--line);
     margin-top: 1rem;
+  }
+  hr {
+    border: none;
+    border-top: 1px solid var(--line);
+    margin: 0.8rem 0 0;
   }
   h3 {
     font-size: 0.95rem;
@@ -201,16 +210,19 @@
     font-style: italic;
     margin: 0.4rem 0;
   }
+  .more {
+    all: unset;
+    cursor: pointer;
+    color: var(--accent);
+  }
+  .more:hover {
+    text-decoration: underline;
+  }
+  .more:focus-visible {
+    outline: 2px solid var(--accent);
+  }
   .synonyms {
     font-size: 0.85rem;
-  }
-  .synonyms details {
-    display: inline;
-    margin-left: 0.4rem;
-  }
-  .synonyms ul {
-    margin: 0.2rem 0;
-    padding-left: 1.2rem;
   }
   .stats {
     display: flex;
@@ -227,10 +239,12 @@
     font-size: 1.1rem;
     font-weight: 600;
   }
+  /* at most five across: no column narrower than a fifth of the row */
   .facets {
+    --gap: 1rem;
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr));
-    gap: 1rem;
+    grid-template-columns: repeat(auto-fit, minmax(max(13rem, calc((100% - 4 * var(--gap)) / 5)), 1fr));
+    gap: var(--gap);
   }
   /* ten single-line rows (a line plus the cells' padding); the rest scroll */
   .rows {
@@ -278,18 +292,10 @@
   .note.warn {
     color: #b4544a;
   }
-  .exports ul {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-    display: flex;
-    flex-direction: column;
-    gap: 0.3rem;
+  /* a table's actions, beside its count */
+  .link {
+    margin-left: 0.8rem;
     font-size: 0.85rem;
-  }
-  .exports li {
-    display: flex;
-    gap: 0.8rem;
-    align-items: baseline;
+    font-weight: 400;
   }
 </style>

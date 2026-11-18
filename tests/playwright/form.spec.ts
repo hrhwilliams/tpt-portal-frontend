@@ -104,8 +104,8 @@ test("the summary is the landing tab, and the previews are behind it", { tag: "@
   await expect(page.getByRole("tab", { name: "Summary" })).toHaveAttribute("aria-selected", "true");
   // the summary's facet tables have no header; the records preview does
   await expect(page.locator("table:has(thead) tbody tr")).toHaveCount(0);
-  // every table's export lives on the summary, whether or not the service can summarise yet
-  await expect(page.getByRole("link", { name: "CSV", exact: true })).toHaveAttribute("href", /duckdb\/download/);
+  // each summarised table carries its own export, beside its count
+  await expect(page.getByRole("link", { name: "Export as CSV" }).first()).toHaveAttribute("href", /duckdb\/download/);
   await expect(page.getByRole("button", { name: "Copy search URL" })).toBeVisible();
 
   await page.getByRole("tab", { name: /^Records/ }).click();
@@ -176,6 +176,76 @@ test("clicking a summary value toggles it in the matching filter", { tag: "@live
 
   await canada.click();
   await expect(page).not.toHaveURL(/country=/);
+});
+
+test("clicking a taxon in the summary narrows the taxon row to it, and back", async ({ page }) => {
+  await open(page, "/search?taxon=genus%7CSorex%7Chost+of+parasite");
+
+  const taxa = page.locator(".facet", { has: page.getByRole("heading", { name: "Taxa" }) });
+  const cinereus = taxa.getByRole("button", { name: "Sorex cinereus" });
+  const monticolus = taxa.getByRole("button", { name: "Sorex monticolus" });
+
+  await cinereus.click();
+  await expect(page).toHaveURL(/taxon=scientific_name%7CSorex\+cinereus%7Chost\+of\+parasite(&|$)/);
+  await expect(cinereus).toHaveAttribute("aria-pressed", "true");
+  // no longer matched, but still listed so a sibling can be picked
+  await expect(monticolus).toHaveAttribute("aria-pressed", "false");
+
+  await monticolus.click();
+  await expect(page).toHaveURL(/scientific_name%7CSorex\+cinereus.*scientific_name%7CSorex\+monticolus/);
+
+  await cinereus.click();
+  await monticolus.click();
+  await expect(page).toHaveURL(/taxon=genus%7CSorex%7Chost\+of\+parasite(&|$)/);
+});
+
+test("a long synonym list shows five names, expands to the rest, and collapses again", async ({ page }) => {
+  await open(page, "/search?taxon=genus%7CSorex&synonyms=yes");
+
+  const echo = page.locator(".echo");
+  const collapsed = "Genus Sorex (also Amphimygale, Amphiosorex, Amphisorex, Asorex, Atophyrax and 2 others…).";
+  await expect(echo).toHaveText(collapsed);
+
+  await echo.getByRole("button", { name: "2 others…" }).click();
+  await expect(echo).toHaveText(
+    "Genus Sorex (also Amphimygale, Amphiosorex, Amphisorex, Asorex, Atophyrax, Corsira, Dolgovia collapse).",
+  );
+
+  await echo.getByRole("button", { name: "collapse" }).click();
+  await expect(echo).toHaveText(collapsed);
+});
+
+test("searching an accepted name credits its source, which links to its references", async ({ page }) => {
+  await open(page, "/search?taxon=genus%7CSorex&synonyms=yes");
+
+  const line = page.locator(".synonyms > div").first();
+  await expect(line).toHaveText(
+    "Sorex Linnaeus, 1758 is the accepted name in ITIS (click for references) and Catalogue of Life (2026-10-16 XR).",
+  );
+  await expect(line.getByRole("link", { name: "ITIS (click for references)", exact: true })).toHaveAttribute(
+    "href",
+    /itis\.gov/,
+  );
+  await expect(line.getByRole("link", { name: "Catalogue of Life (2026-10-16 XR)" })).toHaveAttribute(
+    "href",
+    "https://www.catalogueoflife.org/",
+  );
+});
+
+test("searching a synonym names its accepted name and source", async ({ page }) => {
+  await open(page, "/search?taxon=genus%7CCorsira&synonyms=yes");
+
+  await expect(page.locator(".synonyms > div").first()).toHaveText(
+    "Corsira is a synonym of Sorex Linnaeus, 1758 according to ITIS (click for references) and Catalogue of Life (2026-10-16 XR).",
+  );
+});
+
+test("the taxa of a search on several taxon rows are not clickable", async ({ page }) => {
+  await open(page, "/search?taxon=genus%7CSorex&taxon=genus%7CMyodes");
+
+  const taxa = page.locator(".facet", { has: page.getByRole("heading", { name: "Taxa" }) });
+  await expect(taxa.getByText("Sorex cinereus")).toBeVisible();
+  await expect(taxa.getByRole("button")).toHaveCount(0);
 });
 
 test("each relationship gets a tab of its own", { tag: "@live" }, async ({ page }) => {

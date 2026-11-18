@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import {
+  canPickTaxon,
   escapePipes,
   exportParams,
   fromParams,
@@ -9,6 +10,7 @@ import {
   splitPipes,
   toParams,
   togglePick,
+  toggleTaxon,
 } from "./query.ts";
 import { EMPTY_QUERY, type SearchQuery } from "./types.ts";
 
@@ -204,6 +206,17 @@ describe("togglePick", () => {
     expect(isPicked(q, "parts", { type: "part_name", value: "skull" })).toBe(true);
   });
 
+  it("sets the one collector filter, replacing another and clearing on a second click", () => {
+    const q = fresh();
+    togglePick(q, "collectors", { value: "J. Smith" });
+    expect(q.agent).toBe("J. Smith");
+    expect(isPicked(q, "collectors", { value: "J. Smith" })).toBe(true);
+    togglePick(q, "collectors", { value: "A. Jones" });
+    expect(q.agent).toBe("A. Jones");
+    togglePick(q, "collectors", { value: "A. Jones" });
+    expect(q.agent).toBe("");
+  });
+
   it("leaves a negated row alone", () => {
     const q = fresh();
     q.detectionAttributes = [{ type: "detected", values: ["Hantavirus"], negated: true }];
@@ -300,5 +313,55 @@ describe("exportParams", () => {
 
   it("takes a column preset in place of the chosen columns", () => {
     expect(exportParams(q, "records", ["map"]).get("cols")).toBe("map");
+  });
+});
+
+describe("toggleTaxon", () => {
+  const genus = {
+    rank: "genus",
+    name: "Myodes",
+    relations: ["host of parasite"],
+    related: [{ rank: "class", name: "Cestoda" }],
+  };
+  const names = (q: SearchQuery) => q.taxa.map((t) => `${t.rank}|${t.name}`);
+
+  it("narrows the row to a picked name, keeping its relationship and related taxa", () => {
+    const q: SearchQuery = { ...structuredClone(EMPTY_QUERY), taxa: [structuredClone(genus)] };
+    toggleTaxon(q, "Myodes gapperi", genus);
+    expect(q.taxa).toEqual([{ ...genus, rank: "scientific_name", name: "Myodes gapperi" }]);
+    expect(isPicked(q, "taxa", { value: "Myodes gapperi" })).toBe(true);
+    expect(isPicked(q, "taxa", { value: "Myodes rutilus" })).toBe(false);
+  });
+
+  it("ORs further picks in, and widens back to the original row when the last is taken out", () => {
+    const q: SearchQuery = { ...structuredClone(EMPTY_QUERY), taxa: [structuredClone(genus)] };
+    toggleTaxon(q, "Myodes gapperi", genus);
+    toggleTaxon(q, "Myodes rutilus", genus);
+    expect(names(q)).toEqual(["scientific_name|Myodes gapperi", "scientific_name|Myodes rutilus"]);
+    toggleTaxon(q, "Myodes gapperi", genus);
+    expect(names(q)).toEqual(["scientific_name|Myodes rutilus"]);
+    toggleTaxon(q, "Myodes rutilus", genus);
+    expect(q.taxa).toEqual([genus]);
+  });
+
+  it("reaches the URL as scientific_name rows", () => {
+    const q: SearchQuery = { ...structuredClone(EMPTY_QUERY), taxa: [structuredClone(genus)] };
+    toggleTaxon(q, "Myodes gapperi", genus);
+    expect(toParams(q).getAll("taxon")).toEqual(["scientific_name|Myodes gapperi|host of parasite|class|Cestoda"]);
+  });
+});
+
+describe("canPickTaxon", () => {
+  const row = (rank: string, name: string) => ({ rank, name, relations: [], related: [] });
+  const with_ = (...taxa: ReturnType<typeof row>[]): SearchQuery => ({ ...structuredClone(EMPTY_QUERY), taxa });
+
+  it("allows narrowing one named row", () => {
+    expect(canPickTaxon(with_(row("genus", "Myodes")))).toBe(true);
+  });
+
+  it("refuses OR'd rows, a row already at the picked rank, and no taxon at all", () => {
+    expect(canPickTaxon(with_(row("genus", "Myodes"), row("genus", "Sorex")))).toBe(false);
+    expect(canPickTaxon(with_(row("scientific_name", "Myodes gapperi")))).toBe(false);
+    expect(canPickTaxon(with_())).toBe(false);
   });
 });
