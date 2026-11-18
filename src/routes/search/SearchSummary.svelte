@@ -1,7 +1,6 @@
 <script lang="ts">
   import { page } from "$app/state";
   import { isPicked, type FacetValue, type PickableFacet } from "$lib/query";
-  import { footnote } from "$lib/sources";
   import type { CountedValue, FacetName, SearchQuery, Summary, SummaryBlock } from "$lib/types";
 
   /** One whole table's export links, named after the tab it previews. */
@@ -152,18 +151,32 @@
   <p class="note warn">{error}</p>
 {:else if summary}
   {#if summary.description}
-    <p class="echo">
-      {#each footnote(summary.description, summary.sources) as p, i (i)}{p.text}{#if p.refs}<sup>{p.refs.join(",")}</sup>{/if}{/each}
-    </p>
+    <p class="echo">{summary.description}</p>
   {/if}
-  {#if summary.sources.length}
-    <div class="sources">
-      <h4>Synonym sources</h4>
-      <ol>
-        {#each summary.sources as s (s.key)}
-          <li>{s.title}</li>
-        {/each}
-      </ol>
+  {#if summary.synonyms}
+    {@const syn = summary.synonyms}
+    <div class="synonyms">
+      {#each syn.taxa as t (t.name)}
+        {#if t.status === "synonym" && t.accepted}
+          {@const a = t.accepted}
+          {@const src = a.source === null ? undefined : syn.sources[a.source]}
+          <div>
+            <i>{t.name}</i> is a synonym of <i>{a.name}</i>{a.authorship ? ` ${a.authorship}` : ""}{#if src}, according
+              to
+              {#if a.link}<a href={a.link} target="_blank" rel="external noreferrer" title={src.title}>{src.alias}</a
+                >{:else}<span title={src.title}>{src.alias}</span>{/if}{/if}.
+            {#if a.references.length}
+              <details>
+                <summary>References</summary>
+                <ul>
+                  {#each a.references as r (r)}<li>{r}</li>{/each}
+                </ul>
+              </details>
+            {/if}
+          </div>
+        {/if}
+      {/each}
+      <p class="note">Synonymy via {syn.release.title} ({syn.release.version})</p>
     </div>
   {/if}
   {@render block("Records", summary.records, true)}
@@ -209,10 +222,16 @@
     font-style: italic;
     margin: 0.4rem 0;
   }
-  .sources ol {
-    margin: 0;
-    padding-left: 1.2rem;
+  .synonyms {
     font-size: 0.85rem;
+  }
+  .synonyms details {
+    display: inline;
+    margin-left: 0.4rem;
+  }
+  .synonyms ul {
+    margin: 0.2rem 0;
+    padding-left: 1.2rem;
   }
   .stats {
     display: flex;

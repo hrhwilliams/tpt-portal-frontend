@@ -91,8 +91,24 @@ export type Summary = {
   related: RelationSummary[];
   /** plain-English restatement of the query */
   description: string | null;
-  /** where the added synonyms came from: the checklist release first, then each dataset; empty when none were added */
-  sources: { key: number; title: string; names: string[] }[];
+  /** null unless the query asked for synonyms */
+  synonyms: Synonymy | null;
+};
+
+/** A name as ChecklistBank reports it; `source` keys into `Synonymy.sources`. */
+export type TaxonName = { name: string; authorship: string | null; link: string | null; source: number | null };
+
+export type Synonymy = {
+  /** one per searched name; unmatched and unavailable names were searched alone */
+  taxa: {
+    name: string;
+    status: "accepted" | "synonym" | "unmatched" | "unavailable";
+    accepted: (TaxonName & { references: string[] }) | null;
+    synonyms: TaxonName[];
+  }[];
+  sources: Record<number, { alias: string; title: string }>;
+  /** the COL release every name was read through */
+  release: { title: string; version: string };
 };
 
 export type Taxon = {

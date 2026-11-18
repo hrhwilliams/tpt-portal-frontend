@@ -76,10 +76,9 @@
     onclick={() => (open = !open)}
   >
     <span class="label" class:placeholder={selected.length === 0}
-      >{#if !selected.length}{placeholder}{:else}{#each selected
-          .slice(0, 2)
-          .map(optionOf) as o, n (o.value)}{#if n > 0},
-          {/if}<span class:italic={o.italic}>{o.label}</span>{/each}{#if selected.length > 2}, …{/if}{/if}</span
+      >{#if !selected.length}{placeholder}{:else}{#each selected.slice(0, 2).map(optionOf) as o, n (o.value)}{n > 0
+            ? ", "
+            : ""}<span class:italic={o.italic}>{o.label}</span>{/each}{#if selected.length > 2}, …{/if}{/if}</span
     >
     {#if selected.length > 1}<span class="badge">{selected.length}</span>{/if}
     <span class="caret" aria-hidden="true">▾</span>

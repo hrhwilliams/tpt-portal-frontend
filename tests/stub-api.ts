@@ -23,7 +23,7 @@ const routes: Record<string, (url: URL) => unknown> = {
   "/api/duckdb/schema": () => schema,
   "/api/duckdb/search": () => ({ records: [], column_order: [], summary: { matched: 0 } }),
   "/api/duckdb/relations": () => ({ records: [], column_order: [], summary: { context: 0, matched: 0 } }),
-  "/api/duckdb/summary": () => ({ records: block, related: [], description: null }),
+  "/api/duckdb/summary": () => ({ records: block, related: [], description: null, synonyms: null }),
   "/api/duckdb/taxa": (url) => {
     const q = (url.searchParams.get("q") ?? "").toLowerCase();
     return { matches: taxa.filter((t) => t.name.toLowerCase().startsWith(q)) };
