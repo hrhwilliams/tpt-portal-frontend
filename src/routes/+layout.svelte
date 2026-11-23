@@ -39,7 +39,7 @@
 </main>
 
 <footer>
-  Created using Arctos data. Visit <a href="https://arctosdb.org/about/">https://arctosdb.org/about ↗</a> to learn more. Submit bug reports to <a target="_blank" href="https://github.com/ArctosDB/reciprocal-relationship-portal/issues">https://github.com/ArctosDB/reciprocal-relationship-portal/issues ↗</a>.
+  Created using Arctos data. Visit <a target="_blank" href="https://arctosdb.org/about/">https://arctosdb.org/about ↗</a> to learn more. Submit bug reports to <a target="_blank" href="https://github.com/ArctosDB/reciprocal-relationship-portal/issues">https://github.com/ArctosDB/reciprocal-relationship-portal/issues ↗</a>.
 </footer>
 
 <style>
