@@ -27,7 +27,7 @@
 </svelte:head>
 
 <header>
-  <a class="brand" href={resolve("/")}>TPT specimen portal</a>
+  <a class="brand" href={resolve("/")}>Arctos reciprocal relationship portal</a>
   <nav><a href={resolve("/search")}>Search</a></nav>
   <button type="button" class="theme" onclick={toggleTheme} aria-pressed={dark}>
     {dark ? "Light" : "Dark"} mode

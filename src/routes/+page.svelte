@@ -2,9 +2,9 @@
   import { resolve } from "$app/paths";
 </script>
 
-<svelte:head><title>TPT specimen portal</title></svelte:head>
+<svelte:head><title>Arctos reciprocal relationship portal</title></svelte:head>
 
-<h1>TPT specimen portal</h1>
+<h1>Arctos reciprocal relationship portal</h1>
 
 <p>
   Search Arctos records by taxon, place, collection date, collector, and any recorded attribute for parasite or pathogen

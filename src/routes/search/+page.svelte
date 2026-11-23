@@ -202,9 +202,9 @@
   const lastPage = $derived(Math.min(pageCount, Math.floor(limits.max_result_window / limits.page_size)));
 </script>
 
-<svelte:head><title>Search specimens — TPT portal</title></svelte:head>
+<svelte:head><title>Search specimens — Arctos reciprocal relationship portal</title></svelte:head>
 
-<h1>Arctos parasite/pathogen search portal</h1>
+<h1>Arctos Reciprocal Relationship Portal</h1>
 <p class="snapshot">
   Data current as of {data.schema.snapshot_date}.
 </p>
